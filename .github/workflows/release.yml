@@ -149,7 +149,10 @@ jobs:
           $ErrorActionPreference = "Stop"
           $rid = "${{ matrix.rid }}"
           $runtimeDir = Join-Path $env:GITHUB_WORKSPACE "artifacts\publish\$rid\python-runtime"
-          uv python install 3.12 --install-dir $runtimeDir --with-pip
+          uv python install 3.12 --install-dir $runtimeDir
+          if ($LASTEXITCODE -ne 0) {
+            throw "uv python install failed with exit code $LASTEXITCODE"
+          }
           $python = Get-ChildItem -LiteralPath $runtimeDir -Filter "python.exe" -File -Recurse | Select-Object -First 1
           if ($null -eq $python) {
             throw "The embedded Python executable was not installed under $runtimeDir"
@@ -504,7 +507,7 @@ jobs:
           set -euo pipefail
           rid="${{ matrix.rid }}"
           runtime_dir="$GITHUB_WORKSPACE/artifacts/publish/$rid/python-runtime"
-          uv python install 3.12 --install-dir "$runtime_dir" --with-pip
+          uv python install 3.12 --install-dir "$runtime_dir"
           python_path="$(find "$runtime_dir" \( -type f -o -type l \) \( -name python3 -o -name python3.12 \) -print -quit)"
           if [ -z "$python_path" ]; then
             echo "The embedded Python executable was not installed under $runtime_dir" >&2
@@ -667,7 +670,7 @@ jobs:
           set -euo pipefail
           rid="${{ matrix.rid }}"
           runtime_dir="$GITHUB_WORKSPACE/artifacts/publish/$rid/python-runtime"
-          uv python install 3.12 --install-dir "$runtime_dir" --with-pip
+          uv python install 3.12 --install-dir "$runtime_dir"
           python_path="$(find "$runtime_dir" \( -type f -o -type l \) \( -name python3 -o -name python3.12 \) -print -quit)"
           if [ -z "$python_path" ]; then
             echo "The embedded Python executable was not installed under $runtime_dir" >&2
