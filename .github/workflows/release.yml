@@ -718,12 +718,6 @@ jobs:
           export ARCH="${{ matrix.arch }}"
           bash tools/build-macos-drag-bridge.sh
 
-      - name: Ad-hoc sign app
-        shell: bash
-        run: |
-          package_name="CxShell-$RELEASE_TAG-${{ matrix.package_suffix }}"
-          codesign --force --deep --sign - "artifacts/package/$package_name/CxShell.app"
-
       - name: Validate package
         shell: bash
         run: |
