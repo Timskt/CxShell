@@ -718,6 +718,21 @@ jobs:
           export ARCH="${{ matrix.arch }}"
           bash tools/build-macos-drag-bridge.sh
 
+      - name: Ad-hoc sign app when supported
+        id: sign_app
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_name="CxShell-$RELEASE_TAG-${{ matrix.package_suffix }}"
+          app_path="artifacts/package/$package_name/CxShell.app"
+          xattr -cr "$app_path" || true
+          if codesign --force --deep --sign - "$app_path"; then
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Ad-hoc signing failed. The DMG and archive will still be published, but no Velopack update package will be produced for this macOS architecture."
+          fi
+
       - name: Validate package
         shell: bash
         run: |
@@ -764,6 +779,7 @@ jobs:
           bash tools/create-macos-dmg.sh
 
       - name: Create Velopack package
+        if: steps.sign_app.outputs.signed == 'true'
         shell: bash
         run: |
           set -euo pipefail

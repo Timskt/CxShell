@@ -120,7 +120,7 @@ mv $APP_NAME.app "\$HOME/Applications/"
 Starting and updating $APP_NAME from "\$HOME/Applications" avoids the administrator password prompt that macOS may show when replacing apps in the system /Applications folder.
 Touch ID availability for system installation prompts is controlled by macOS, not by $APP_NAME.
 
-This package is not code-signed or notarized. If macOS blocks the app after download, run:
+This package may be ad-hoc signed, but is not notarized. If macOS blocks the app after download, run:
 
 chmod +x $APP_NAME.app/Contents/MacOS/$APP_NAME
 xattr -dr com.apple.quarantine $APP_NAME.app
