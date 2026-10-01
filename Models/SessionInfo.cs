@@ -142,6 +142,12 @@ public enum LoginScriptExecutionMode
     PowerShell
 }
 
+public enum LoginScriptExecutionTarget
+{
+    Remote,
+    Local
+}
+
 public class ProxySettings : INotifyPropertyChanged
 {
     private string _nextProxyDisplay = string.Empty;
@@ -512,6 +518,8 @@ public class SessionInfo
     public string LoginScriptParameters { get; set; } = string.Empty;
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public LoginScriptExecutionMode LoginScriptExecutionMode { get; set; } = LoginScriptExecutionMode.SendText;
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public LoginScriptExecutionTarget LoginScriptExecutionTarget { get; set; } = LoginScriptExecutionTarget.Remote;
     public string LoginScriptInterpreter { get; set; } = string.Empty;
     public string SshRemoteCommand { get; set; } = string.Empty;
     public string SshVersionPolicy { get; set; } = "Ssh2Only";
@@ -542,6 +550,7 @@ public class SessionInfo
     public List<SshTunnelRule> SshTunnelRules { get; set; } = new();
     public bool SshAutoRestoreTunnels { get; set; } = true;
     public bool SshForwardX11 { get; set; } = true;
+    public bool SshX11UseBuiltinServer { get; set; }
     public bool SshX11UseXmanager { get; set; } = true;
     public string SshX11Display { get; set; } = "localhost:0.0";
     public bool TelnetUseXDisplayLocation { get; set; } = true;

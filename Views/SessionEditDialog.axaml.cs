@@ -349,6 +349,21 @@ public partial class SessionEditDialog : AtomUI.Desktop.Controls.Window
                 out var mode))
         {
             vm.LoginScriptExecutionMode = mode;
+            SelectOption(LoginScriptExecutionTargetSelect, vm.LoginScriptExecutionTarget.ToString());
+        }
+    }
+
+    private void OnLoginScriptExecutionTargetSelectionChanged(object? sender, SelectSelectionChangedEventArgs e)
+    {
+        if (_isInitializingSelections || DataContext is not SessionEditViewModel vm)
+            return;
+
+        if (Enum.TryParse<LoginScriptExecutionTarget>(
+                GetSelectedOptionText(LoginScriptExecutionTargetSelect, vm.LoginScriptExecutionTarget.ToString()),
+                true,
+                out var target))
+        {
+            vm.LoginScriptExecutionTarget = target;
         }
     }
 
@@ -393,6 +408,7 @@ public partial class SessionEditDialog : AtomUI.Desktop.Controls.Window
             vm.SshCipherAlgorithms = GetSelectedAlgorithmText(SshCipherSelect, vm.SshCipherAlgorithms);
             vm.SshMacAlgorithms = GetSelectedAlgorithmText(SshMacSelect, vm.SshMacAlgorithms);
             vm.SshKeyExchangeAlgorithms = GetSelectedAlgorithmText(SshKeyExchangeSelect, vm.SshKeyExchangeAlgorithms);
+            vm.SshX11UseBuiltinServer = SshX11BuiltinButton.IsChecked == true;
             vm.SshX11UseXmanager = SshX11XmanagerButton.IsChecked == true;
             vm.SshX11Display = SshX11DisplayBox?.Text ?? vm.SshX11Display;
             vm.TelnetXDisplayLocation = TelnetXDisplayLocationBox?.Text ?? vm.TelnetXDisplayLocation;
@@ -406,6 +422,13 @@ public partial class SessionEditDialog : AtomUI.Desktop.Controls.Window
                     out var loginScriptExecutionMode))
             {
                 vm.LoginScriptExecutionMode = loginScriptExecutionMode;
+            }
+            if (Enum.TryParse<LoginScriptExecutionTarget>(
+                    GetSelectedOptionText(LoginScriptExecutionTargetSelect, vm.LoginScriptExecutionTarget.ToString()),
+                    true,
+                    out var loginScriptExecutionTarget))
+            {
+                vm.LoginScriptExecutionTarget = loginScriptExecutionTarget;
             }
             vm.RloginPasswordPrompt = RloginPasswordPromptBox?.Text ?? vm.RloginPasswordPrompt;
             vm.RloginTerminalSpeed = GetSelectedOptionText(RloginTerminalSpeedSelect, vm.RloginTerminalSpeed);
@@ -607,6 +630,7 @@ public partial class SessionEditDialog : AtomUI.Desktop.Controls.Window
             {
                 vm.ApplyLoginScriptFileSelection(path);
                 SelectOption(LoginScriptExecutionModeSelect, vm.LoginScriptExecutionMode.ToString());
+                SelectOption(LoginScriptExecutionTargetSelect, vm.LoginScriptExecutionTarget.ToString());
             }
         }
     }
@@ -1579,8 +1603,9 @@ public partial class SessionEditDialog : AtomUI.Desktop.Controls.Window
         SelectAlgorithmOption(SshCipherSelect, vm.SshCipherAlgorithms);
         SelectAlgorithmOption(SshMacSelect, vm.SshMacAlgorithms);
         SelectAlgorithmOption(SshKeyExchangeSelect, vm.SshKeyExchangeAlgorithms);
-        SshX11XmanagerButton.IsChecked = vm.SshX11UseXmanager;
-        SshX11DisplayButton.IsChecked = !vm.SshX11UseXmanager;
+        SshX11BuiltinButton.IsChecked = vm.SshX11UseBuiltinServer;
+        SshX11XmanagerButton.IsChecked = !vm.SshX11UseBuiltinServer && vm.SshX11UseXmanager;
+        SshX11DisplayButton.IsChecked = !vm.SshX11UseBuiltinServer && !vm.SshX11UseXmanager;
     }
 
     private void SetSelectedProxyOptions()
@@ -2725,6 +2750,7 @@ public partial class SessionEditDialog : AtomUI.Desktop.Controls.Window
 
         SelectOption(SessionTerminalTypeSelect, vm.TerminalType);
         SelectOption(LoginScriptExecutionModeSelect, vm.LoginScriptExecutionMode.ToString());
+        SelectOption(LoginScriptExecutionTargetSelect, vm.LoginScriptExecutionTarget.ToString());
         SelectOption(SessionTerminalEncodingSelect, vm.TerminalEncoding);
         SelectOption(SessionTerminalSendLineEndingSelect, vm.TerminalSendLineEnding);
         SelectOption(SessionTerminalReceiveLineEndingSelect, vm.TerminalReceiveLineEnding);

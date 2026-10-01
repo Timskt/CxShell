@@ -105,6 +105,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
         ["SessionEdit.LoginPrompt"] = "Login Prompts",
         ["SessionEdit.LoginScript"] = "Login Script",
         ["SessionEdit.LoginScriptExecutionMode"] = "Execution mode",
+        ["SessionEdit.LoginScriptExecutionTarget"] = "Run on",
+        ["SessionEdit.LoginScriptExecutionTargetHint"] = "Remote keeps the existing behavior. Local uses the bundled Python runtime with your account permissions; output is shown here, not sent to the server. Local scripts are non-interactive.",
         ["SessionEdit.LoginScriptInterpreter"] = "Interpreter command",
         ["SessionEdit.LoginScriptExecutionModeHint"] = "The execution mode is matched from the selected file extension and can be changed manually.",
         ["SessionEdit.LoginScriptInterpreterHint"] = "Command used on the remote server, such as python3, py -3, bash, or pwsh.",
@@ -156,6 +158,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
         ["SessionEdit.SshTunnelTitle"] = "SSH Tunneling",
         ["SessionEdit.AutoRestoreSshTunnels"] = "Restore tunnels after automatic reconnect",
         ["SessionEdit.AutoRestoreSshTunnelsDescription"] = "When enabled, configured SSH tunnels start again after an automatic terminal reconnect. Manual tunnel stops apply only to the current connection.",
+        ["SessionEdit.X11BuiltinServer"] = "Use CxShell built-in X server",
+        ["SessionEdit.X11TrustWarning"] = "Trusted forwarding, not a sandbox. Programs running as this SSH user can access other X11 windows, clipboard, and input in the same session. Run only trusted GUI apps.",
         ["SessionEdit.VncSshTunnelTitle"] = "VNC SSH Tunneling",
         ["SessionEdit.UseVncSshTunnel"] = "Connect VNC through SSH tunnel",
         ["SessionEdit.VncSshTunnelDescription"] = "When selected, the host/port above is the VNC address reachable from the SSH server, for example 127.0.0.1:5901.",
@@ -479,6 +483,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
         ["SessionEdit.SshTunnelTitle"] = "SSH 隧道",
         ["SessionEdit.AutoRestoreSshTunnels"] = "自动重连后恢复隧道",
         ["SessionEdit.AutoRestoreSshTunnelsDescription"] = "启用后，Terminal 自动重连成功时会重新启动已配置的 SSH 隧道。手动停止隧道只对当前连接生效。",
+        ["SessionEdit.X11BuiltinServer"] = "使用 CxShell 内置 X Server",
+        ["SessionEdit.X11TrustWarning"] = "这是可信转发，不是沙箱。同一 SSH 用户运行的程序可以访问本会话中的其他 X11 窗口、剪贴板和输入。请仅运行可信的图形程序。",
         ["SessionEdit.VncSshTunnelTitle"] = "VNC SSH 隧道",
         ["SessionEdit.UseVncSshTunnel"] = "通过 SSH 隧道连接 VNC",
         ["SessionEdit.VncSshTunnelDescription"] = "勾选后，上方主机/端口表示 SSH 服务器内部可访问的 VNC 地址，例如 127.0.0.1:5901。",
@@ -1065,6 +1071,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
         EnglishTexts["ApplicationSettings.NoKnownHosts"] = "No SSH host fingerprints have been saved.";
         EnglishTexts["ApplicationSettings.SshLastSeen"] = "Last used {0}";
         EnglishTexts["ApplicationSettings.SshRemoveKnownHost"] = "Remove trusted host";
+        EnglishTexts["ApplicationSettings.SshRemoveKnownHostConfirmTitle"] = "Remove trusted host?";
+        EnglishTexts["ApplicationSettings.SshRemoveKnownHostConfirmMessage"] = "Remove the trusted SSH host {0}? Its fingerprint will be checked again the next time you connect.";
         EnglishTexts["ApplicationSettings.Close"] = "Close";
         EnglishTexts["Recording.Title"] = "Session Recordings";
         EnglishTexts["Recording.Description"] = "Replay locally stored terminal output. Recordings never include keyboard input or credentials.";
@@ -1178,6 +1186,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
         EnglishTexts["Option.LoginScriptPython"] = "Python";
         EnglishTexts["Option.LoginScriptBash"] = "Bash / Shell";
         EnglishTexts["Option.LoginScriptPowerShell"] = "PowerShell";
+        EnglishTexts["Option.LoginScriptTargetRemote"] = "Remote server";
+        EnglishTexts["Option.LoginScriptTargetLocal"] = "This computer";
         EnglishTexts["SessionEdit.RdpDriveFolder"] = "Local folder:";
         EnglishTexts["SessionEdit.RdpDriveName"] = "Remote drive name:";
         EnglishTexts["SessionEdit.RdpDriveHint"] = "The selected folder appears as a redirected drive in the remote Windows session. Reconnect the RDP session after changing this setting.";
@@ -1612,6 +1622,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
         ChineseTexts["ApplicationSettings.NoKnownHosts"] = "\u5c1a\u672a\u4fdd\u5b58 SSH \u4e3b\u673a\u6307\u7eb9\u3002";
         ChineseTexts["ApplicationSettings.SshLastSeen"] = "\u6700\u540e\u4f7f\u7528 {0}";
         ChineseTexts["ApplicationSettings.SshRemoveKnownHost"] = "\u5220\u9664\u5df2\u4fe1\u4efb\u4e3b\u673a";
+        ChineseTexts["ApplicationSettings.SshRemoveKnownHostConfirmTitle"] = "\u5220\u9664\u4fe1\u4efb\u4e3b\u673a\uff1f";
+        ChineseTexts["ApplicationSettings.SshRemoveKnownHostConfirmMessage"] = "\u786e\u5b9a\u5220\u9664\u5df2\u4fe1\u4efb\u7684 SSH \u4e3b\u673a {0} \u5417\uff1f\u4e0b\u6b21\u8fde\u63a5\u65f6\u5c06\u91cd\u65b0\u6821\u9a8c\u670d\u52a1\u5668\u6307\u7eb9\u3002";
         ChineseTexts["ApplicationSettings.Close"] = "\u5173\u95ed";
         ChineseTexts["Recording.Title"] = "\u4f1a\u8bdd\u5f55\u5236";
         ChineseTexts["Recording.Description"] = "\u56de\u653e\u4ec5\u4fdd\u5b58\u5728\u672c\u673a\u7684\u7ec8\u7aef\u8f93\u51fa\uff0c\u5f55\u5236\u4e2d\u4e0d\u5305\u542b\u952e\u76d8\u8f93\u5165\u548c\u767b\u5f55\u51ed\u636e\u3002";
@@ -1719,6 +1731,9 @@ public sealed class LocalizationService : INotifyPropertyChanged
         ChineseTexts["Rdp.Keyboard.PrintScreen"] = "\u4fdd\u5b58\u8fdc\u7a0b\u622a\u56fe\uff08Win+PrintScreen\uff09";
         ChineseTexts["SessionEdit.RdpAudioHint"] = "\u8fdc\u7a0b\u97f3\u9891\u548c\u9ea6\u514b\u98ce\u8bbe\u7f6e\u4f1a\u5728\u91cd\u65b0\u8fde\u63a5\u540e\u751f\u6548\u3002\u672c\u5730\u64ad\u653e\u548c\u9ea6\u514b\u98ce\u91cd\u5b9a\u5411\u9700\u8981\u539f\u751f\u97f3\u9891\u540e\u7aef\u53ca\u670d\u52a1\u5668\u7b56\u7565\u652f\u6301\u3002";
         ChineseTexts["SessionEdit.LoginScriptExecutionMode"] = "\u6267\u884c\u65b9\u5f0f";
+        ChineseTexts["SessionEdit.LoginScriptExecutionTarget"] = "\u8fd0\u884c\u4f4d\u7f6e";
+        ChineseTexts["SessionEdit.LoginScriptExecutionTargetHint"] = "\u8fdc\u7aef\u4fdd\u6301\u539f\u6709\u884c\u4e3a\u3002\u672c\u673a\u4f7f\u7528\u968f\u5e94\u7528\u63d0\u4f9b\u7684 Python\uff0c\u4ee5\u5f53\u524d\u7528\u6237\u6743\u9650\u8fd0\u884c\uff1b\u8f93\u51fa\u663e\u793a\u5728\u6b64\u7ec8\u7aef\uff0c\u4e0d\u4f1a\u53d1\u9001\u5230\u670d\u52a1\u5668\u3002";
+        ChineseTexts["SessionEdit.LoginScriptExecutionTargetHint"] += "\u811a\u672c\u4ee5\u975e\u4ea4\u4e92\u65b9\u5f0f\u8fd0\u884c\u3002";
         ChineseTexts["SessionEdit.LoginScriptInterpreter"] = "\u89e3\u91ca\u5668\u547d\u4ee4";
         ChineseTexts["SessionEdit.LoginScriptExecutionModeHint"] = "\u6267\u884c\u65b9\u5f0f\u4f1a\u6839\u636e\u9009\u62e9\u7684\u6587\u4ef6\u6269\u5c55\u540d\u81ea\u52a8\u5339\u914d\uff0c\u4e5f\u53ef\u624b\u52a8\u5207\u6362\u3002";
         ChineseTexts["SessionEdit.LoginScriptInterpreterHint"] = "\u8fdc\u7a0b\u670d\u52a1\u5668\u4e0a\u4f7f\u7528\u7684\u547d\u4ee4\uff0c\u4f8b\u5982 python3\u3001py -3\u3001bash \u6216 pwsh\u3002";
@@ -1729,6 +1744,8 @@ public sealed class LocalizationService : INotifyPropertyChanged
         ChineseTexts["Option.LoginScriptPython"] = "Python";
         ChineseTexts["Option.LoginScriptBash"] = "Bash / Shell";
         ChineseTexts["Option.LoginScriptPowerShell"] = "PowerShell";
+        ChineseTexts["Option.LoginScriptTargetRemote"] = "\u8fdc\u7a0b\u670d\u52a1\u5668";
+        ChineseTexts["Option.LoginScriptTargetLocal"] = "\u672c\u673a";
         ChineseTexts["SessionEdit.RdpDriveFolder"] = "\u672c\u5730\u6587\u4ef6\u5939\uff1a";
         ChineseTexts["SessionEdit.RdpDriveName"] = "\u8fdc\u7a0b\u9a71\u52a8\u5668\u540d\u79f0\uff1a";
         ChineseTexts["SessionEdit.RdpDriveHint"] = "\u9009\u4e2d\u7684\u6587\u4ef6\u5939\u4f1a\u5728\u8fdc\u7a0b Windows \u4f1a\u8bdd\u4e2d\u663e\u793a\u4e3a\u91cd\u5b9a\u5411\u9a71\u52a8\u5668\u3002\u4fee\u6539\u6b64\u8bbe\u7f6e\u540e\u9700\u91cd\u65b0\u8fde\u63a5 RDP\u3002";

@@ -320,6 +320,15 @@ public class TerminalBuffer
             : TerminalCell.Default;
     }
 
+    internal bool IsViewportRowWrapped(int row, int scrollOffset)
+    {
+        if (row < 0 || row >= Rows)
+            return false;
+
+        scrollOffset = Math.Clamp(scrollOffset, 0, _scrollback.Count);
+        return IsRowWrapped(_scrollback.Count - scrollOffset + row);
+    }
+
     /// <summary>
     /// Copies one visible viewport row into a caller-owned buffer. The render
     /// path uses this to avoid resolving the same cell repeatedly for
@@ -350,17 +359,21 @@ public class TerminalBuffer
     public string ExportText()
     {
         var lines = new List<string>(_scrollback.Count + Rows);
-        foreach (var row in _scrollback)
-            lines.Add(FormatRowText(row));
-
-        for (var row = 0; row < Rows; row++)
+        var logicalLine = new StringBuilder();
+        var totalRows = _scrollback.Count + Rows;
+        for (var combinedRow = 0; combinedRow < totalRows; combinedRow++)
         {
-            var cells = new TerminalCell[Columns];
-            for (var column = 0; column < Columns; column++)
-                cells[column] = _cells[row, column];
+            var wraps = IsRowWrapped(combinedRow);
+            logicalLine.Append(FormatRowText(GetCombinedRow(combinedRow), preserveWrittenTrailingSpaces: wraps));
+            if (wraps)
+                continue;
 
-            lines.Add(FormatRowText(cells));
+            lines.Add(logicalLine.ToString().TrimEnd());
+            logicalLine.Clear();
         }
+
+        if (logicalLine.Length > 0)
+            lines.Add(logicalLine.ToString().TrimEnd());
 
         while (lines.Count > 0 && lines[^1].Length == 0)
             lines.RemoveAt(lines.Count - 1);
@@ -368,11 +381,19 @@ public class TerminalBuffer
         return string.Join('\n', lines);
     }
 
-    private static string FormatRowText(IReadOnlyList<TerminalCell> row)
+    private static string FormatRowText(IReadOnlyList<TerminalCell> row, bool preserveWrittenTrailingSpaces = false)
     {
         var end = row.Count;
-        while (end > 0 && !row[end - 1].IsWideContinuation && row[end - 1].GetText() == " ")
-            end--;
+        if (preserveWrittenTrailingSpaces)
+        {
+            while (end > 0 && !row[end - 1].IsWritten)
+                end--;
+        }
+        else
+        {
+            while (end > 0 && !row[end - 1].IsWideContinuation && row[end - 1].GetText() == " ")
+                end--;
+        }
 
         var text = new StringBuilder(end);
         for (var column = 0; column < end; column++)
@@ -382,7 +403,7 @@ public class TerminalBuffer
                 text.Append(cell.GetText());
         }
 
-        return text.ToString().TrimEnd();
+        return preserveWrittenTrailingSpaces ? text.ToString() : text.ToString().TrimEnd();
     }
 
     public IReadOnlyList<TerminalTextMatch> FindTextMatches(string query)
@@ -515,6 +536,7 @@ public class TerminalBuffer
         {
             Character = text[0],
             Text = text.Length > 1 ? text : null,
+            IsWritten = true,
             Foreground = CurrentForeground,
             Background = CurrentBackground,
             Bold = CurrentBold,
@@ -535,6 +557,7 @@ public class TerminalBuffer
             _cells[CursorRow, CursorCol + 1] = new TerminalCell
             {
                 Character = ' ',
+                IsWritten = true,
                 Foreground = CurrentForeground,
                 Background = CurrentBackground,
                 Bold = CurrentBold,
@@ -883,6 +906,7 @@ public class TerminalBuffer
                 _cells[row, column] = new TerminalCell
                 {
                     Character = character,
+                    IsWritten = true,
                     Foreground = CurrentForeground,
                     Background = CurrentBackground,
                     Bold = CurrentBold,

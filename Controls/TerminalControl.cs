@@ -48,6 +48,8 @@ public class TerminalControl : Control
     private readonly Dictionary<int, List<TerminalTextMatch>> _searchMatchesByRow = new();
     private int _searchMatchIndex = -1;
     private bool _searchRefreshScheduled;
+    private TopLevel? _scalingSource;
+    private TerminalPtySize? _lastReportedPtySize;
     private readonly DispatcherTimer _cursorBlinkTimer;
     private bool _cursorBlinkVisible = true;
     private readonly TerminalTextInputMethodClient _textInputMethodClient;
@@ -429,6 +431,7 @@ public class TerminalControl : Control
     public event Action<string>? InputReceived;
     public event Action<byte[]>? BinaryInputReceived;
     public event Action<int, int>? SizeChanged2;
+    public event Action<TerminalPtySize>? PtySizeChanged;
     public event Action? SearchChanged;
 
     /// <summary>
@@ -454,6 +457,12 @@ public class TerminalControl : Control
 
     public int Columns => _columns;
     public int Rows => _rows;
+    public TerminalPtySize CurrentPtySize => CalculatePtySize(
+        _columns,
+        _rows,
+        _cellWidth,
+        _cellHeight,
+        TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
     public bool HasSelection => _selectionAnchor.HasValue
         && _selectionEnd.HasValue
         && _selectionAnchor.Value != _selectionEnd.Value;
@@ -485,13 +494,57 @@ public class TerminalControl : Control
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        _scalingSource = TopLevel.GetTopLevel(this);
+        if (_scalingSource != null)
+            _scalingSource.ScalingChanged += OnScalingChanged;
+        ReportPtySizeIfChanged();
         UpdateCursorBlinkTimer();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
+        if (_scalingSource != null)
+        {
+            _scalingSource.ScalingChanged -= OnScalingChanged;
+            _scalingSource = null;
+        }
         _cursorBlinkTimer.Stop();
         base.OnDetachedFromVisualTree(e);
+    }
+
+    private void OnScalingChanged(object? sender, EventArgs e) => ReportPtySizeIfChanged();
+
+    internal static TerminalPtySize CalculatePtySize(
+        int columns,
+        int rows,
+        double cellWidth,
+        double cellHeight,
+        double renderScaling)
+    {
+        var scale = double.IsFinite(renderScaling) && renderScaling > 0 ? renderScaling : 1;
+        return new TerminalPtySize(
+            Math.Max(1, columns),
+            Math.Max(1, rows),
+            ToPixelSize(Math.Max(0, columns) * cellWidth * scale),
+            ToPixelSize(Math.Max(0, rows) * cellHeight * scale));
+    }
+
+    private static int ToPixelSize(double value)
+    {
+        if (!double.IsFinite(value) || value <= 0)
+            return 0;
+
+        return (int)Math.Clamp(Math.Round(value), 1, int.MaxValue);
+    }
+
+    private void ReportPtySizeIfChanged()
+    {
+        var size = CurrentPtySize;
+        if (_lastReportedPtySize == size)
+            return;
+
+        _lastReportedPtySize = size;
+        PtySizeChanged?.Invoke(size);
     }
 
     private void OnCursorBlinkTimerTick(object? sender, EventArgs e)
@@ -690,6 +743,7 @@ public class TerminalControl : Control
 
         if (notify && changed)
             SizeChanged2?.Invoke(_columns, _rows);
+        ReportPtySizeIfChanged();
     }
 
     private void ApplyFixedSizeToBuffer(bool notify)
@@ -704,6 +758,7 @@ public class TerminalControl : Control
 
         if (notify && changed)
             SizeChanged2?.Invoke(_columns, _rows);
+        ReportPtySizeIfChanged();
     }
 
     public override void Render(DrawingContext context)
@@ -1873,22 +1928,43 @@ public class TerminalControl : Control
         if (buffer == null || !TryGetOrderedSelection(out var start, out var end))
             return string.Empty;
 
+        return BuildSelectedText(buffer, _scrollOffset, start.Row, start.Column, end.Row, end.Column);
+    }
+
+    internal static string BuildSelectedText(
+        TerminalBuffer buffer,
+        int scrollOffset,
+        int startRow,
+        int startColumn,
+        int endRow,
+        int endColumn)
+    {
         var result = new StringBuilder();
-        for (int row = start.Row; row <= end.Row; row++)
+        for (int row = startRow; row <= endRow; row++)
         {
-            int startCol = row == start.Row ? start.Column : 0;
-            int endColExclusive = row == end.Row ? end.Column : buffer.Columns;
+            int startCol = row == startRow ? startColumn : 0;
+            int endColExclusive = row == endRow ? endColumn : buffer.Columns;
+            var continues = row < endRow && buffer.IsViewportRowWrapped(row, scrollOffset);
+            if (continues)
+            {
+                while (endColExclusive > startCol &&
+                       !buffer.GetViewportCell(row, endColExclusive - 1, scrollOffset).IsWritten)
+                {
+                    endColExclusive--;
+                }
+            }
+
             var line = new StringBuilder();
 
             for (int col = startCol; col < endColExclusive; col++)
             {
-                var cell = GetViewportCell(buffer, row, col);
+                var cell = buffer.GetViewportCell(row, col, scrollOffset);
                 if (!cell.IsWideContinuation)
                     line.Append(cell.GetText());
             }
 
-            result.Append(line.ToString().TrimEnd());
-            if (row < end.Row)
+            result.Append(continues ? line.ToString() : line.ToString().TrimEnd());
+            if (row < endRow && !continues)
                 result.AppendLine();
         }
 

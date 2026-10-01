@@ -18,6 +18,11 @@ public partial class SettingsCenterWindow : Window
         : this()
     {
         DataContext = viewModel;
+        viewModel.ApplicationSettings.ConfirmRemoveKnownHostAsync = hostKey =>
+            AtomUiDialogService.ShowConfirmAsync(
+                this,
+                viewModel.ApplicationSettings.RemoveKnownHostConfirmTitleText,
+                viewModel.ApplicationSettings.BuildRemoveKnownHostConfirmMessage(hostKey));
         Closed += (_, _) => viewModel.Dispose();
     }
 

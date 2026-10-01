@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    VelaShell.XServer —— 可嵌入的 X11 服务端(rootless,软件绘图,无原生依赖)。
+
+    与 VelaShell.Ssh 同样的定位:一个独立的 MIT 库,放在宿主仓库里、不单独发包。
+    公开的类型全部在根命名空间 VelaShell.XServer(文件在 Host/,X11Server 的公开成员全在 Server/X11Server.cs);
+    其余一律 internal,按文件夹分层:
+
+      Host/         面向宿主的公开类型:IX11ServerHost、X11ServerOptions、XTopLevelWindow 与快照、XCursor、XKeymap……
+      Server/       X11Server 的 partial 文件:执行循环、监听与连接、请求分派,以及按领域 / 扩展拆开的请求处理;
+                    自成一体的扩展是独立的类(GlxExtension)
+      Protocol/     常量、字节序感知的请求读取与回复 / 事件 / 错误写出
+      Resources/    资源类型(像素图、GC、颜色表、光标、字体,以及各扩展的资源)、颜色名
+      Windowing/    窗口模型
+      Drawing/      像素缓冲、区域、软件光栅化、RENDER 的合成 / 取样 / 覆盖率
+      Gl/           GLX 间接渲染用的软件 GL(固定功能管线的一个子集)
+      Fonts/        BDF、内置 misc-fixed 字体、XLFD 匹配
+      Input/        键码表、抓取的数据结构
+
+    架构、净室规程与里程碑见 velashell-docs/zh/xserver/design/architecture.md;
+    开发纪律见同目录 AGENTS.md。本目录按 MIT 授权(LICENSE / NOTICE.md)。
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+    <Description>Embeddable, rootless X11 server for .NET — core protocol, software rendering, no native dependencies. Independent implementation; see NOTICE.md.</Description>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <IsPackable>false</IsPackable>
+    <!-- MIT-SHM 在 Linux 上经 LibraryImport 调 libc 的 shmat / shmdt(系统调用,不是第三方原生库);源生成的封送代码要求开启。 -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 内置位图字体(X.Org font-misc-misc,公有领域),见 Fonts/Data/README.md。 -->
+    <EmbeddedResource Include="Fonts/Data/*.bdf" LogicalName="VelaShell.XServer.Fonts.%(Filename).bdf" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(SignAssembly)' != 'true'">
+    <InternalsVisibleTo Include="VelaShell.XServer.Tests" />
+    <InternalsVisibleTo Include="CxShell.Tests" />
+  </ItemGroup>
+
+</Project>

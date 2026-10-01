@@ -11,9 +11,11 @@ namespace CxShell.ViewModels;
 
 public sealed partial class KnownSshHostKeyItemViewModel : ObservableObject
 {
-    private readonly Action<KnownSshHostKeyItemViewModel> _remove;
+    private readonly Func<KnownSshHostKeyItemViewModel, Task> _remove;
 
-    public KnownSshHostKeyItemViewModel(KnownSshHostKey hostKey, Action<KnownSshHostKeyItemViewModel> remove)
+    public KnownSshHostKeyItemViewModel(
+        KnownSshHostKey hostKey,
+        Func<KnownSshHostKeyItemViewModel, Task> remove)
     {
         HostKey = hostKey;
         _remove = remove;
@@ -29,9 +31,9 @@ public sealed partial class KnownSshHostKeyItemViewModel : ObservableObject
     public string RemoveText => LocalizationService.Shared.Text("ApplicationSettings.SshRemoveKnownHost");
 
     [RelayCommand]
-    private void Remove()
+    private async Task Remove()
     {
-        _remove(this);
+        await _remove(this);
     }
 
     public void NotifyLocalizationChanged()
@@ -49,6 +51,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     private readonly Action<string> _applyTheme;
     private readonly LocalizationService _localization = LocalizationService.Shared;
     private readonly SshHostKeyTrustService _hostKeyTrust = SshHostKeyTrustService.Shared;
+
+    public Func<KnownSshHostKey, Task<bool>>? ConfirmRemoveKnownHostAsync { get; set; }
 
     [ObservableProperty] private bool _showSessionManagerOnStartup;
     [ObservableProperty] private bool _showTabBar;
@@ -129,6 +133,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     public string BlockChangedSshHostKeysText => Text("ApplicationSettings.BlockChangedSshHostKeys");
     public string KnownHostsText => Text("ApplicationSettings.KnownHosts");
     public string NoKnownHostsText => Text("ApplicationSettings.NoKnownHosts");
+    public string RemoveKnownHostConfirmTitleText => Text("ApplicationSettings.SshRemoveKnownHostConfirmTitle");
+    public string BuildRemoveKnownHostConfirmMessage(KnownSshHostKey hostKey) => string.Format(
+        Text("ApplicationSettings.SshRemoveKnownHostConfirmMessage"),
+        $"{hostKey.Host}:{hostKey.Port}");
     public string RecordingText => Text("ApplicationSettings.Recording");
     public string RecordTerminalSessionsText => Text("ApplicationSettings.RecordTerminalSessions");
     public string RecordingDescriptionText => Text("ApplicationSettings.RecordingDescription");
@@ -953,8 +961,12 @@ public partial class ApplicationSettingsViewModel : ObservableObject
             item.NotifyLocalizationChanged();
     }
 
-    private void RemoveKnownHost(KnownSshHostKeyItemViewModel item)
+    private async Task RemoveKnownHostAsync(KnownSshHostKeyItemViewModel item)
     {
+        if (ConfirmRemoveKnownHostAsync == null ||
+            !await ConfirmRemoveKnownHostAsync(item.HostKey))
+            return;
+
         _hostKeyTrust.RemoveKnownHost(
             item.HostKey.Host,
             item.HostKey.Port,
@@ -966,7 +978,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     {
         KnownHosts.Clear();
         foreach (var host in _hostKeyTrust.GetKnownHosts())
-            KnownHosts.Add(new KnownSshHostKeyItemViewModel(host, RemoveKnownHost));
+            KnownHosts.Add(new KnownSshHostKeyItemViewModel(host, RemoveKnownHostAsync));
         OnPropertyChanged(nameof(HasKnownHosts));
     }
 

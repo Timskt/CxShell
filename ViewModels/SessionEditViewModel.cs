@@ -34,6 +34,8 @@ public partial class SessionEditViewModel : ObservableObject
     public string LoginPromptText => L.Text("SessionEdit.LoginPrompt");
     public string LoginScriptText => L.Text("SessionEdit.LoginScript");
     public string LoginScriptExecutionModeText => L.Text("SessionEdit.LoginScriptExecutionMode");
+    public string LoginScriptExecutionTargetText => L.Text("SessionEdit.LoginScriptExecutionTarget");
+    public string LoginScriptExecutionTargetHintText => L.Text("SessionEdit.LoginScriptExecutionTargetHint");
     public string LoginScriptInterpreterText => L.Text("SessionEdit.LoginScriptInterpreter");
     public string LoginScriptExecutionModeHintText => L.Text("SessionEdit.LoginScriptExecutionModeHint");
     public string LoginScriptInterpreterHintText => L.Text("SessionEdit.LoginScriptInterpreterHint");
@@ -86,6 +88,7 @@ public partial class SessionEditViewModel : ObservableObject
     public string RdpSshTunnelDescriptionText => L.Text("SessionEdit.RdpSshTunnelDescription");
     public string AutoRestoreSshTunnelsText => L.Text("SessionEdit.AutoRestoreSshTunnels");
     public string AutoRestoreSshTunnelsDescriptionText => L.Text("SessionEdit.AutoRestoreSshTunnelsDescription");
+    public string X11BuiltinServerText => L.Text("SessionEdit.X11BuiltinServer");
     public string SshHostText => L.Text("SessionEdit.SshHost");
     public string SshPortText => L.Text("SessionEdit.SshPort");
     public string SshUsernameText => L.Text("SessionEdit.SshUsername");
@@ -259,6 +262,7 @@ public partial class SessionEditViewModel : ObservableObject
     [ObservableProperty] private string _loginScriptFilePath = string.Empty;
     [ObservableProperty] private string _loginScriptParameters = string.Empty;
     [ObservableProperty] private LoginScriptExecutionMode _loginScriptExecutionMode = LoginScriptExecutionMode.Bash;
+    [ObservableProperty] private LoginScriptExecutionTarget _loginScriptExecutionTarget = LoginScriptExecutionTarget.Remote;
     [ObservableProperty] private string _loginScriptInterpreter = "bash";
     [ObservableProperty] private string _sshRemoteCommand = string.Empty;
     [ObservableProperty] private string _sshVersionPolicy = "Ssh2Only";
@@ -279,6 +283,7 @@ public partial class SessionEditViewModel : ObservableObject
     [ObservableProperty] private bool _autoRestoreSshTunnels = true;
     [ObservableProperty] private SshTunnelRule? _selectedSshTunnelRule;
     [ObservableProperty] private bool _sshForwardX11 = true;
+    [ObservableProperty] private bool _sshX11UseBuiltinServer;
     [ObservableProperty] private bool _sshX11UseXmanager = true;
     [ObservableProperty] private string _sshX11Display = "localhost:0.0";
     [ObservableProperty] private string? _validationMessage;
@@ -419,7 +424,11 @@ public partial class SessionEditViewModel : ObservableObject
     public bool IsSessionKeepAliveIntervalEnabled => SendSessionKeepAlive;
     public bool IsIdleStringSettingsEnabled => SendIdleString;
     public bool IsLoginScriptFileEnabled => RunLoginScriptFile;
-    public bool IsLoginScriptInterpreterEnabled => IsLoginScriptFileEnabled && LoginScriptExecutionMode != LoginScriptExecutionMode.SendText;
+    public bool IsLoginScriptInterpreterEnabled =>
+        IsLoginScriptFileEnabled &&
+        LoginScriptExecutionMode != LoginScriptExecutionMode.SendText &&
+        LoginScriptExecutionTarget == LoginScriptExecutionTarget.Remote;
+    public bool IsLoginScriptExecutionTargetEnabled => IsLoginScriptFileEnabled && LoginScriptExecutionMode == LoginScriptExecutionMode.Python;
     public bool IsKeyboardMappingFileEnabled => string.Equals(TerminalKeyboardFunctionKeyMode, "UserCustom", StringComparison.OrdinalIgnoreCase);
     public bool IsCtrlAltAsAltGrEnabled => TerminalLeftAltAsMeta;
     public bool IsFileTransferPathSettingsEnabled => !FileTransferAlwaysAskDownloadFolder;
@@ -673,6 +682,11 @@ public partial class SessionEditViewModel : ObservableObject
         new SelectOption { Header = "Python", Content = LoginScriptExecutionMode.Python.ToString() },
         new SelectOption { Header = "Bash / Shell", Content = LoginScriptExecutionMode.Bash.ToString() },
         new SelectOption { Header = "PowerShell", Content = LoginScriptExecutionMode.PowerShell.ToString() }
+    ];
+    public ObservableCollection<ISelectOption> LoginScriptExecutionTargetOptions { get; } =
+    [
+        new SelectOption { Header = "Remote server", Content = LoginScriptExecutionTarget.Remote.ToString() },
+        new SelectOption { Header = "This computer", Content = LoginScriptExecutionTarget.Local.ToString() }
     ];
     public ObservableCollection<ISelectOption> ProxyOptions { get; } =
     [
@@ -1077,6 +1091,8 @@ public partial class SessionEditViewModel : ObservableObject
         OnPropertyChanged(nameof(LoginPromptText));
         OnPropertyChanged(nameof(LoginScriptText));
         OnPropertyChanged(nameof(LoginScriptExecutionModeText));
+        OnPropertyChanged(nameof(LoginScriptExecutionTargetText));
+        OnPropertyChanged(nameof(LoginScriptExecutionTargetHintText));
         OnPropertyChanged(nameof(LoginScriptInterpreterText));
         OnPropertyChanged(nameof(LoginScriptExecutionModeHintText));
         OnPropertyChanged(nameof(LoginScriptInterpreterHintText));
@@ -1129,6 +1145,7 @@ public partial class SessionEditViewModel : ObservableObject
         OnPropertyChanged(nameof(RdpSshTunnelDescriptionText));
         OnPropertyChanged(nameof(AutoRestoreSshTunnelsText));
         OnPropertyChanged(nameof(AutoRestoreSshTunnelsDescriptionText));
+        OnPropertyChanged(nameof(X11BuiltinServerText));
         OnPropertyChanged(nameof(SshHostText));
         OnPropertyChanged(nameof(SshPortText));
         OnPropertyChanged(nameof(SshUsernameText));
@@ -1157,6 +1174,8 @@ public partial class SessionEditViewModel : ObservableObject
         SetOptionHeader(LoginScriptExecutionModeOptions, "Python", "Option.LoginScriptPython");
         SetOptionHeader(LoginScriptExecutionModeOptions, "Bash", "Option.LoginScriptBash");
         SetOptionHeader(LoginScriptExecutionModeOptions, "PowerShell", "Option.LoginScriptPowerShell");
+        SetOptionHeader(LoginScriptExecutionTargetOptions, "Remote server", "Option.LoginScriptTargetRemote");
+        SetOptionHeader(LoginScriptExecutionTargetOptions, "This computer", "Option.LoginScriptTargetLocal");
         SetOptionHeader(TerminalEncodingOptions, "default", "Option.DefaultLanguage");
         SetOptionHeader(TerminalKeyboardFunctionKeyOptions, "Default", "Option.Default");
         SetOptionHeader(TerminalKeyboardFunctionKeyOptions, "UserCustom", "Option.UserCustom");
@@ -1415,6 +1434,7 @@ public partial class SessionEditViewModel : ObservableObject
         LoginScriptFilePath = session.LoginScriptFilePath ?? string.Empty;
         LoginScriptParameters = session.LoginScriptParameters ?? string.Empty;
         LoginScriptExecutionMode = NormalizeLoginScriptExecutionMode(session.LoginScriptExecutionMode, LoginScriptFilePath);
+        LoginScriptExecutionTarget = session.LoginScriptExecutionTarget;
         LoginScriptInterpreter = string.IsNullOrWhiteSpace(session.LoginScriptInterpreter)
             ? GetDefaultLoginScriptInterpreter(LoginScriptExecutionMode)
             : session.LoginScriptInterpreter;
@@ -1441,6 +1461,7 @@ public partial class SessionEditViewModel : ObservableObject
         foreach (var rule in session.SshTunnelRules)
             SshTunnelRules.Add(CloneTunnelRule(rule));
         SshForwardX11 = session.SshForwardX11;
+        SshX11UseBuiltinServer = session.SshX11UseBuiltinServer;
         SshX11UseXmanager = session.SshX11UseXmanager;
         SshX11Display = string.IsNullOrWhiteSpace(session.SshX11Display) ? "localhost:0.0" : session.SshX11Display;
         TelnetUseXDisplayLocation = session.TelnetUseXDisplayLocation;
@@ -1639,6 +1660,7 @@ public partial class SessionEditViewModel : ObservableObject
         session.LoginScriptFilePath = LoginScriptFilePath.Trim();
         session.LoginScriptParameters = LoginScriptParameters.Trim();
         session.LoginScriptExecutionMode = LoginScriptExecutionMode;
+        session.LoginScriptExecutionTarget = LoginScriptExecutionTarget;
         session.LoginScriptInterpreter = LoginScriptInterpreter.Trim();
         session.SshRemoteCommand = SshRemoteCommand.Trim();
         session.SshVersionPolicy = NormalizeSshVersionPolicy(SshVersionPolicy);
@@ -1662,6 +1684,7 @@ public partial class SessionEditViewModel : ObservableObject
         session.SshTunnelRules = SshTunnelRules.Select(CloneTunnelRule).ToList();
         session.SshAutoRestoreTunnels = AutoRestoreSshTunnels;
         session.SshForwardX11 = SshForwardX11;
+        session.SshX11UseBuiltinServer = SshX11UseBuiltinServer;
         session.SshX11UseXmanager = SshX11UseXmanager;
         session.SshX11Display = SshX11Display.Trim();
         session.TelnetUseXDisplayLocation = TelnetUseXDisplayLocation;
@@ -2131,6 +2154,7 @@ public partial class SessionEditViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(IsLoginScriptFileEnabled));
         OnPropertyChanged(nameof(IsLoginScriptInterpreterEnabled));
+        OnPropertyChanged(nameof(IsLoginScriptExecutionTargetEnabled));
     }
 
     partial void OnLoginScriptExecutionModeChanged(LoginScriptExecutionMode value)
@@ -2138,7 +2162,17 @@ public partial class SessionEditViewModel : ObservableObject
         if (value != LoginScriptExecutionMode.SendText)
             LoginScriptInterpreter = GetDefaultLoginScriptInterpreter(value);
 
+        if (value != LoginScriptExecutionMode.Python && LoginScriptExecutionTarget == LoginScriptExecutionTarget.Local)
+            LoginScriptExecutionTarget = LoginScriptExecutionTarget.Remote;
+
         OnPropertyChanged(nameof(IsLoginScriptInterpreterEnabled));
+        OnPropertyChanged(nameof(IsLoginScriptExecutionTargetEnabled));
+    }
+
+    partial void OnLoginScriptExecutionTargetChanged(LoginScriptExecutionTarget value)
+    {
+        OnPropertyChanged(nameof(IsLoginScriptInterpreterEnabled));
+        OnPropertyChanged(nameof(IsLoginScriptExecutionTargetEnabled));
     }
 
     public void ApplyLoginScriptFileSelection(string path)

@@ -155,7 +155,7 @@ public static class SshAgentAuthService
     {
         var sshAuthSock = Environment.GetEnvironmentVariable("SSH_AUTH_SOCK");
         if (!string.IsNullOrWhiteSpace(sshAuthSock))
-            yield return () => new SshAgent(sshAuthSock);
+            yield return () => new SshAgent(sshAuthSock, null);
 
         yield return () => new SshAgent();
         yield return () => new Pageant();

@@ -2,12 +2,12 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
-using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CxShell.Models;
+using CxShell.Services.X11;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 
@@ -34,9 +34,7 @@ public class SshConnectionService : ITerminalConnectionService
     private readonly Dictionary<Guid, SshTunnelActivitySnapshot> _forwardedPortActivity = new();
     private readonly object _forwardedPortsLock = new();
     private readonly object _forwardedPortsOperationLock = new();
-    private ForwardedPortRemote? _x11ForwardedPort;
-    private string? _remoteX11Display;
-    private string? _x11StatusMessage;
+    private IX11ForwardingBackend? _x11ForwardingBackend;
     private CancellationTokenSource? _readCts;
     private Task? _readTask;
     private readonly object _writeLock = new();
@@ -71,8 +69,18 @@ public class SshConnectionService : ITerminalConnectionService
         int columns = 80, int rows = 24,
         CancellationToken cancellationToken = default)
     {
+        await ConnectAsync(session, password, new TerminalPtySize(columns, rows), cancellationToken);
+    }
+
+    public async Task ConnectAsync(
+        SessionInfo session,
+        string? password,
+        TerminalPtySize size,
+        CancellationToken cancellationToken = default)
+    {
         Disconnect();
-        _x11StatusMessage = null;
+        var columns = Math.Max(1, size.Columns);
+        var rows = Math.Max(1, size.Rows);
         var connectionInstanceId = _connectionLifecycle.Begin();
         _session = session;
         SupportsPosixShellFeatures = true;
@@ -113,7 +121,9 @@ public class SshConnectionService : ITerminalConnectionService
             if (AutoStartConfiguredTunnels)
                 StartForwardedPorts(session);
             if (SupportsPosixShellFeatures)
-                StartX11Forwarding(session);
+                await StartX11ForwardingAsync(session, cancellationToken).ConfigureAwait(false);
+            else if (session.SshForwardX11 && session.SshX11UseBuiltinServer)
+                ErrorOccurred?.Invoke("CxShell built-in X server forwarding requires a POSIX SSH host.");
 
             TraceSshProtocol(session.SshNoTerminal
                 ? "opening shell channel without PTY"
@@ -123,7 +133,9 @@ public class SshConnectionService : ITerminalConnectionService
                 : _sshClient.CreateShellStream(
                     TerminalSessionOptions.GetTerminalType(session),
                     (uint)columns, (uint)rows,
-                    GetPixelWidth(columns), GetPixelHeight(rows), 65536);
+                    (uint)Math.Max(0, size.PixelWidth),
+                    (uint)Math.Max(0, size.PixelHeight),
+                    65536);
 
             if (session.SshForwardAgent)
             {
@@ -452,96 +464,65 @@ public class SshConnectionService : ITerminalConnectionService
             : host.Trim();
     }
 
-    private void StartX11Forwarding(SessionInfo session)
+    private async Task StartX11ForwardingAsync(SessionInfo session, CancellationToken cancellationToken)
     {
         if (_sshClient == null || !session.SshForwardX11)
             return;
 
-        var localDisplay = ResolveLocalX11Display(session);
-        Exception? lastError = null;
+        IX11ForwardingTransport transport = new SshNetX11ForwardingTransport(
+            _sshClient,
+            (command, standardInput, timeout, token) => RunCommandCoreAsync(
+                command,
+                timeout,
+                outputReceived: null,
+                errorReceived: null,
+                token,
+                outputEncoding: Encoding.UTF8,
+                inputBytes: standardInput),
+            message => ErrorOccurred?.Invoke(message),
+            message => TraceSshTunneling(message));
+        IX11ForwardingBackend backend = X11ForwardingBackendFactory.Create(session, transport);
+        _x11ForwardingBackend = backend;
 
-        for (uint remoteDisplayNumber = 10; remoteDisplayNumber <= 19; remoteDisplayNumber++)
+        try
         {
-            var remotePort = 6000u + remoteDisplayNumber;
-
-            try
-            {
-                _x11ForwardedPort = new ForwardedPortRemote(
-                    "127.0.0.1",
-                    remotePort,
-                    localDisplay.Host,
-                    localDisplay.Port);
-                _x11ForwardedPort.Exception += (_, e) =>
-                {
-                    ErrorOccurred?.Invoke($"SSH X11 forwarding failed: {e.Exception.Message}");
-                };
-
-                _sshClient.AddForwardedPort(_x11ForwardedPort);
-                _x11ForwardedPort.Start();
-                _remoteX11Display = $"localhost:{remoteDisplayNumber}.0";
-                _x11StatusMessage =
-                    $"[SSH X11 forwarding enabled: DISPLAY={_remoteX11Display}, local target={localDisplay.Host}:{localDisplay.Port}]";
-                TraceSshTunneling($"started X11 remote display {_remoteX11Display} -> {localDisplay.Host}:{localDisplay.Port}");
-                return;
-            }
-            catch (Exception ex)
-            {
-                lastError = ex;
-                try
-                {
-                    if (_x11ForwardedPort != null)
-                        _sshClient.RemoveForwardedPort(_x11ForwardedPort);
-                }
-                catch
-                {
-                    // Ignore cleanup failure; the next display number will be tried.
-                }
-
-                _x11ForwardedPort?.Dispose();
-                _x11ForwardedPort = null;
-                _remoteX11Display = null;
-            }
+            await backend.StartAsync(cancellationToken).ConfigureAwait(false);
         }
-
-        ErrorOccurred?.Invoke($"SSH X11 forwarding is disabled: {lastError?.Message ?? "no remote display port is available"}");
-    }
-
-    private static (string Host, uint Port) ResolveLocalX11Display(SessionInfo session)
-    {
-        var display = session.SshX11UseXmanager || string.IsNullOrWhiteSpace(session.SshX11Display)
-            ? "localhost:0.0"
-            : session.SshX11Display.Trim();
-
-        var host = "localhost";
-        var displayPart = display;
-        var separatorIndex = display.LastIndexOf(':');
-        if (separatorIndex >= 0)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            host = string.IsNullOrWhiteSpace(display[..separatorIndex])
-                ? "localhost"
-                : display[..separatorIndex];
-            displayPart = display[(separatorIndex + 1)..];
+            backend.Stop();
+            _x11ForwardingBackend = null;
+            throw;
         }
-
-        var screenSeparator = displayPart.IndexOf('.');
-        var displayNumberText = screenSeparator >= 0
-            ? displayPart[..screenSeparator]
-            : displayPart;
-        var displayNumber = uint.TryParse(displayNumberText, NumberStyles.None, CultureInfo.InvariantCulture, out var parsed)
-            ? parsed
-            : 0;
-
-        return (host, 6000 + displayNumber);
+        catch (Exception exception)
+        {
+            backend.Stop();
+            _x11ForwardingBackend = null;
+            string label = session.SshX11UseBuiltinServer
+                ? "CxShell built-in X11 forwarding could not be configured on the remote host"
+                : "SSH X11 forwarding is disabled";
+            ErrorOccurred?.Invoke($"{label}: {exception.Message}");
+        }
     }
 
     private void SendX11DisplayExport()
     {
-        if (string.IsNullOrWhiteSpace(_remoteX11Display))
+        string? remoteDisplay = _x11ForwardingBackend?.RemoteDisplay;
+        if (string.IsNullOrWhiteSpace(remoteDisplay))
             return;
 
         try
         {
-            var command = $"export DISPLAY={_remoteX11Display}\r";
+            var command = $"export DISPLAY={remoteDisplay}";
+            string? authorityPath = _x11ForwardingBackend?.RemoteAuthorityPath;
+            if (!string.IsNullOrWhiteSpace(authorityPath))
+            {
+                string quotedPath = X11AuthorityFile.QuotePosix(authorityPath);
+                string cleanupCommand = X11AuthorityFile.QuotePosix($"rm -f {quotedPath}");
+                command += $"; export XAUTHORITY={quotedPath}; trap {cleanupCommand} 0";
+            }
+
+            command += "\r";
             var bytes = _terminalEncoding.GetBytes(command);
             RegisterStartupEchoSuppression(command);
             _shellStream?.Write(bytes, 0, bytes.Length);
@@ -555,8 +536,9 @@ public class SshConnectionService : ITerminalConnectionService
 
     private void EmitStartupStatus()
     {
-        if (!string.IsNullOrWhiteSpace(_x11StatusMessage))
-            DataReceived?.Invoke($"\r\n{_x11StatusMessage}\r\n");
+        string? statusMessage = _x11ForwardingBackend?.StatusMessage;
+        if (!string.IsNullOrWhiteSpace(statusMessage))
+            DataReceived?.Invoke($"\r\n{statusMessage}\r\n");
     }
 
     private void TraceSshProtocol(string message)
@@ -1122,8 +1104,12 @@ public class SshConnectionService : ITerminalConnectionService
         Action<string>? errorReceived,
         CancellationToken cancellationToken,
         Encoding? outputEncoding = null,
-        string? inputText = null)
+        string? inputText = null,
+        ReadOnlyMemory<byte>? inputBytes = null)
     {
+        if (inputBytes is not null && !string.IsNullOrEmpty(inputText))
+            throw new ArgumentException("Text and binary command input cannot be provided together.");
+
         var connectionInstanceId = _connectionLifecycle.ActiveInstanceId;
         var sshClient = _sshClient;
         if (sshClient == null || !sshClient.IsConnected)
@@ -1155,15 +1141,23 @@ public class SshConnectionService : ITerminalConnectionService
                     errorReceived ?? IgnoreOutput,
                     cancellationToken);
 
-                if (!string.IsNullOrEmpty(inputText))
+                if (inputBytes is not null || !string.IsNullOrEmpty(inputText))
                 {
                     // SSH.NET documents creating the input stream after
                     // ExecuteAsync, writing the payload, then disposing it to
                     // signal EOF to the remote command.
                     using var commandInput = command.CreateInputStream();
-                    var inputBytes = commandEncoding.GetBytes(inputText + "\n");
-                    commandInput.Write(inputBytes, 0, inputBytes.Length);
-                    commandInput.Flush();
+                    if (inputBytes is { } binaryInput)
+                    {
+                        await commandInput.WriteAsync(binaryInput, cancellationToken).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        byte[] textBytes = commandEncoding.GetBytes(inputText + "\n");
+                        await commandInput.WriteAsync(textBytes, cancellationToken).ConfigureAwait(false);
+                    }
+
+                    await commandInput.FlushAsync(cancellationToken).ConfigureAwait(false);
                 }
 
                 await executeTask.ConfigureAwait(false);
@@ -1238,6 +1232,11 @@ public class SshConnectionService : ITerminalConnectionService
 
     public void ResizeTerminal(int columns, int rows)
     {
+        ResizeTerminal(new TerminalPtySize(columns, rows));
+    }
+
+    public void ResizeTerminal(TerminalPtySize size)
+    {
         try
         {
             if (_shellStream == null)
@@ -1272,10 +1271,10 @@ public class SshConnectionService : ITerminalConnectionService
 
             method.Invoke(channel, new object[]
             {
-                (uint)Math.Max(1, columns),
-                (uint)Math.Max(1, rows),
-                GetPixelWidth(columns),
-                GetPixelHeight(rows)
+                (uint)Math.Max(1, size.Columns),
+                (uint)Math.Max(1, size.Rows),
+                (uint)Math.Max(0, size.PixelWidth),
+                (uint)Math.Max(0, size.PixelHeight)
             });
         }
         catch (Exception ex)
@@ -1284,10 +1283,6 @@ public class SshConnectionService : ITerminalConnectionService
             ErrorOccurred?.Invoke($"SSH terminal resize failed: {ex.Message}");
         }
     }
-
-    private static uint GetPixelWidth(int columns) => (uint)Math.Max(1, columns * 8);
-
-    private static uint GetPixelHeight(int rows) => (uint)Math.Max(1, rows * 16);
 
     public void Disconnect()
     {
@@ -1347,36 +1342,9 @@ public class SshConnectionService : ITerminalConnectionService
 
     private void StopX11Forwarding()
     {
-        if (_x11ForwardedPort == null)
-        {
-            _remoteX11Display = null;
-            _x11StatusMessage = null;
-            return;
-        }
-
-        try
-        {
-            if (_x11ForwardedPort.IsStarted)
-                _x11ForwardedPort.Stop();
-        }
-        catch
-        {
-            // Ignore X11 shutdown failures during disconnect.
-        }
-
-        try
-        {
-            _sshClient?.RemoveForwardedPort(_x11ForwardedPort);
-        }
-        catch
-        {
-            // Ignore removal failures during disconnect.
-        }
-
-        _x11ForwardedPort.Dispose();
-        _x11ForwardedPort = null;
-        _remoteX11Display = null;
-        _x11StatusMessage = null;
+        IX11ForwardingBackend? backend = _x11ForwardingBackend;
+        _x11ForwardingBackend = null;
+        backend?.Stop();
     }
 
     private static string ExpandPath(string path)

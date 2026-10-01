@@ -52,6 +52,7 @@ public partial class TerminalViewModel : ObservableObject
     private ITerminalConnectionService? _connection;
     private TerminalSendQueue? _sendQueue;
     private SessionInfo? _session;
+    private TerminalPtySize _terminalPtySize = new(80, 24);
     private string? _password;
     private CancellationTokenSource? _connectionCts;
     private readonly SemaphoreSlim _connectGate = new(1, 1);
@@ -131,6 +132,7 @@ public partial class TerminalViewModel : ObservableObject
     public Func<string, Task>? SetClipboardTextAsync { get; set; }
     public string ZmodemUploadStartDirectory => _session?.FileTransferUploadDirectory ?? string.Empty;
     public bool IsTerminalSizeFixed => _session?.TerminalFixedSize == true;
+    internal TerminalPtySize CurrentPtySize => _terminalPtySize;
     public bool EnableCommandSuggestions => _enableCommandSuggestions;
     public string KeyboardFunctionKeyMode => _session?.TerminalKeyboardFunctionKeyMode ?? "Default";
     public string KeyboardMappingFile => _session?.TerminalKeyboardMappingFile ?? string.Empty;
@@ -613,6 +615,11 @@ public partial class TerminalViewModel : ObservableObject
         {
             Columns = Math.Clamp(session.TerminalColumns, 20, 500);
             Rows = Math.Clamp(session.TerminalRows, 5, 200);
+            _terminalPtySize = new TerminalPtySize(Columns, Rows);
+        }
+        else
+        {
+            _terminalPtySize = _terminalPtySize with { Columns = Columns, Rows = Rows };
         }
 
         Buffer = new TerminalBuffer(
@@ -730,7 +737,7 @@ public partial class TerminalViewModel : ObservableObject
                 });
             };
 
-            await connection.ConnectAsync(_session, _password, Columns, Rows, cancellationToken);
+            await connection.ConnectAsync(_session, _password, _terminalPtySize, cancellationToken);
             SupportsPosixShellFeatures = ConnectionSupportsPosixShellFeatures(connection);
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -754,7 +761,7 @@ public partial class TerminalViewModel : ObservableObject
                 return;
             }
 
-            connection.ResizeTerminal(Columns, Rows);
+            connection.ResizeTerminal(_terminalPtySize);
             IsConnected = true;
             HostInfo = GetHostInfo(_session);
             RefreshRecordingOptions();
@@ -1517,6 +1524,53 @@ public partial class TerminalViewModel : ObservableObject
                     return;
 
                 var expandedScript = ApplyLoginScriptParameters(scriptText, session.LoginScriptParameters);
+                var mode = SessionEditViewModel.NormalizeLoginScriptExecutionMode(
+                    session.LoginScriptExecutionMode,
+                    session.LoginScriptFilePath);
+                if (session.LoginScriptExecutionTarget == LoginScriptExecutionTarget.Local)
+                {
+                    if (mode != LoginScriptExecutionMode.Python)
+                    {
+                        await Dispatcher.UIThread.InvokeAsync(() =>
+                            AppendStatusMessage("[Local script execution currently supports Python only]", "31"));
+                        return;
+                    }
+
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                        AppendStatusMessage("[Running login script locally with Python]", "36"));
+                    var result = await LocalPythonScriptRunner.RunAsync(
+                        path,
+                        expandedScript,
+                        session.LoginScriptParameters,
+                        async (line, isError) =>
+                        {
+                            var safeLine = RemoveTerminalControlCharacters(line);
+                            if (safeLine.Length == 0)
+                                return;
+
+                            await Dispatcher.UIThread.InvokeAsync(() =>
+                            {
+                                if (generation == _connectionGeneration && !_manualDisconnect)
+                                {
+                                    var stream = isError ? " stderr" : string.Empty;
+                                    AppendPlainStatusMessage($"[Local Python{stream}] {safeLine}");
+                                }
+                            });
+                        },
+                        cancellationToken);
+
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        if (generation == _connectionGeneration && !_manualDisconnect)
+                        {
+                            var runtime = result.IsBundled ? "bundled runtime" : "system Python fallback";
+                            var color = result.ExitCode == 0 ? "32" : "31";
+                            AppendStatusMessage($"[Local Python exited with code {result.ExitCode}; {runtime}]", color);
+                        }
+                    });
+                    return;
+                }
+
                 var payload = BuildLoginScriptPayload(session, connection, expandedScript);
                 TrySendData(connection, payload);
             }
@@ -1957,6 +2011,11 @@ public partial class TerminalViewModel : ObservableObject
             .Replace("\r\n", "\n", StringComparison.Ordinal)
             .Replace('\r', '\n')
             .Replace("\n", "\r", StringComparison.Ordinal);
+    }
+
+    private static string RemoveTerminalControlCharacters(string text)
+    {
+        return new string(text.Where(character => !char.IsControl(character) || character == '\t').ToArray());
     }
 
     private static string ApplyLoginScriptParameters(string scriptText, string? parameters)
@@ -3541,13 +3600,30 @@ public partial class TerminalViewModel : ObservableObject
 
     public void Resize(int columns, int rows, bool notifyRemote = true)
     {
+        Resize(_terminalPtySize with { Columns = columns, Rows = rows }, notifyRemote);
+    }
+
+    public void Resize(TerminalPtySize size, bool notifyRemote = true)
+    {
+        var columns = size.Columns;
+        var rows = size.Rows;
         if (_session?.TerminalFixedSize == true)
-            return;
+        {
+            columns = Math.Clamp(_session.TerminalColumns, 20, 500);
+            rows = Math.Clamp(_session.TerminalRows, 5, 200);
+        }
+        else
+        {
+            columns = Math.Max(1, columns);
+            rows = Math.Max(1, rows);
+        }
+
+        _terminalPtySize = size with { Columns = columns, Rows = rows };
 
         if (columns == Columns && rows == Rows)
         {
             if (notifyRemote)
-                _connection?.ResizeTerminal(columns, rows);
+                _connection?.ResizeTerminal(_terminalPtySize);
             return;
         }
 
@@ -3555,7 +3631,7 @@ public partial class TerminalViewModel : ObservableObject
         Rows = rows;
         Buffer.Resize(columns, rows);
         if (notifyRemote)
-            _connection?.ResizeTerminal(columns, rows);
+            _connection?.ResizeTerminal(_terminalPtySize);
     }
 
     public void ApplyConfiguredTerminalSize()
@@ -3565,6 +3641,7 @@ public partial class TerminalViewModel : ObservableObject
 
         var columns = Math.Clamp(_session.TerminalColumns, 20, 500);
         var rows = Math.Clamp(_session.TerminalRows, 5, 200);
+        _terminalPtySize = _terminalPtySize with { Columns = columns, Rows = rows };
         Columns = columns;
         Rows = rows;
         Buffer.Resize(columns, rows);

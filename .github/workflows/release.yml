@@ -141,6 +141,21 @@ jobs:
             /p:DebugType=none `
             /p:DebugSymbols=false
 
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Package embedded Python runtime
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $rid = "${{ matrix.rid }}"
+          $runtimeDir = Join-Path $env:GITHUB_WORKSPACE "artifacts\publish\$rid\python-runtime"
+          uv python install 3.12 --install-dir $runtimeDir --with-pip
+          $python = Get-ChildItem -LiteralPath $runtimeDir -Filter "python.exe" -File -Recurse | Select-Object -First 1
+          if ($null -eq $python) {
+            throw "The embedded Python executable was not installed under $runtimeDir"
+          }
+          & $python.FullName --version
+
       - name: Build RDP bridge
         shell: pwsh
         run: |
@@ -481,6 +496,22 @@ jobs:
             chmod +x "$publish_dir/CxShell"
           fi
 
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Package embedded Python runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          rid="${{ matrix.rid }}"
+          runtime_dir="$GITHUB_WORKSPACE/artifacts/publish/$rid/python-runtime"
+          uv python install 3.12 --install-dir "$runtime_dir" --with-pip
+          python_path="$(find "$runtime_dir" \( -type f -o -type l \) \( -name python3 -o -name python3.12 \) -print -quit)"
+          if [ -z "$python_path" ]; then
+            echo "The embedded Python executable was not installed under $runtime_dir" >&2
+            exit 1
+          fi
+          "$python_path" --version
+
       - name: Build RDP bridge
         shell: bash
         run: |
@@ -628,6 +659,22 @@ jobs:
             /p:DebugType=none \
             /p:DebugSymbols=false
 
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Package embedded Python runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          rid="${{ matrix.rid }}"
+          runtime_dir="$GITHUB_WORKSPACE/artifacts/publish/$rid/python-runtime"
+          uv python install 3.12 --install-dir "$runtime_dir" --with-pip
+          python_path="$(find "$runtime_dir" \( -type f -o -type l \) \( -name python3 -o -name python3.12 \) -print -quit)"
+          if [ -z "$python_path" ]; then
+            echo "The embedded Python executable was not installed under $runtime_dir" >&2
+            exit 1
+          fi
+          "$python_path" --version
+
       - name: Create app bundle
         shell: bash
         run: |
@@ -640,6 +687,13 @@ jobs:
           export BUNDLE_SHORT_VERSION="${RELEASE_TAG#v}"
 
           bash tools/package-macos-app.sh
+          runtime_dir="$ARTIFACT_DIR/CxShell.app/Contents/MacOS/python-runtime"
+          python_path="$(find "$runtime_dir" \( -type f -o -type l \) \( -name python3 -o -name python3.12 \) -print -quit)"
+          if [ -z "$python_path" ]; then
+            echo "The embedded Python runtime was not copied into CxShell.app." >&2
+            exit 1
+          fi
+          "$python_path" --version
           cp LICENSE NOTICE README.md README.zh-CN.md "$ARTIFACT_DIR/"
           find "$ARTIFACT_DIR" -name "*.pdb" -delete
 
@@ -775,10 +829,10 @@ jobs:
           notes="$(cat <<'EOF'
           ## What's Changed
 
-          - Consolidate application data in SQLite and migrate legacy JSON data safely.
-          - Add configurable retention for session debug logs.
-          - Improve session recording selection and bulk deletion behavior.
-          - Fix a crash when refreshing recent connections.
+          - Add an optional built-in X server for SSH X11 forwarding, including per-session authorization and clipboard synchronization.
+          - Add local Python execution for login scripts and bundle Python 3.12 with Windows, Linux, and macOS packages.
+          - Improve terminal sizing, selection, scrollback, and SSH X11 authorization handling.
+          - Upgrade AtomUI to 6.2.2 and Avalonia to 12.1.3.
           - Publish self-contained packages for Windows, macOS, and Linux.
           EOF
           )"

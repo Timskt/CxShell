@@ -11,6 +11,7 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using CxShell.Models;
 using CxShell.ViewModels;
 using AtomContextMenu = AtomUI.Desktop.Controls.ContextMenu;
 using AtomMenuItem = AtomUI.Desktop.Controls.MenuItem;
@@ -23,7 +24,6 @@ public partial class TerminalView : UserControl
     private TerminalViewModel? _boundVm;
     private Controls.TerminalControl? _terminal;
     private int _suppressRemoteResizeDepth;
-    private int _suppressNextRemoteResizeEvents;
     private int _remoteResizeVersion;
 
     public TerminalView()
@@ -62,11 +62,11 @@ public partial class TerminalView : UserControl
         if (DataContext is not TerminalViewModel vm) return;
 
         _boundVm = vm;
-        _suppressNextRemoteResizeEvents = 2;
 
         _terminal.InputReceived += OnInputReceived;
         _terminal.BinaryInputReceived += OnBinaryInputReceived;
         _terminal.SizeChanged2 += OnSizeChanged;
+        _terminal.PtySizeChanged += OnPtySizeChanged;
         _terminal.PointerPressed += OnPointerPressed;
         _terminal.KeyDown += OnTerminalKeyDown;
         _terminal.LocalKeyHandler = HandleLocalTerminalKey;
@@ -92,6 +92,7 @@ public partial class TerminalView : UserControl
             _terminal.InputReceived -= OnInputReceived;
             _terminal.BinaryInputReceived -= OnBinaryInputReceived;
             _terminal.SizeChanged2 -= OnSizeChanged;
+            _terminal.PtySizeChanged -= OnPtySizeChanged;
             _terminal.PointerPressed -= OnPointerPressed;
             _terminal.KeyDown -= OnTerminalKeyDown;
             _terminal.LocalKeyHandler = null;
@@ -202,13 +203,17 @@ public partial class TerminalView : UserControl
         if (!IsActuallyVisible())
             return;
 
-        var notifyRemote = _suppressRemoteResizeDepth == 0 && _suppressNextRemoteResizeEvents <= 0;
-        if (_suppressNextRemoteResizeEvents > 0)
-            _suppressNextRemoteResizeEvents--;
-
         _boundVm?.Resize(cols, rows, notifyRemote: false);
-        if (notifyRemote)
-            ScheduleRemoteResize(cols, rows);
+    }
+
+    private void OnPtySizeChanged(TerminalPtySize size)
+    {
+        if (!IsActuallyVisible())
+            return;
+
+        _boundVm?.Resize(size, notifyRemote: false);
+        if (_suppressRemoteResizeDepth == 0)
+            ScheduleRemoteResize(size);
     }
 
     private void SyncTerminalSize(bool notifyRemote)
@@ -222,25 +227,30 @@ public partial class TerminalView : UserControl
         if (_boundVm.IsTerminalSizeFixed)
         {
             _boundVm.ApplyConfiguredTerminalSize();
+            var fixedSize = _terminal.CurrentPtySize;
+            _boundVm.Resize(fixedSize, notifyRemote: false);
+            if (notifyRemote)
+                ScheduleRemoteResize(fixedSize);
             return;
         }
 
-        if (!notifyRemote)
-            _suppressRemoteResizeDepth++;
+        _suppressRemoteResizeDepth++;
 
         try
         {
             _terminal.SyncSizeToBounds();
-            _boundVm.Resize(_terminal.Columns, _terminal.Rows, notifyRemote);
+            var size = _terminal.CurrentPtySize;
+            _boundVm.Resize(size, notifyRemote: false);
+            if (notifyRemote)
+                ScheduleRemoteResize(size);
         }
         finally
         {
-            if (!notifyRemote)
-                _suppressRemoteResizeDepth--;
+            _suppressRemoteResizeDepth--;
         }
     }
 
-    private void ScheduleRemoteResize(int cols, int rows)
+    private void ScheduleRemoteResize(TerminalPtySize size)
     {
         var version = ++_remoteResizeVersion;
         _ = Task.Run(async () =>
@@ -251,7 +261,7 @@ public partial class TerminalView : UserControl
                 if (version != _remoteResizeVersion || _boundVm == null || !IsActuallyVisible())
                     return;
 
-                _boundVm.Resize(cols, rows, notifyRemote: true);
+                _boundVm.Resize(size, notifyRemote: true);
             }, DispatcherPriority.Background);
         });
     }

@@ -10,6 +10,8 @@ public struct TerminalCell
     /// followed by combining marks. Common BMP cells keep this null.
     /// </summary>
     public string? Text;
+    /// <summary>Whether this cell contains output written by the terminal.</summary>
+    public bool IsWritten;
     public Color Foreground;
     public Color Background;
     public bool Bold;
@@ -55,6 +57,7 @@ public struct TerminalCell
     {
         Character = ' ';
         Text = null;
+        IsWritten = false;
         Foreground = TerminalColors.DefaultForeground;
         Background = TerminalColors.DefaultBackground;
         Bold = false;

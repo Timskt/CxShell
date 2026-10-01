@@ -227,6 +227,7 @@ public partial class SessionTreeViewModel : ObservableObject
         target.SshTunnelRules = source.SshTunnelRules.Select(SessionEditViewModel.CloneTunnelRule).ToList();
         target.SshAutoRestoreTunnels = source.SshAutoRestoreTunnels;
         target.SshForwardX11 = source.SshForwardX11;
+        target.SshX11UseBuiltinServer = source.SshX11UseBuiltinServer;
         target.SshX11UseXmanager = source.SshX11UseXmanager;
         target.SshX11Display = source.SshX11Display;
         target.TelnetUseXDisplayLocation = source.TelnetUseXDisplayLocation;
@@ -1146,6 +1147,7 @@ public partial class SessionTreeViewModel : ObservableObject
             SshTunnelRules = source.SshTunnelRules.Select(SessionEditViewModel.CloneTunnelRule).ToList(),
             SshAutoRestoreTunnels = source.SshAutoRestoreTunnels,
             SshForwardX11 = source.SshForwardX11,
+            SshX11UseBuiltinServer = source.SshX11UseBuiltinServer,
             SshX11UseXmanager = source.SshX11UseXmanager,
             SshX11Display = source.SshX11Display,
             TelnetUseXDisplayLocation = source.TelnetUseXDisplayLocation,

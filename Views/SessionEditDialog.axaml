@@ -691,7 +691,7 @@
                                    TextWrapping="Wrap"
                                    Foreground="{atom:SharedTokenResource ColorText}"/>
 
-                        <Grid RowDefinitions="Auto,12,380,22,Auto,12,Auto,8,Auto,10,Auto,8,Auto,8,Auto,10,Auto"
+                        <Grid RowDefinitions="Auto,12,380,22,Auto,12,Auto,8,Auto,8,Auto,10,Auto,8,Auto,8,Auto,10,Auto"
                               ColumnDefinitions="*,12,104"
                               HorizontalAlignment="Stretch"
                               Margin="0,0,18,0">
@@ -787,13 +787,29 @@
                                              IsEnabled="{Binding IsLoginScriptFileEnabled}"/>
                             </Grid>
 
-                            <TextBlock Grid.Row="10"
+                            <Grid Grid.Row="10"
+                                  Grid.ColumnSpan="3"
+                                  ColumnDefinitions="Auto,12,220"
+                                  HorizontalAlignment="Stretch">
+                                <TextBlock Text="{Binding LoginScriptExecutionTargetText}"
+                                           VerticalAlignment="Center"
+                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                <atom:Select Grid.Column="2"
+                                             x:Name="LoginScriptExecutionTargetSelect"
+                                             Mode="Single"
+                                             HorizontalAlignment="Stretch"
+                                             OptionsSource="{Binding LoginScriptExecutionTargetOptions}"
+                                             SelectionChanged="OnLoginScriptExecutionTargetSelectionChanged"
+                                             IsEnabled="{Binding IsLoginScriptExecutionTargetEnabled}"/>
+                            </Grid>
+
+                            <TextBlock Grid.Row="12"
                                        Grid.ColumnSpan="3"
-                                       Text="{Binding LoginScriptExecutionModeHintText}"
+                                       Text="{Binding LoginScriptExecutionTargetHintText}"
                                        TextWrapping="Wrap"
                                        Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
 
-                            <Grid Grid.Row="12"
+                            <Grid Grid.Row="14"
                                   Grid.ColumnSpan="3"
                                   ColumnDefinitions="Auto,12,*"
                                   HorizontalAlignment="Stretch">
@@ -808,13 +824,13 @@
                                                IsEnabled="{Binding IsLoginScriptInterpreterEnabled}"/>
                             </Grid>
 
-                            <TextBlock Grid.Row="14"
+                            <TextBlock Grid.Row="16"
                                        Grid.ColumnSpan="3"
                                        Text="{Binding LoginScriptInterpreterHintText}"
                                        TextWrapping="Wrap"
                                        Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
 
-                            <Grid Grid.Row="16"
+                            <Grid Grid.Row="18"
                                   Grid.ColumnSpan="3"
                                   ColumnDefinitions="Auto,12,*"
                                   HorizontalAlignment="Stretch">
@@ -1109,11 +1125,20 @@
                                 <StackPanel Grid.Row="4"
                                             Grid.Column="1"
                                             Grid.ColumnSpan="3"
+                                            IsEnabled="{Binding SshForwardX11}"
                                             Spacing="8">
                                     <atom:RadioButton x:Name="SshX11XmanagerButton"
                                                       Content="Xmanager(M)"
                                                       GroupName="SshX11DisplayMode"
                                                       IsChecked="{Binding SshX11UseXmanager, Mode=TwoWay}"/>
+                                    <atom:RadioButton x:Name="SshX11BuiltinButton"
+                                                      Content="{Binding X11BuiltinServerText}"
+                                                      GroupName="SshX11DisplayMode"/>
+                                    <TextBlock Text="{Binding [SessionEdit.X11TrustWarning], Source={x:Static services:LocalizationService.Shared}}"
+                                               Margin="24,0,0,0"
+                                               FontSize="12"
+                                               TextWrapping="Wrap"
+                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
                                     <Grid ColumnDefinitions="Auto,12,*">
                                         <atom:RadioButton x:Name="SshX11DisplayButton"
                                                           Content="X DISPLAY(D):"
