@@ -11,21 +11,21 @@
         <Setter Property="Background" Value="{atom:SharedTokenResource ColorBgContainer}"/>
         <Setter Property="BorderBrush" Value="{atom:SharedTokenResource ColorBorder}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="6"/>
-        <Setter Property="Padding" Value="14,12"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="16,12"/>
     </Style>
     <Style Selector="Border.cx-card-tight">
         <Setter Property="Background" Value="{atom:SharedTokenResource ColorBgContainer}"/>
         <Setter Property="BorderBrush" Value="{atom:SharedTokenResource ColorBorder}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="CornerRadius" Value="5"/>
         <Setter Property="Padding" Value="10,6"/>
     </Style>
     <Style Selector="Border.cx-card-quiet">
         <Setter Property="Background" Value="{atom:SharedTokenResource ColorBgLayout}"/>
         <Setter Property="BorderBrush" Value="{atom:SharedTokenResource ColorSplit}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="Padding" Value="16,12"/>
     </Style>
 
@@ -36,7 +36,7 @@
         <Setter Property="BorderThickness" Value="0,0,1,0"/>
     </Style>
     <Style Selector="Border.cx-panel-header">
-        <Setter Property="MinHeight" Value="38"/>
+        <Setter Property="MinHeight" Value="40"/>
         <Setter Property="Padding" Value="10,0"/>
         <Setter Property="Background" Value="{atom:SharedTokenResource ColorBgContainer}"/>
         <Setter Property="BorderBrush" Value="{atom:SharedTokenResource ColorBorderSecondary}"/>
@@ -45,7 +45,7 @@
 
     <!-- Typography roles -->
     <Style Selector="TextBlock.cx-section-title, atom|TextBlock.cx-section-title">
-        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontSize" Value="12.5"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{atom:SharedTokenResource ColorText}"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
@@ -58,18 +58,18 @@
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
     </Style>
     <Style Selector="TextBlock.cx-field-label, atom|TextBlock.cx-field-label">
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="12"/>
         <Setter Property="Foreground" Value="{atom:SharedTokenResource ColorTextSecondary}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
     </Style>
     <Style Selector="TextBlock.cx-section-hint, atom|TextBlock.cx-section-hint">
-        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontSize" Value="11.5"/>
         <Setter Property="Foreground" Value="{atom:SharedTokenResource ColorTextTertiary}"/>
         <Setter Property="TextWrapping" Value="Wrap"/>
     </Style>
     <Style Selector="TextBlock.cx-meta, atom|TextBlock.cx-meta">
-        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontSize" Value="11.5"/>
         <Setter Property="Foreground" Value="{atom:SharedTokenResource ColorTextTertiary}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
@@ -82,7 +82,7 @@
     </Style>
     <Style Selector="TextBlock.cx-metric, atom|TextBlock.cx-metric">
         <Setter Property="FontFamily" Value="Cascadia Mono,Menlo,Consolas,DejaVu Sans Mono,monospace"/>
-        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontSize" Value="15"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{atom:SharedTokenResource ColorText}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -94,7 +94,7 @@
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
     </Style>
     <Style Selector="TextBlock.cx-hero-title, atom|TextBlock.cx-hero-title">
-        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontSize" Value="20"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{atom:SharedTokenResource ColorText}"/>
     </Style>
@@ -116,12 +116,12 @@
     <!-- Chips / status pills -->
     <Style Selector="Border.cx-chip">
         <Setter Property="Background" Value="{atom:SharedTokenResource ColorFillTertiary}"/>
-        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="CornerRadius" Value="5"/>
         <Setter Property="Padding" Value="8,3"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
     <Style Selector="TextBlock.cx-chip-text, atom|TextBlock.cx-chip-text">
-        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontSize" Value="11.5"/>
         <Setter Property="Foreground" Value="{atom:SharedTokenResource ColorTextSecondary}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
@@ -135,7 +135,7 @@
         <Setter Property="HorizontalAlignment" Value="Center"/>
     </Style>
     <Style Selector="TextBlock.cx-badge-text, atom|TextBlock.cx-badge-text">
-        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="FontSize" Value="11"/>
         <Setter Property="Foreground" Value="{atom:SharedTokenResource ColorPrimary}"/>
         <Setter Property="TextAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -150,7 +150,36 @@
     </Style>
     <Style Selector="TextBlock.cx-banner-warning-text, atom|TextBlock.cx-banner-warning-text">
         <Setter Property="Foreground" Value="{atom:SharedTokenResource ColorWarningText}"/>
-        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Every status colour is a pair: the soft token is the surface, the hard one
+         is the mark. A bare saturated colour on a panel screams; the pair reads. -->
+    <Style Selector="Border.cx-banner-error">
+        <Setter Property="Background" Value="{atom:SharedTokenResource ColorErrorBg}"/>
+        <Setter Property="BorderBrush" Value="{atom:SharedTokenResource ColorErrorBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="7"/>
+        <Setter Property="Padding" Value="10,6"/>
+    </Style>
+    <Style Selector="TextBlock.cx-banner-error-text, atom|TextBlock.cx-banner-error-text">
+        <Setter Property="Foreground" Value="{atom:SharedTokenResource ColorErrorText}"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style Selector="Border.cx-dot-success">
+        <Setter Property="Width" Value="8"/>
+        <Setter Property="Height" Value="8"/>
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Background" Value="{atom:SharedTokenResource ColorSuccess}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Border.cx-dot-error">
+        <Setter Property="Width" Value="8"/>
+        <Setter Property="Height" Value="8"/>
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Background" Value="{atom:SharedTokenResource ColorError}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
@@ -164,8 +193,8 @@
 
     <!-- Toolbar and title-bar icon buttons -->
     <Style Selector="Button.cx-icon-button, atom|Button.cx-icon-button">
-        <Setter Property="Width" Value="32"/>
-        <Setter Property="Height" Value="30"/>
+        <Setter Property="Width" Value="30"/>
+        <Setter Property="Height" Value="26"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
@@ -188,20 +217,20 @@
         <Setter Property="BorderThickness" Value="0,0,1,0"/>
     </Style>
     <Style Selector="TextBlock.cx-nav-label">
-        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="FontSize" Value="11"/>
         <Setter Property="Foreground" Value="{atom:SharedTokenResource ColorTextSecondary}"/>
         <Setter Property="TextAlignment" Value="Center"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
     </Style>
     <Style Selector="Button.cx-nav-item, atom|Button.cx-nav-item">
         <Setter Property="Width" Value="64"/>
-        <Setter Property="Height" Value="46"/>
+        <Setter Property="Height" Value="44"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Margin" Value="0"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="CornerRadius" Value="7"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -209,11 +238,13 @@
     <Style Selector="Button.cx-nav-item:pointerover, atom|Button.cx-nav-item:pointerover">
         <Setter Property="Background" Value="{atom:SharedTokenResource ColorFillQuaternary}"/>
     </Style>
+    <!-- State is a swatch, not a coloured edge: a stripe reads as decoration and
+         competes with the panel border it sits against. -->
     <Style Selector="Border.cx-nav-item-active">
         <Setter Property="Background" Value="{atom:SharedTokenResource ColorPrimaryBg}"/>
-        <Setter Property="BorderBrush" Value="{atom:SharedTokenResource ColorPrimary}"/>
-        <Setter Property="BorderThickness" Value="2,0,0,0"/>
-        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="BorderBrush" Value="{atom:SharedTokenResource ColorPrimaryBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="7"/>
         <Setter Property="Margin" Value="0,2"/>
     </Style>
 
@@ -233,7 +264,7 @@
         <Setter Property="Background" Value="#E61F2933"/>
         <Setter Property="BorderBrush" Value="#4464D8FF"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="CornerRadius" Value="7"/>
         <Setter Property="Padding" Value="14,6"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Top"/>
@@ -245,6 +276,6 @@
         <Setter Property="BorderBrush" Value="{atom:SharedTokenResource ColorBorderSecondary}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="8"/>
-        <Setter Property="BoxShadow" Value="0 8 24 0 #26000000"/>
+        <Setter Property="BoxShadow" Value="0 12 28 0 #29000000"/>
     </Style>
 </Styles>
