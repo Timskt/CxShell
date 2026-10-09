@@ -2,6 +2,8 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using CxShell.Models;
+using System.Collections.Generic;
+using System.Linq;
 using CxShell.Services;
 
 namespace CxShell.Tests;
@@ -88,6 +90,45 @@ public sealed class LocalTerminalConnectionServiceTests
     private static bool PtyRequested() =>
         !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CXSHELL_TEST_PTY")) &&
         (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS());
+
+    [Fact]
+    public async Task DetectedLoginShell_ProducesOutput()
+    {
+        if (!PtyRequested())
+            return;
+
+        // /bin/cat proves the pipe works; this proves the profile the app actually
+        // launches - a login shell with the user's home directory and rc files - does.
+        var profile = LocalTerminalCatalog.Detect().FirstOrDefault();
+        Assert.NotNull(profile);
+
+        using var service = new LocalTerminalConnectionService();
+        var sawOutput = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        string? failure = null;
+        service.DataReceived += _ => sawOutput.TrySetResult();
+        service.ErrorOccurred += message => failure ??= message;
+
+        var session = new SessionInfo
+        {
+            Id = Guid.NewGuid(),
+            Name = "shell",
+            Protocol = SessionProtocol.Local,
+            LocalTerminalProfile = profile
+        };
+
+        await service.ConnectAsync(session, password: null, columns: 80, rows: 24);
+        service.SendData("printf 'cxshell-probe\\r'\n");
+
+        var completed = await Task.WhenAny(sawOutput.Task, Task.Delay(8000));
+        Assert.True(completed == sawOutput.Task, $"{profile.Name} produced no output; error: {failure ?? "none"}");
+
+        // Resizing is what the view does the moment it lays out, and it reaches for
+        // ioctl(TIOCSWINSZ) - a call the connect-only tests never made, which is how a
+        // broken entry point there survived as "local terminals do not work".
+        service.ResizeTerminal(100, 30);
+        await Task.Delay(200);
+        Assert.Null(failure);
+    }
 
     private static SessionInfo LocalSession() => new()
     {

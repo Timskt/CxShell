@@ -799,7 +799,12 @@ public sealed class LocalTerminalConnectionService : ITerminalConnectionService
         private const int SigTerm = 15;
         private const int SigKill = 9;
         private const ulong LinuxTioCsWinsz = 0x5414;
-        private const ulong MacTioCsWinsz = 0x80487467;
+
+        // _IOW('t', 103, struct winsize): direction 2<<30, size 8<<16, group 't', nr 103.
+        // The size field is the whole reason this was wrong before - 0x80487467 encodes a
+        // 72-byte argument, the kernel finds no handler for that request code, and every
+        // resize came back as ENOTTY ("Inappropriate ioctl for device").
+        private const ulong MacTioCsWinsz = 0x80087467;
 
         private const int PollSliceMilliseconds = 50;
 
@@ -1021,25 +1026,25 @@ public sealed class LocalTerminalConnectionService : ITerminalConnectionService
                 public ushort YPixel;
             }
 
-            [DllImport("libc", SetLastError = true)]
+            [DllImport("libc", EntryPoint = "chdir", SetLastError = true)]
             public static extern int ChDir(IntPtr path);
 
-            [DllImport("libc", SetLastError = true)]
+            [DllImport("libc", EntryPoint = "setenv", SetLastError = true)]
             public static extern int SetEnv(IntPtr name, IntPtr value, int overwrite);
 
-            [DllImport("libc", SetLastError = true)]
+            [DllImport("libc", EntryPoint = "execv", SetLastError = true)]
             public static extern int ExecV(IntPtr file, IntPtr argv);
 
             [DllImport("libc", EntryPoint = "_exit")]
             public static extern void ExitImmediately(int status);
 
-            [DllImport("libc", SetLastError = true)]
+            [DllImport("libc", EntryPoint = "ioctl", SetLastError = true)]
             public static extern int Ioctl(int fileDescriptor, ulong request, ref WinSize windowSize);
 
-            [DllImport("libc", SetLastError = true)]
+            [DllImport("libc", EntryPoint = "kill", SetLastError = true)]
             public static extern int Kill(int processId, int signal);
 
-            [DllImport("libc", SetLastError = true)]
+            [DllImport("libc", EntryPoint = "waitpid", SetLastError = true)]
             public static extern int WaitPid(int processId, out int status, int options);
         }
 
