@@ -660,6 +660,54 @@
 
                             <Border Classes="cx-card"
                                     Padding="0"
+                                    IsVisible="{Binding IsSavedSessionLauncherVisible}">
+                                <StackPanel>
+                                    <Grid ColumnDefinitions="*,Auto" Margin="14,10">
+                                        <atom:TextBlock Classes="cx-section-title"
+                                                        VerticalAlignment="Center"
+                                                        Text="{Binding SessionTree.SessionManagerTitle, x:CompileBindings=False}"/>
+                                        <atom:TextBlock Grid.Column="1"
+                                                        Classes="cx-meta"
+                                                        VerticalAlignment="Center"
+                                                        Text="{Binding SessionTree.SessionRows.Count, x:CompileBindings=False}"/>
+                                    </Grid>
+                                    <Border Classes="cx-divider" Margin="0"/>
+                                    <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl Margin="6"
+                                                      ItemsSource="{Binding SessionTree.SessionRows, x:CompileBindings=False}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:SessionNodeViewModel">
+                                                    <atom:Button Classes="cx-ghost"
+                                                                ButtonType="Text"
+                                                                HorizontalContentAlignment="Stretch"
+                                                                HorizontalAlignment="Stretch"
+                                                                Command="{Binding $parent[Window].DataContext.ConnectQuickSessionCommand, x:CompileBindings=False}"
+                                                                CommandParameter="{Binding Session}">
+                                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                                            <atom:IconPresenter Grid.Column="0"
+                                                                                Icon="{antdicons:AntDesignIconProvider Kind=CloudServerOutlined}"
+                                                                                Width="16"
+                                                                                Height="16"
+                                                                                IconBrush="{atom:SharedTokenResource ColorPrimary}"
+                                                                                VerticalAlignment="Center"/>
+                                                            <atom:TextBlock Grid.Column="1"
+                                                                            Classes="cx-value"
+                                                                            Text="{Binding Name}"/>
+                                                            <atom:TextBlock Grid.Column="2"
+                                                                            Classes="cx-mono"
+                                                                            Text="{Binding Host}"
+                                                                            VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                    </atom:Button>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Classes="cx-card"
+                                    Padding="0"
                                     IsVisible="{Binding HasRecentSessions}">
                                 <StackPanel>
                                     <Grid ColumnDefinitions="*,Auto" Margin="14,10">
