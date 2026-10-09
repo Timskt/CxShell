@@ -56,9 +56,10 @@ public partial class App : Application
             var legacySettings = new SessionStorageService().Load().Settings;
             themeMode = new ApplicationSettingsStore().Load(legacySettings).ThemeMode;
         }
-        catch
+        catch (Exception ex)
         {
             // Keep startup on the established dark theme if the settings file is unavailable.
+            AppLog.Warn("Startup settings load failed; falling back to dark theme", ex);
         }
 
         var isDark = !string.Equals(

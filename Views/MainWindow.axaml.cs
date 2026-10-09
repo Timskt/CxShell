@@ -79,7 +79,7 @@ public partial class MainWindow : Window
         };
         _fullScreenHintTimer.Tick += (_, _) => HideFullScreenHintIfNeeded();
 
-        var vm = new MainWindowViewModel();
+        var vm = new MainWindowViewModel(new ShellWindowService());
         AgentPanelHost.CloseRequested += OnAgentPanelCloseRequested;
         ApplyAgentPanelLayout(vm);
         vm.PropertyChanged += (_, e) =>

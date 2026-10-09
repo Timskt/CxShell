@@ -528,9 +528,10 @@ public class SshConnectionService : ITerminalConnectionService
             _shellStream?.Write(bytes, 0, bytes.Length);
             _shellStream?.Flush();
         }
-        catch
+        catch (Exception ex)
         {
             // X11 DISPLAY export is best-effort; the shell remains usable.
+            AppLog.Warn("X11 DISPLAY export failed; shell stays usable", ex);
         }
     }
 
@@ -576,9 +577,10 @@ public class SshConnectionService : ITerminalConnectionService
             _shellStream?.Write(bytes, 0, bytes.Length);
             _shellStream?.Flush();
         }
-        catch
+        catch (Exception ex)
         {
             // Locale bootstrap is best-effort; the shell remains usable if it fails.
+            AppLog.Warn("UTF-8 locale bootstrap failed; shell stays usable", ex);
         }
     }
 
@@ -886,9 +888,10 @@ public class SshConnectionService : ITerminalConnectionService
             _shellStream?.Write(bytes, 0, bytes.Length);
             _shellStream?.Flush();
         }
-        catch
+        catch (Exception ex)
         {
             // Remote command startup is best-effort; normal input remains available.
+            AppLog.Warn("Startup remote command failed to send", ex);
         }
     }
 
