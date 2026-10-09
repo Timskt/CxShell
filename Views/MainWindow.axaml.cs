@@ -111,6 +111,7 @@ public partial class MainWindow : Window
             }
         };
         DataContext = vm;
+        SizeChanged += (_, _) => vm.SetWorkspaceWidth(ClientSize.Width);
         WriteToolbarDiagnostics("MainWindow initialized; toolbar menus use AtomUI ContextMenu.");
         Closed += (_, _) => vm.Dispose();
         PropertyChanged += (_, e) =>
