@@ -1382,6 +1382,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         OnPropertyChanged(nameof(IsMainChromeVisible));
         OnPropertyChanged(nameof(IsQuickSessionBarVisible));
+        OnPropertyChanged(nameof(IsSessionSidebarVisible));
         OnPropertyChanged(nameof(IsSftpPanelVisible));
         OnPropertyChanged(nameof(SftpSplitterWidth));
         OnPropertyChanged(nameof(IsMonitorPanelVisible));
@@ -1665,6 +1666,15 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             _lastSftpPanelWidth = DefaultSftpPanelWidth;
         SftpPanelWidth = new GridLength(Math.Max(MinimumSftpPanelWidth, _lastSftpPanelWidth));
     }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSessionSidebarVisible))]
+    private bool _isSessionSidebarOpen;
+
+    public bool IsSessionSidebarVisible => IsSessionSidebarOpen && !IsTerminalFullScreen;
+
+    [RelayCommand]
+    private void ToggleSessionSidebar() => IsSessionSidebarOpen = !IsSessionSidebarOpen;
 
     [RelayCommand]
     private void ShowSessionManager()
