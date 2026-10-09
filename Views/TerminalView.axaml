@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:services="using:CxShell.Services"
              xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
              xmlns:vm="using:CxShell.ViewModels"
              xmlns:controls="using:CxShell.Controls"
              x:Class="CxShell.Views.TerminalView"
@@ -58,16 +59,13 @@
                                   TerminalBuffer="{Binding Buffer}"/>
 
         <Border x:Name="SearchBar"
+                Classes="cx-popover"
                 ZIndex="10"
                 IsVisible="False"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
                 Margin="0,10,18,0"
-                Padding="6"
-                Background="{atom:SharedTokenResource ColorBgElevated}"
-                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                BorderThickness="1"
-                CornerRadius="6">
+                Padding="6">
             <Grid ColumnDefinitions="220,Auto,Auto,Auto,Auto"
                   ColumnSpacing="4">
                 <atom:LineEdit x:Name="SearchBox"
@@ -77,33 +75,26 @@
                                KeyDown="OnSearchBoxKeyDown"/>
                 <atom:TextBlock x:Name="SearchStatus"
                                 Grid.Column="1"
+                                Classes="cx-meta"
                                 MinWidth="44"
-                                VerticalAlignment="Center"
                                 HorizontalAlignment="Center"
-                                Text="0/0"
-                                Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                Text="0/0"/>
                 <atom:Button Grid.Column="2"
-                             Content="↑"
-                             Width="30"
-                             Height="30"
-                             Padding="0"
+                             Classes="cx-icon-button"
                              ButtonType="Text"
+                             Icon="{antdicons:AntDesignIconProvider Kind=ArrowUpOutlined}"
                              atom:ToolTip.Tip="{Binding SearchPreviousText}"
                              Click="OnSearchPreviousClick"/>
                 <atom:Button Grid.Column="3"
-                             Content="↓"
-                             Width="30"
-                             Height="30"
-                             Padding="0"
+                             Classes="cx-icon-button"
                              ButtonType="Text"
+                             Icon="{antdicons:AntDesignIconProvider Kind=DownOutlined}"
                              atom:ToolTip.Tip="{Binding SearchNextText}"
                              Click="OnSearchNextClick"/>
                 <atom:Button Grid.Column="4"
-                             Content="×"
-                             Width="30"
-                             Height="30"
-                             Padding="0"
+                             Classes="cx-icon-button"
                              ButtonType="Text"
+                             Icon="{antdicons:AntDesignIconProvider Kind=CloseOutlined}"
                              atom:ToolTip.Tip="{Binding SearchCloseText}"
                              Click="OnSearchCloseClick"/>
             </Grid>

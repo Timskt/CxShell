@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using Avalonia.Styling;
 using AtomUI;
 using AtomUI.Controls;
 using AtomUI.Desktop.Controls;
@@ -36,6 +37,16 @@ public partial class App : Application
         });
     }
 
+    /// <summary>
+    /// Avalonia's own FluentTheme resources (used by AvaloniaEdit and LiveMarkdown)
+    /// do not read AtomUI's theme manager, so the variant has to mirror it explicitly.
+    /// </summary>
+    public static void ApplyAvaloniaThemeVariant(bool dark)
+    {
+        if (Current is { } app)
+            app.RequestedThemeVariant = dark ? ThemeVariant.Dark : ThemeVariant.Light;
+    }
+
     private static ThemeConfig LoadInitialTheme()
     {
         var themeMode = ApplicationSettings.DarkThemeMode;
@@ -50,12 +61,15 @@ public partial class App : Application
             // Keep startup on the established dark theme if the settings file is unavailable.
         }
 
-        var algorithms = string.Equals(
+        var isDark = !string.Equals(
             themeMode,
             ApplicationSettings.LightThemeMode,
-            StringComparison.OrdinalIgnoreCase)
-            ? new[] { ThemeAlgorithm.Default }
-            : new[] { ThemeAlgorithm.Default, ThemeAlgorithm.Dark };
+            StringComparison.OrdinalIgnoreCase);
+        ApplyAvaloniaThemeVariant(isDark);
+
+        var algorithms = isDark
+            ? new[] { ThemeAlgorithm.Default, ThemeAlgorithm.Dark }
+            : new[] { ThemeAlgorithm.Default };
 
         return new ThemeConfigBuilder()
             .WithAlgorithms(algorithms)

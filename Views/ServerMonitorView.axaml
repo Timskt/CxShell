@@ -16,22 +16,19 @@
         <StackPanel Spacing="0">
 
             <!-- 头部：主机名 + 状态 -->
-            <Border Padding="12,10,4,10" Background="{atom:SharedTokenResource ColorBgContainer}">
+            <Border Classes="cx-panel-header">
                 <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
                     <TextBlock Grid.Row="0"
                                Grid.Column="0"
                                Text="{Binding MonitorTitleText}"
-                               FontSize="11" Foreground="{atom:SharedTokenResource ColorTextTertiary}"
-                               FontWeight="Bold"/>
+                               Classes="cx-panel-title"/>
                     <StackPanel Grid.Row="1"
                                 Grid.Column="0"
                                 Orientation="Horizontal"
                                 Spacing="6">
                         <TextBlock Text="{Binding HostLabel}"
-                                   FontSize="12" Foreground="{atom:SharedTokenResource ColorText}"
-                                   TextTrimming="CharacterEllipsis"
-                                   MaxWidth="168"
-                                   VerticalAlignment="Center"/>
+                                   Classes="cx-value"
+                                   MaxWidth="168"/>
                         <Ellipse Width="8"
                                  Height="8"
                                  VerticalAlignment="Center">
@@ -40,8 +37,7 @@
                             </Ellipse.Fill>
                         </Ellipse>
                         <TextBlock Text="{Binding MonitorStatusText}"
-                                   FontSize="11" Foreground="{atom:SharedTokenResource ColorTextTertiary}"
-                                   VerticalAlignment="Center"/>
+                                   Classes="cx-meta"/>
                     </StackPanel>
                     <atom:Button Grid.Row="0"
                                  Grid.Column="1"
@@ -52,8 +48,7 @@
                                  ButtonType="Text"
                                  Background="Transparent"
                                  BorderThickness="0"
-                                 Content="×"
-                                 FontSize="18"
+                                 Icon="{antdicons:AntDesignIconProvider Kind=CloseOutlined}"
                                  Command="{Binding $parent[UserControl].PanelCloseCommand, x:CompileBindings=False}"
                                  IsVisible="{Binding $parent[UserControl].IsPanelCloseButtonVisible, x:CompileBindings=False}"
                                  HorizontalAlignment="Right"
@@ -75,8 +70,7 @@
             <Border Padding="12,10,12,6">
                 <StackPanel Spacing="6">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="CPU" FontSize="11"
-                                   Foreground="{atom:SharedTokenResource ColorTextTertiary}" FontWeight="Bold"/>
+                        <TextBlock Text="CPU" Classes="cx-section-title"/>
                         <TextBlock FontSize="11" Foreground="{atom:SharedTokenResource ColorSuccess}">
                             <TextBlock.Text>
                                 <Binding Path="CpuTotalUsage" StringFormat="{}{0:F1}%"/>
@@ -116,14 +110,13 @@
                 </StackPanel>
             </Border>
 
-            <Border Height="1" Background="{atom:SharedTokenResource ColorSplit}" Margin="12,0"/>
+            <Border Classes="cx-divider"/>
 
             <!-- 内存区域 -->
             <Border Padding="12,10,12,6"
                     IsVisible="{Binding Memory, Converter={x:Static controls:NullToBoolConverter.Instance}}">
                 <StackPanel Spacing="8">
-                    <TextBlock Text="{Binding MemoryTitleText}" FontSize="11"
-                               Foreground="{atom:SharedTokenResource ColorTextTertiary}" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding MemoryTitleText}" Classes="cx-section-title"/>
                     <Grid ColumnDefinitions="120,*">
                         <!-- 饼图 -->
                         <controls:PieChartControl Grid.Column="0"
@@ -134,52 +127,49 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Ellipse Width="8" Height="8" Fill="{atom:SharedTokenResource ColorError}"/>
                                 <TextBlock Text="{Binding MemoryUsedDisplay}"
-                                           FontSize="10" Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-meta"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Ellipse Width="8" Height="8" Fill="{atom:SharedTokenResource ColorInfo}"/>
                                 <TextBlock Text="{Binding MemoryCachedDisplay}"
-                                           FontSize="10" Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-meta"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Ellipse Width="8" Height="8" Fill="{atom:SharedTokenResource ColorSuccess}"/>
                                 <TextBlock Text="{Binding MemoryFreeDisplay}"
-                                           FontSize="10" Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-meta"/>
                             </StackPanel>
                             <TextBlock Text="{Binding MemoryTotalDisplay}"
-                                       FontSize="10" Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                       Classes="cx-meta"/>
                         </StackPanel>
                     </Grid>
                 </StackPanel>
             </Border>
 
-            <Border Height="1" Background="{atom:SharedTokenResource ColorSplit}" Margin="12,0"/>
+            <Border Classes="cx-divider"/>
 
             <!-- 网络区域 -->
             <Border Padding="12,10,12,6">
                 <StackPanel Spacing="6">
-                    <TextBlock Text="{Binding NetworkTitleText}" FontSize="11"
-                               Foreground="{atom:SharedTokenResource ColorTextTertiary}" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding NetworkTitleText}" Classes="cx-section-title"/>
                     <!-- 当前速度 -->
                     <Grid ColumnDefinitions="*,*">
                         <StackPanel Grid.Column="0" Spacing="2">
                             <TextBlock Text="{Binding DownloadText}" FontSize="10" Foreground="{atom:SharedTokenResource ColorInfo}"/>
-                            <TextBlock FontSize="11" Foreground="{atom:SharedTokenResource ColorText}"
+                            <TextBlock Classes="cx-value"
                                        Text="{Binding CurrentNetworkSpeed.RxFormatted, FallbackValue='0 B/s'}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="2">
                             <TextBlock Text="{Binding UploadText}" FontSize="10" Foreground="{atom:SharedTokenResource ColorSuccess}"/>
-                            <TextBlock FontSize="11" Foreground="{atom:SharedTokenResource ColorText}"
+                            <TextBlock Classes="cx-value"
                                        Text="{Binding CurrentNetworkSpeed.TxFormatted, FallbackValue='0 B/s'}"/>
                         </StackPanel>
                     </Grid>
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <TextBlock Text="{Binding LatencyText}"
-                                   FontSize="10"
-                                   Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                   Classes="cx-meta"/>
                         <TextBlock Text="{Binding LatencyDisplay}"
-                                   FontSize="10"
-                                   Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                   Classes="cx-mono"/>
                     </StackPanel>
                     <!-- 折线图 -->
                     <controls:LineChartControl
@@ -190,14 +180,13 @@
                 </StackPanel>
             </Border>
 
-            <Border Height="1" Background="{atom:SharedTokenResource ColorSplit}" Margin="12,0"/>
+            <Border Classes="cx-divider"/>
 
             <!-- 磁盘分区 -->
             <Border Padding="12,10,12,6"
                     IsVisible="{Binding DiskPartitions.Count, Converter={x:Static controls:CountToBoolConverter.Instance}}">
                 <StackPanel Spacing="6">
-                    <TextBlock Text="{Binding DiskTitleText}" FontSize="11"
-                               Foreground="{atom:SharedTokenResource ColorTextTertiary}" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding DiskTitleText}" Classes="cx-section-title"/>
                     <ItemsControl ItemsSource="{Binding DiskPartitions}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="models:DiskPartitionInfo">
@@ -205,9 +194,8 @@
                                     <Grid ColumnDefinitions="*,Auto">
                                         <TextBlock Grid.Column="0"
                                                    Text="{Binding MountPoint}"
-                                                   FontSize="10" Foreground="{atom:SharedTokenResource ColorTextSecondary}"
-                                                   TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Grid.Column="1" FontSize="10" Foreground="{atom:SharedTokenResource ColorTextTertiary}">
+                                                   Classes="cx-mono"/>
+                                        <TextBlock Grid.Column="1" Classes="cx-meta">
                                             <TextBlock.Text>
                                                 <MultiBinding StringFormat="{}{0}/{1}">
                                                     <Binding Path="UsedFormatted"/>
@@ -234,24 +222,22 @@
             <Border Padding="12,6,12,10"
                     IsVisible="{Binding DiskIo.Count, Converter={x:Static controls:CountToBoolConverter.Instance}}">
                 <StackPanel Spacing="4">
-                    <TextBlock Text="{Binding DiskIoTitleText}" FontSize="11"
-                               Foreground="{atom:SharedTokenResource ColorTextTertiary}" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding DiskIoTitleText}" Classes="cx-section-title"/>
                     <ItemsControl ItemsSource="{Binding DiskIo}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="models:DiskIoInfo">
                                 <Grid ColumnDefinitions="50,*,*" Margin="0,2">
                                     <TextBlock Grid.Column="0"
                                                Text="{Binding Device}"
-                                               FontSize="10" Foreground="{atom:SharedTokenResource ColorTextSecondary}"
-                                               VerticalAlignment="Center"/>
+                                               Classes="cx-meta"/>
                                     <StackPanel Grid.Column="1" Spacing="1">
                                         <TextBlock Text="{Binding $parent[UserControl].DataContext.ReadText, x:CompileBindings=False}" FontSize="9" Foreground="{atom:SharedTokenResource ColorInfo}"/>
-                                        <TextBlock FontSize="10" Foreground="{atom:SharedTokenResource ColorTextSecondary}"
+                                        <TextBlock Classes="cx-mono"
                                                    Text="{Binding ReadFormatted}"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="2" Spacing="1">
                                         <TextBlock Text="{Binding $parent[UserControl].DataContext.WriteText, x:CompileBindings=False}" FontSize="9" Foreground="{atom:SharedTokenResource ColorSuccess}"/>
-                                        <TextBlock FontSize="10" Foreground="{atom:SharedTokenResource ColorTextSecondary}"
+                                        <TextBlock Classes="cx-mono"
                                                    Text="{Binding WriteFormatted}"/>
                                     </StackPanel>
                                 </Grid>

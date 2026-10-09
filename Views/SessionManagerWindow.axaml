@@ -18,10 +18,7 @@
     <Grid RowDefinitions="*,Auto">
         <views:SessionTreeView Grid.Row="0" DataContext="{Binding}"/>
 
-        <Border Grid.Row="1"
-                BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                BorderThickness="0,1,0,0"
-                Padding="20,12">
+        <Border Grid.Row="1" Classes="cx-footer-bar">
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right"
                         Spacing="8">

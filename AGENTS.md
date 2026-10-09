@@ -6,15 +6,18 @@ CxShell is a single-project Avalonia desktop terminal and remote session client 
 
 - `Views/`: Avalonia `.axaml` views and their code-behind files.
 - `ViewModels/`: MVVM presentation logic, commands, and observable state.
-- `Models/`: session, SFTP, and monitoring data objects.
+- `Models/`: session, SFTP, and monitoring data objects. Keep Avalonia types out of this layer.
 - `Services/`: SSH/SFTP connections, persistence, monitoring, and Linux parsing.
 - `Terminal/`: terminal buffer, cells, ANSI parsing, and color handling.
 - `Controls/` and `Converters/`: reusable UI controls and binding converters.
+- `Themes/`: `Styles.axaml`, registered in `App.axaml`, holds the shared `cx-*` appearance classes.
 - `Assets/`: resources embedded through `CxShell.csproj`.
 
 `AtomUI/` is ignored reference source and explicitly excluded from compilation. Do not treat `bin/` or `obj/` as source.
 
 ## Build, Test, and Development Commands
+
+The .NET 10 SDK must be 10.0.300 or newer: `ThirdParty/VelaShell.XServer` uses `with` collection-expression syntax, and older SDKs fail with `CS0103: The name 'with' does not exist`.
 
 Run commands from the repository root:
 
@@ -31,9 +34,15 @@ dotnet format CxShell.csproj
 
 Use four-space indentation in C# and follow existing file-scoped namespace style. Keep nullable reference types enabled. Use PascalCase for types, public members, views, and view models; use camelCase for parameters and `_camelCase` for private fields. Pair each view with matching names such as `TerminalView.axaml` and `TerminalView.axaml.cs`. Prefer CommunityToolkit.Mvvm attributes (`[ObservableProperty]`, `[RelayCommand]`) over repetitive boilerplate.
 
+## UI Styling Conventions
+
+Repeated surfaces use the shared classes in `Themes/Styles.axaml` (`cx-card`, `cx-panel-header`, `cx-section-title`, `cx-field-label`, `cx-meta`, `cx-divider`, `cx-footer-bar`, `cx-popover`, `cx-nav-item`, and the `cx-banner-warning` pair) instead of restating background, border, radius, padding, and font size per view. Colours come from `{atom:SharedTokenResource ...}` so light and dark themes stay in sync; hard-coded hex values are reserved for surfaces that are deliberately opaque canvas backdrops (remote desktop and recording playback). AtomUI's XAML analyser rejects cross-file `StaticResource` keys, so metric values live inside the style classes rather than in a separate token dictionary.
+
+`dotnet run -- --ui-shot <path>[,scene]` renders a window to a PNG and exits; scenes are `session-edit`, `settings`, `session-manager`, `recent-connections`, `tunnels`, and `agent`. Use it to check visual changes where no display capture permission exists.
+
 ## Testing Guidelines
 
-No automated test project currently exists. Before submitting changes, run `dotnet build CxShell.csproj` and manually exercise affected SSH, SFTP, terminal, or monitoring workflows. New test projects should use names such as `CxShell.Tests`, with test files named `<ClassName>Tests.cs`; run them with `dotnet test`.
+`CxShell.Tests` holds the xUnit suite (terminal engine, Agent runtime, X11, transfer policies, and persistence). Run it with `dotnet test CxShell.Tests/CxShell.Tests.csproj`; CI runs the same command on every push to `master` and on pull requests. View code-behind and the large window view models are not covered, so also exercise affected SSH, SFTP, terminal, or monitoring workflows by hand. New test files are named `<ClassName>Tests.cs`.
 
 ## Terminal Interaction Requirements
 

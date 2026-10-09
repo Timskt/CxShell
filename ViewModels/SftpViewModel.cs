@@ -932,7 +932,6 @@ public partial class SftpViewModel : ObservableObject, IDisposable
                 return new SftpPathSuggestionItem(
                     item.Name,
                     path,
-                    item.Icon,
                     item.IsDirectory);
             })
             .ToList();
@@ -2822,12 +2821,10 @@ public class PathSegment
 public sealed class SftpPathSuggestionItem(
     string name,
     string completionPath,
-    string icon,
     bool isDirectory)
 {
     public string Name { get; } = name;
     public string CompletionPath { get; } = completionPath;
-    public string Icon { get; } = icon;
     public bool IsDirectory { get; } = isDirectory;
     public string TypeText => IsDirectory ? "目录" : "文件";
 }

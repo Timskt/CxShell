@@ -4,6 +4,7 @@
              xmlns:antdicons="https://atomui.net/icons/antdesign"
              xmlns:vm="using:CxShell.ViewModels"
              xmlns:models="using:CxShell.Models"
+             xmlns:conv="using:CxShell.Converters"
              x:Class="CxShell.Views.SftpPanelView"
              x:DataType="vm:SftpViewModel">
 
@@ -35,32 +36,27 @@
     <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" Background="{atom:SharedTokenResource ColorBgLayout}">
 
         <Border Grid.Row="0"
-                Background="{atom:SharedTokenResource ColorBgContainer}"
-                Padding="10,8,4,8">
+                Classes="cx-panel-header">
             <Grid ColumnDefinitions="*,Auto"
                   VerticalAlignment="Center">
                 <StackPanel Grid.Column="0"
                             Orientation="Horizontal"
                             Spacing="6"
                             VerticalAlignment="Center">
-                    <TextBlock Text="📁"
-                               FontSize="14"
-                               VerticalAlignment="Center"
-                               Foreground="{atom:SharedTokenResource ColorText}"/>
+                    <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=FolderOpenOutlined}"
+                                        Width="16"
+                                        Height="16"
+                                        IconBrush="{atom:SharedTokenResource ColorText}"
+                                        VerticalAlignment="Center"/>
                     <TextBlock Text="{Binding ProtocolLabel}"
-                               FontSize="13"
-                               FontWeight="Bold"
-                               Foreground="{atom:SharedTokenResource ColorText}"
-                               VerticalAlignment="Center"/>
+                               Classes="cx-panel-title"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             Spacing="6"
                             VerticalAlignment="Center">
                     <TextBlock Text="{Binding HostLabel}"
-                               FontSize="11"
-                               Foreground="{atom:SharedTokenResource ColorTextTertiary}"
-                               VerticalAlignment="Center"/>
+                               Classes="cx-meta"/>
                     <Ellipse Width="8"
                              Height="8"
                              VerticalAlignment="Center"
@@ -118,11 +114,7 @@
                        IsLightDismissEnabled="False">
                     <Border Width="{Binding Bounds.Width, ElementName=RemotePathInput}"
                             MaxHeight="220"
-                            Background="{atom:SharedTokenResource ColorBgElevated}"
-                            BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            BoxShadow="0 6 18 0 #26000000"
+                            Classes="cx-popover"
                             Padding="2">
                         <ListBox ItemsSource="{Binding PathSuggestions}"
                                  SelectedIndex="{Binding SelectedPathSuggestionIndex, Mode=TwoWay}"
@@ -137,17 +129,15 @@
                                           ColumnSpacing="6"
                                           MinHeight="28"
                                           Margin="4,0">
-                                        <TextBlock Grid.Column="0"
-                                                   Text="{Binding Icon}"
-                                                   FontSize="12"
-                                                   VerticalAlignment="Center"
-                                                   Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                        <atom:IconPresenter Grid.Column="0"
+                                                            Icon="{Binding Converter={x:Static conv:FileKindIconConverter.Instance}}"
+                                                            Width="16"
+                                                            Height="16"
+                                                            IconBrush="{atom:SharedTokenResource ColorTextSecondary}"
+                                                            VerticalAlignment="Center"/>
                                         <TextBlock Grid.Column="1"
                                                    Text="{Binding CompletionPath}"
-                                                   FontSize="12"
-                                                   VerticalAlignment="Center"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   Foreground="{atom:SharedTokenResource ColorText}"/>
+                                                   Classes="cx-value"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -169,33 +159,32 @@
                              Padding="8,5"
                              Command="{Binding NavigateHomeCommand}"
                              CornerRadius="4">
-                    <TextBlock Text="🏠"
-                               FontSize="14"
-                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                    <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=HomeOutlined}"
+                                        Width="14"
+                                        Height="14"
+                                        IconBrush="{atom:SharedTokenResource ColorTextSecondary}"/>
                 </atom:Button>
                 <atom:Button Background="{atom:SharedTokenResource ColorFillTertiary}"
                              BorderThickness="0"
                              Padding="8,5"
                              Command="{Binding NavigateUpCommand}"
                              CornerRadius="4">
-                    <TextBlock Text="↑"
-                               FontSize="14"
-                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"
-                               FontWeight="Bold"/>
+                    <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=ArrowUpOutlined}"
+                                        Width="14"
+                                        Height="14"
+                                        IconBrush="{atom:SharedTokenResource ColorTextSecondary}"/>
                 </atom:Button>
                 <atom:Button Background="{atom:SharedTokenResource ColorFillTertiary}"
                              BorderThickness="0"
                              Padding="8,5"
                              Command="{Binding RefreshCommand}"
                              CornerRadius="4">
-                    <TextBlock Text="↻"
-                               FontSize="14"
-                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"
-                               FontWeight="Bold"/>
+                    <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=ReloadOutlined}"
+                                        Width="14"
+                                        Height="14"
+                                        IconBrush="{atom:SharedTokenResource ColorTextSecondary}"/>
                 </atom:Button>
-                <Border Width="1"
-                        Background="{atom:SharedTokenResource ColorBorder}"
-                        Margin="4,4"/>
+                <Border Classes="cx-divider-vertical"/>
                 <atom:Button Background="{atom:SharedTokenResource ColorSuccessBg}"
                              BorderThickness="0"
                              Padding="8,5"
@@ -267,12 +256,12 @@
                     IsVisible="{Binding IsCreatingDirectory}">
                 <Grid ColumnDefinitions="Auto,*"
                       ColumnSpacing="6">
-                    <TextBlock Grid.Column="0"
-                               Text="+"
-                               FontSize="15"
-                               FontWeight="Bold"
-                               VerticalAlignment="Center"
-                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                    <atom:IconPresenter Grid.Column="0"
+                                        Icon="{antdicons:AntDesignIconProvider Kind=PlusOutlined}"
+                                        Width="14"
+                                        Height="14"
+                                        IconBrush="{atom:SharedTokenResource ColorTextSecondary}"
+                                        VerticalAlignment="Center"/>
                     <atom:TextBox Grid.Column="1"
                                   x:Name="NewDirInput"
                                   Text="{Binding NewDirectoryName, Mode=TwoWay}"
@@ -290,13 +279,13 @@
                         Spacing="8"
                         Grid.RowSpan="2"
                         IsVisible="{Binding !IsConnected}">
-                <TextBlock Text="📁"
-                           FontSize="32"
-                           HorizontalAlignment="Center"
-                           Opacity="0.3"/>
+                <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=FolderOpenOutlined}"
+                                    Width="32"
+                                    Height="32"
+                                    HorizontalAlignment="Center"
+                                    Opacity="0.3"/>
                 <TextBlock Text="{Binding ConnectHintText}"
-                           FontSize="12"
-                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"
+                           Classes="cx-section-hint"
                            HorizontalAlignment="Center"/>
             </StackPanel>
 
@@ -333,12 +322,13 @@
                             <atom:DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate DataType="models:SftpFileItem">
                                     <Grid ColumnDefinitions="Auto,*">
-                                        <TextBlock Grid.Column="0"
-                                                   Text="{Binding Icon}"
-                                                   FontSize="13"
-                                                   VerticalAlignment="Center"
-                                                   Foreground="{atom:SharedTokenResource ColorTextSecondary}"
-                                                   Margin="0,0,6,0"/>
+                                        <atom:IconPresenter Grid.Column="0"
+                                                            Icon="{Binding Converter={x:Static conv:FileKindIconConverter.Instance}}"
+                                                            Width="16"
+                                                            Height="16"
+                                                            IconBrush="{atom:SharedTokenResource ColorTextSecondary}"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,6,0"/>
                                         <Grid Grid.Column="1">
                                             <TextBlock Text="{Binding DisplayName}"
                                                        FontSize="12"
@@ -376,43 +366,34 @@
         </Grid>
 
         <Border Grid.Row="5"
-                Background="{atom:SharedTokenResource ColorBgContainer}"
-                BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                BorderThickness="0,1,0,0">
+                Classes="cx-footer-bar">
             <Grid RowDefinitions="Auto,Auto">
                 <Grid Grid.Row="0"
                       ColumnDefinitions="Auto,*,Auto,Auto"
                       ColumnSpacing="8"
-                      MinHeight="34"
-                      Margin="8,4">
+                      MinHeight="34">
                     <TextBlock Grid.Column="0"
                                Text="{Binding TransferQueueTitleText}"
-                               FontSize="12"
-                               FontWeight="SemiBold"
-                               VerticalAlignment="Center"
-                               Foreground="{atom:SharedTokenResource ColorText}"/>
+                               Classes="cx-panel-title"/>
                     <TextBlock Grid.Column="1"
                                Text="{Binding TransferSummaryText}"
-                               FontSize="10"
-                               VerticalAlignment="Center"
-                               Foreground="{atom:SharedTokenResource ColorTextTertiary}"
-                               TextTrimming="CharacterEllipsis"/>
+                               Classes="cx-meta"/>
                     <atom:Button Grid.Column="2"
+                                 Classes="cx-ghost"
                                  Height="24"
-                                 Padding="7,2"
                                  ButtonType="Text"
                                  IsEnabled="{Binding HasCompletedTransfers}"
                                  Command="{Binding ClearCompletedTransfersCommand}">
                         <TextBlock Text="{Binding ClearCompletedTransfersText}"
-                                   FontSize="10"/>
+                                   Classes="cx-chip-text"/>
                     </atom:Button>
                     <atom:Button Grid.Column="3"
+                                 Classes="cx-ghost"
                                  Height="24"
-                                 Padding="7,2"
                                  ButtonType="Text"
                                  Command="{Binding ToggleTransferPanelCommand}">
                         <TextBlock Text="{Binding TransferPanelToggleText}"
-                                   FontSize="10"/>
+                                   Classes="cx-chip-text"/>
                     </atom:Button>
                 </Grid>
 

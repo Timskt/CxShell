@@ -86,12 +86,7 @@
     </atom:Window.Styles>
 
     <Grid Margin="20" ColumnDefinitions="220,14,*,14,104">
-        <Border Grid.Column="0"
-                Background="{atom:SharedTokenResource ColorBgContainer}"
-                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                BorderThickness="1"
-                CornerRadius="6"
-                Padding="12">
+        <Border Grid.Column="0" Classes="cx-card">
             <DockPanel LastChildFill="True">
                 <StackPanel DockPanel.Dock="Top" Spacing="2" Margin="2,2,2,12">
                     <TextBlock Text="{Binding NavTitleText}"
@@ -160,15 +155,10 @@
         </Border>
 
         <Grid Grid.Column="2" RowDefinitions="Auto,12,*">
-            <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                    BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                    BorderThickness="0,0,0,1"
-                    Padding="12,8">
+            <Border Classes="cx-panel-header">
                 <TextBlock x:Name="PageTitleText"
                            Text="{Binding ConnectionText}"
-                           FontSize="15"
-                           FontWeight="SemiBold"
-                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                           Classes="cx-panel-title"/>
             </Border>
 
             <Grid Grid.Row="2">
@@ -186,21 +176,15 @@
                                        TextWrapping="Wrap"/>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,12,Auto,12,Auto,12,Auto,12,Auto"
                                   ColumnDefinitions="110,*">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="{Binding GeneralText}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
 
                                 <TextBlock Grid.Row="4" Text="{Binding NameText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="4" Grid.Column="1"
                                               x:Name="NameBox"
                                               Status="{Binding NameStatus}"
@@ -208,8 +192,7 @@
                                               PlaceholderText="{Binding NamePlaceholderText}"/>
 
                                 <TextBlock Grid.Row="6" Text="{Binding ProtocolText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="6" Grid.Column="1"
                                              x:Name="ProtocolSelect"
                                              Mode="Single"
@@ -219,8 +202,7 @@
                                              SelectionChanged="OnProtocolSelectionChanged"/>
 
                                 <TextBlock Grid.Row="8" Text="{Binding HostText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="8" Grid.Column="1"
                                               x:Name="HostBox"
                                               Status="{Binding HostStatus}"
@@ -228,8 +210,7 @@
                                               PlaceholderText="{Binding HostPlaceholderText}"/>
 
                                 <TextBlock Grid.Row="10" Text="{Binding PortText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="10" Grid.Column="1"
                                               x:Name="PortBox"
                                               Width="160"
@@ -240,22 +221,16 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
                                   ColumnDefinitions="110,*">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="{Binding UserAuthText}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
 
                                 <TextBlock Grid.Row="1" Text="{Binding UsernameText}"
-                                           VerticalAlignment="Center"
-                                           Margin="0,14,0,0"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"
+                                           Margin="0,14,0,0"/>
                                 <atom:LineEdit Grid.Row="1" Grid.Column="1"
                                               x:Name="ConnectionUsernameBox"
                                               Margin="0,14,0,0"
@@ -263,9 +238,8 @@
                                               PlaceholderText="root"/>
 
                                 <TextBlock Grid.Row="2" Text="{Binding AuthMethodText}"
-                                           VerticalAlignment="Center"
-                                           Margin="0,12,0,0"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"
+                                           Margin="0,12,0,0"/>
                                 <StackPanel Grid.Row="2" Grid.Column="1"
                                             Orientation="Horizontal"
                                             Spacing="20"
@@ -279,10 +253,9 @@
                                 </StackPanel>
 
                                 <TextBlock Grid.Row="3" Text="{Binding PasswordText}"
-                                           VerticalAlignment="Center"
+                                           Classes="cx-field-label"
                                            Margin="0,12,0,0"
-                                           IsVisible="{Binding IsPasswordAuth}"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           IsVisible="{Binding IsPasswordAuth}"/>
                                 <atom:LineEdit Grid.Row="3"
                                                Grid.Column="1"
                                                Margin="0,12,0,0"
@@ -297,18 +270,15 @@
                                             Margin="0,6,0,0"
                                             IsVisible="{Binding IsPasswordAuth}">
                                     <TextBlock Text="{Binding PasswordNotSavedText}"
-                                               FontSize="12"
-                                               Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                               Classes="cx-section-hint"/>
                                     <TextBlock Text="{Binding PasswordSavedEncryptedText}"
-                                               FontSize="12"
-                                               Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                               Classes="cx-section-hint"/>
                                 </StackPanel>
 
                                 <TextBlock Grid.Row="5" Text="{Binding PrivateKeyPathText}"
-                                           VerticalAlignment="Center"
+                                           Classes="cx-field-label"
                                            Margin="0,12,0,0"
-                                           IsVisible="{Binding IsPrivateKeyAuth}"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           IsVisible="{Binding IsPrivateKeyAuth}"/>
                                 <Grid Grid.Row="5" Grid.Column="1"
                                       ColumnDefinitions="*,Auto"
                                       ColumnSpacing="8"
@@ -323,10 +293,9 @@
                                 </Grid>
 
                                 <TextBlock Grid.Row="6" Text="{Binding PrivateKeyPassphraseText}"
-                                           VerticalAlignment="Center"
+                                           Classes="cx-field-label"
                                            Margin="0,12,0,0"
-                                           IsVisible="{Binding IsPrivateKeyAuth}"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           IsVisible="{Binding IsPrivateKeyAuth}"/>
                                 <atom:LineEdit Grid.Row="6"
                                                Grid.Column="1"
                                                Margin="0,12,0,0"
@@ -338,26 +307,19 @@
                                 <TextBlock Grid.Row="7"
                                            Grid.Column="1"
                                            Text="{Binding PrivateKeyPassphraseHintText}"
-                                           FontSize="12"
-                                           TextWrapping="Wrap"
+                                           Classes="cx-section-hint"
                                            Margin="0,6,0,0"
-                                           IsVisible="{Binding IsPrivateKeyAuth}"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           IsVisible="{Binding IsPrivateKeyAuth}"/>
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18"
+                        <Border Classes="cx-card"
                                 IsVisible="False">
                             <Grid RowDefinitions="Auto,14,Auto,8,Auto,12,Auto,12,Auto,12,Auto,12,Auto,12,Auto,12,Auto,12,Auto"
                                   ColumnDefinitions="110,*">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="{Binding VncSshTunnelTitleText}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
 
                                 <atom:CheckBox Grid.Row="2"
                                                Grid.ColumnSpan="2"
@@ -367,13 +329,11 @@
                                 <TextBlock Grid.Row="4"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding VncSshTunnelDescriptionText}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
 
                                 <TextBlock Grid.Row="6"
                                            Text="{Binding SshHostText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="6"
                                                Grid.Column="1"
                                                Text="{Binding VncSshHost, Mode=TwoWay}"
@@ -382,8 +342,7 @@
 
                                 <TextBlock Grid.Row="8"
                                            Text="{Binding SshPortText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="8"
                                                Grid.Column="1"
                                                Width="160"
@@ -394,8 +353,7 @@
 
                                 <TextBlock Grid.Row="10"
                                            Text="VNC Host"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="10"
                                                Grid.Column="1"
                                                Text="{Binding VncSshRemoteHost, Mode=TwoWay}"
@@ -404,8 +362,7 @@
 
                                 <TextBlock Grid.Row="12"
                                            Text="VNC Port"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="12"
                                                Grid.Column="1"
                                                Width="160"
@@ -416,8 +373,7 @@
 
                                 <TextBlock Grid.Row="14"
                                            Text="{Binding SshUsernameText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="14"
                                                Grid.Column="1"
                                                Text="{Binding VncSshUsername, Mode=TwoWay}"
@@ -426,8 +382,7 @@
 
                                 <TextBlock Grid.Row="16"
                                            Text="{Binding AuthMethodText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <StackPanel Grid.Row="16"
                                             Grid.Column="1"
                                             Orientation="Horizontal"
@@ -443,9 +398,8 @@
 
                                 <TextBlock Grid.Row="18"
                                            Text="{Binding SshPasswordText}"
-                                           VerticalAlignment="Center"
-                                           IsVisible="{Binding IsVncSshPasswordAuth}"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"
+                                           IsVisible="{Binding IsVncSshPasswordAuth}"/>
                                 <atom:LineEdit Grid.Row="18"
                                                Grid.Column="1"
                                                Text="{Binding VncSshPassword, Mode=TwoWay}"
@@ -457,9 +411,8 @@
 
                                 <TextBlock Grid.Row="18"
                                            Text="{Binding SshPrivateKeyText}"
-                                           VerticalAlignment="Center"
-                                           IsVisible="{Binding IsVncSshPrivateKeyAuth}"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"
+                                           IsVisible="{Binding IsVncSshPrivateKeyAuth}"/>
                                 <Grid Grid.Row="18"
                                       Grid.Column="1"
                                       ColumnDefinitions="*,Auto"
@@ -476,18 +429,13 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                IsVisible="{Binding SupportsTerminalAutoReconnect}"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                IsVisible="{Binding SupportsTerminalAutoReconnect}">
                             <Grid RowDefinitions="Auto,14,Auto,12,Auto"
                                   ColumnDefinitions="Auto,8,112,6,Auto,24,Auto,8,112,6,Auto,*">
                                 <TextBlock Grid.ColumnSpan="12"
                                            Text="{Binding ReconnectText}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
 
                                 <atom:CheckBox Grid.Row="2"
                                                Grid.ColumnSpan="12"
@@ -496,8 +444,7 @@
 
                                 <TextBlock Grid.Row="4" Grid.Column="0"
                                            Text="{Binding IntervalText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:NumericUpDown Grid.Row="4" Grid.Column="2"
                                                     Minimum="1"
                                                     Maximum="3600"
@@ -505,13 +452,11 @@
                                                     IsEnabled="{Binding AutoReconnect}"/>
                                 <TextBlock Grid.Row="4" Grid.Column="4"
                                            Text="{Binding SecondsText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
 
                                 <TextBlock Grid.Row="4" Grid.Column="6"
                                            Text="{Binding LimitText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:NumericUpDown Grid.Row="4" Grid.Column="8"
                                                     Minimum="0"
                                                     Maximum="1440"
@@ -519,8 +464,7 @@
                                                     IsEnabled="{Binding AutoReconnect}"/>
                                 <TextBlock Grid.Row="4" Grid.Column="10"
                                            Text="{Binding MinutesText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                             </Grid>
                         </Border>
                     </StackPanel>
@@ -528,18 +472,13 @@
 
                 <ScrollViewer x:Name="KeepAlivePage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                IsVisible="{Binding SupportsTerminalKeepAlive}"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                IsVisible="{Binding SupportsTerminalKeepAlive}">
                             <Grid RowDefinitions="Auto,14,Auto,18,Auto,12,Auto,18,Auto,10,Auto"
                                   ColumnDefinitions="Auto,14,110,18,56,56,120,*">
                                 <TextBlock Grid.ColumnSpan="8"
                                            Text="{Binding [UiText.010], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
 
                                 <atom:CheckBox Grid.Row="2"
                                                Grid.ColumnSpan="8"
@@ -550,9 +489,8 @@
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.012], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Right"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"
+                                           HorizontalAlignment="Right"/>
                                 <atom:NumericUpDown Grid.Row="4"
                                                     Grid.Column="4"
                                                     Grid.ColumnSpan="2"
@@ -563,8 +501,7 @@
                                 <TextBlock Grid.Row="4"
                                            Grid.Column="6"
                                            Text="{Binding SecondsText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
 
                                 <atom:CheckBox Grid.Row="6"
                                                Grid.ColumnSpan="8"
@@ -575,9 +512,8 @@
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.014], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Right"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"
+                                           HorizontalAlignment="Right"/>
                                 <atom:NumericUpDown Grid.Row="8"
                                                     Grid.Column="4"
                                                     Grid.ColumnSpan="2"
@@ -588,15 +524,13 @@
                                 <TextBlock Grid.Row="8"
                                            Grid.Column="6"
                                            Text="{Binding SecondsText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <TextBlock Grid.Row="10"
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.015], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Right"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"
+                                           HorizontalAlignment="Right"/>
                                 <atom:LineEdit Grid.Row="10"
                                                Grid.Column="4"
                                                Grid.ColumnSpan="4"
@@ -607,12 +541,8 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                IsVisible="{Binding SupportsTcpTransportOptions}"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                IsVisible="{Binding SupportsTcpTransportOptions}">
                             <atom:CheckBox Content="{Binding [UiText.016], Source={x:Static services:LocalizationService.Shared}}"
                                            IsChecked="{Binding TcpKeepAlive, Mode=TwoWay}"/>
                         </Border>
@@ -621,32 +551,24 @@
 
                 <ScrollViewer x:Name="LoginPromptPage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,28,Auto,12,Auto"
                                   ColumnDefinitions="160,320">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="TELNET"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [SessionEdit.LoginPrompt.TelnetDescription], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
                                 <TextBlock Grid.Row="4" Text="{Binding [UiText.017], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="4" Grid.Column="1"
                                               x:Name="TelnetUsernamePromptBox"
                                               Text="{Binding TelnetUsernamePrompt, Mode=TwoWay}"
                                               PlaceholderText="ogin:"/>
                                 <TextBlock Grid.Row="6" Text="{Binding [UiText.018], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="6" Grid.Column="1"
                                               x:Name="TelnetPasswordPromptBox"
                                               Text="{Binding TelnetPasswordPrompt, Mode=TwoWay}"
@@ -654,25 +576,18 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,28,Auto"
                                   ColumnDefinitions="160,320">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="RLOGIN"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.019], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
                                 <TextBlock Grid.Row="4" Text="{Binding [UiText.018], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="4" Grid.Column="1"
                                               x:Name="RloginPasswordPromptBox"
                                               Text="{Binding RloginPasswordPrompt, Mode=TwoWay}"
@@ -776,8 +691,7 @@
                                   ColumnDefinitions="Auto,12,220"
                                   HorizontalAlignment="Stretch">
                                 <TextBlock Text="{Binding LoginScriptExecutionModeText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Column="2"
                                              x:Name="LoginScriptExecutionModeSelect"
                                              Mode="Single"
@@ -792,8 +706,7 @@
                                   ColumnDefinitions="Auto,12,220"
                                   HorizontalAlignment="Stretch">
                                 <TextBlock Text="{Binding LoginScriptExecutionTargetText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Column="2"
                                              x:Name="LoginScriptExecutionTargetSelect"
                                              Mode="Single"
@@ -806,16 +719,14 @@
                             <TextBlock Grid.Row="12"
                                        Grid.ColumnSpan="3"
                                        Text="{Binding LoginScriptExecutionTargetHintText}"
-                                       TextWrapping="Wrap"
-                                       Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                       Classes="cx-section-hint"/>
 
                             <Grid Grid.Row="14"
                                   Grid.ColumnSpan="3"
                                   ColumnDefinitions="Auto,12,*"
                                   HorizontalAlignment="Stretch">
                                 <TextBlock Text="{Binding LoginScriptInterpreterText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Column="2"
                                                Text="{Binding LoginScriptInterpreter, Mode=TwoWay}"
                                                PlaceholderText="python3"
@@ -827,16 +738,14 @@
                             <TextBlock Grid.Row="16"
                                        Grid.ColumnSpan="3"
                                        Text="{Binding LoginScriptInterpreterHintText}"
-                                       TextWrapping="Wrap"
-                                       Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                       Classes="cx-section-hint"/>
 
                             <Grid Grid.Row="18"
                                   Grid.ColumnSpan="3"
                                   ColumnDefinitions="Auto,12,*"
                                   HorizontalAlignment="Stretch">
                                 <TextBlock Text="{Binding [UiText.028], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Column="2"
                                                Text="{Binding LoginScriptParameters, Mode=TwoWay}"
                                                MinWidth="0"
@@ -849,20 +758,14 @@
 
                 <ScrollViewer x:Name="SshPage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,28,Auto"
                                   ColumnDefinitions="*">
                                 <TextBlock Text="{Binding [UiText.029], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Text="{Binding [UiText.030], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
                                 <atom:LineEdit Grid.Row="4"
                                               x:Name="SshRemoteCommandBox"
                                               Text="{Binding SshRemoteCommand, Mode=TwoWay}"
@@ -870,20 +773,14 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,28,Auto"
                                   ColumnDefinitions="*">
                                 <TextBlock Text="{Binding [UiText.032], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Text="{Binding [UiText.033], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
                                 <atom:Select Grid.Row="4"
                                              x:Name="SshVersionPolicySelect"
                                              Mode="Single"
@@ -892,18 +789,12 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="12">
                                 <TextBlock Text="{Binding [UiText.034], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Text="{Binding [UiText.035], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
                                 <atom:CheckBox Content="{Binding [UiText.036], Source={x:Static services:LocalizationService.Shared}}"
                                                IsChecked="{Binding SshUseXagent, Mode=TwoWay}"/>
                                 <atom:CheckBox Content="{Binding [UiText.037], Source={x:Static services:LocalizationService.Shared}}"
@@ -911,15 +802,10 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="12">
                                 <TextBlock Text="{Binding [UiText.038], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <atom:CheckBox Content="{Binding [UiText.039], Source={x:Static services:LocalizationService.Shared}}"
                                                IsChecked="{Binding SshUseCompression, Mode=TwoWay}"/>
                                 <atom:CheckBox Content="{Binding [UiText.040], Source={x:Static services:LocalizationService.Shared}}"
@@ -935,15 +821,10 @@
 
                 <ScrollViewer x:Name="SshOtherPage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="12">
                                 <TextBlock Text="{Binding ServerMonitoringText}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <atom:CheckBox Content="{Binding EnableServerMonitoringText}"
                                                IsChecked="{Binding SshEnableServerMonitoring, Mode=TwoWay}"/>
                                 <atom:CheckBox Content="{Binding EnableMonitorNetworkLatencyText}"
@@ -952,8 +833,7 @@
                                 <Grid ColumnDefinitions="160,120,40"
                                       ColumnSpacing="10">
                                     <TextBlock Text="{Binding MonitorRefreshIntervalText}"
-                                               VerticalAlignment="Center"
-                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                               Classes="cx-field-label"/>
                                     <atom:NumericUpDown Grid.Column="1"
                                                         Minimum="1"
                                                         Maximum="30"
@@ -961,8 +841,7 @@
                                                         IsEnabled="{Binding SshEnableServerMonitoring}"/>
                                     <TextBlock Grid.Column="2"
                                                Text="{Binding SecondsText}"
-                                               VerticalAlignment="Center"
-                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                               Classes="cx-field-label"/>
                                 </Grid>
                                 <atom:CheckBox Content="{Binding [UiText.260], Source={x:Static services:LocalizationService.Shared}}"
                                                IsChecked="{Binding SshAutoOpenMonitorPanel, Mode=TwoWay}"
@@ -974,27 +853,20 @@
 
                 <ScrollViewer x:Name="SshSecurityPage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,80,Auto,12,Auto,12,Auto"
                                   ColumnDefinitions="110,*,100">
                                 <TextBlock Grid.ColumnSpan="3"
                                            Text="{Binding [UiText.043], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Grid.ColumnSpan="3"
                                            Text="{Binding [UiText.044], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
 
                                 <TextBlock Grid.Row="4"
                                            Text="{Binding [UiText.045], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="4"
                                              Grid.Column="1"
                                              x:Name="SshCipherSelect"
@@ -1009,8 +881,7 @@
 
                                 <TextBlock Grid.Row="6"
                                            Text="MAC:"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="6"
                                              Grid.Column="1"
                                              x:Name="SshMacSelect"
@@ -1025,8 +896,7 @@
 
                                 <TextBlock Grid.Row="8"
                                            Text="{Binding [UiText.048], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="8"
                                              Grid.Column="1"
                                              x:Name="SshKeyExchangeSelect"
@@ -1045,22 +915,16 @@
 
                 <ScrollViewer x:Name="SshTunnelPage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,10,Auto,10,Auto,14,260,14,Auto"
                                   ColumnDefinitions="*,120,120,120,56">
                                 <TextBlock Grid.ColumnSpan="5"
                                            Text="{Binding [UiText.050], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Grid.ColumnSpan="5"
                                            Text="{Binding [UiText.051], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
 
                                 <atom:CheckBox Grid.Row="4"
                                                Grid.ColumnSpan="5"
@@ -1106,17 +970,12 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,12,Auto,10,Auto"
                                   ColumnDefinitions="36,120,170,*">
                                 <TextBlock Grid.ColumnSpan="4"
                                            Text="{Binding [UiText.056], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <atom:CheckBox Grid.Row="2"
                                                Grid.Column="1"
                                                Grid.ColumnSpan="3"
@@ -1136,9 +995,7 @@
                                                       GroupName="SshX11DisplayMode"/>
                                     <TextBlock Text="{Binding [SessionEdit.X11TrustWarning], Source={x:Static services:LocalizationService.Shared}}"
                                                Margin="24,0,0,0"
-                                               FontSize="12"
-                                               TextWrapping="Wrap"
-                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                               Classes="cx-section-hint"/>
                                     <Grid ColumnDefinitions="Auto,12,*">
                                         <atom:RadioButton x:Name="SshX11DisplayButton"
                                                           Content="X DISPLAY(D):"
@@ -1160,29 +1017,22 @@
 
                 <ScrollViewer x:Name="TelnetPage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,22,Auto,12,Auto,12,Auto"
                                   ColumnDefinitions="140,360">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="XDISPLOC"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.058], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
                                 <atom:CheckBox Grid.Row="4"
                                                Grid.ColumnSpan="2"
                                                Content="{Binding [UiText.059], Source={x:Static services:LocalizationService.Shared}}"
                                                IsChecked="{Binding TelnetUseXDisplayLocation, Mode=TwoWay}"/>
                                 <TextBlock Grid.Row="6" Text="{Binding [UiText.060], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="6" Grid.Column="1"
                                               x:Name="TelnetXDisplayLocationBox"
                                               Text="{Binding TelnetXDisplayLocation, Mode=TwoWay}"
@@ -1190,22 +1040,16 @@
                                 <TextBlock Grid.Row="8"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.061], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="12">
                                 <TextBlock Text="{Binding [UiText.062], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Text="{Binding [UiText.063], Source={x:Static services:LocalizationService.Shared}}"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
                                 <atom:RadioButton x:Name="TelnetPassiveOptionButton"
                                                   Content="Passive"
                                                   GroupName="TelnetOptionMode"/>
@@ -1215,15 +1059,10 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="12">
                                 <TextBlock Text="{Binding [UiText.064], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <atom:CheckBox Content="{Binding [UiText.065], Source={x:Static services:LocalizationService.Shared}}"
                                                IsChecked="{Binding TelnetForceCharacterAtATime, Mode=TwoWay}"/>
                             </StackPanel>
@@ -1233,26 +1072,19 @@
 
                 <ScrollViewer x:Name="ProxyPage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,12,Auto,28,Auto"
                                   ColumnDefinitions="140,*,160">
                                 <TextBlock Grid.ColumnSpan="3"
                                            Text="{Binding [UiText.066], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Grid.ColumnSpan="3"
                                            Text="{Binding [UiText.067], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
                                 <TextBlock Grid.Row="4"
                                            Text="{Binding [UiText.068], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="4"
                                              Grid.Column="1"
                                              x:Name="ProxySelect"
@@ -1271,21 +1103,15 @@
 
                 <ScrollViewer x:Name="RloginPage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,18,Auto"
                                   ColumnDefinitions="140,250,*">
                                 <TextBlock Grid.ColumnSpan="3"
                                            Text="{Binding GeneralText}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Text="{Binding [UiText.070], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="2"
                                              Grid.Column="1"
                                              x:Name="RloginTerminalSpeedSelect"
@@ -1301,27 +1127,20 @@
 
                 <ScrollViewer x:Name="SftpPage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,28,Auto,12,Auto,12,Auto"
                                   ColumnDefinitions="140,*,64">
                                 <TextBlock Grid.ColumnSpan="3"
                                            Text="{Binding [UiText.071], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Grid.ColumnSpan="3"
                                            Text="{Binding [UiText.072], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
 
                                 <TextBlock Grid.Row="4"
                                            Text="{Binding [UiText.073], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="4"
                                                Grid.Column="1"
                                                x:Name="SftpLocalStartDirectoryBox"
@@ -1338,8 +1157,7 @@
 
                                 <TextBlock Grid.Row="6"
                                            Text="{Binding [UiText.075], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="6"
                                                Grid.Column="1"
                                                Grid.ColumnSpan="2"
@@ -1353,17 +1171,12 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,12,Auto,8,Auto"
                                   ColumnDefinitions="140,*">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.076], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <atom:CheckBox Grid.Row="2"
                                                Grid.ColumnSpan="2"
                                                Content="{Binding [UiText.077], Source={x:Static services:LocalizationService.Shared}}"
@@ -1372,8 +1185,7 @@
                                                IsChecked="{Binding SftpUseCustomServer, Mode=TwoWay}"/>
                                 <TextBlock Grid.Row="4"
                                            Text="{Binding [UiText.078], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="4"
                                                Grid.Column="1"
                                                x:Name="SftpCustomServerCommandBox"
@@ -1384,8 +1196,7 @@
                                 <TextBlock Grid.Row="6"
                                            Grid.Column="1"
                                            Text="{Binding [UiText.079], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
                             </Grid>
                         </Border>
                     </StackPanel>
@@ -1393,21 +1204,15 @@
 
                 <ScrollViewer x:Name="SerialPage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,12,Auto,12,Auto,12,Auto,12,Auto,12,Auto"
                                   ColumnDefinitions="140,240">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.080], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
 
                                 <TextBlock Grid.Row="2" Text="{Binding [UiText.081], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="2" Grid.Column="1"
                                              x:Name="SerialPortSelect"
                                              Mode="Single"
@@ -1417,8 +1222,7 @@
                                              OptionsSource="{Binding SerialPortOptions}"/>
 
                                 <TextBlock Grid.Row="4" Text="{Binding [UiText.082], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="4" Grid.Column="1"
                                              x:Name="SerialBaudRateSelect"
                                              Mode="Single"
@@ -1427,8 +1231,7 @@
                                              OptionsSource="{Binding SerialBaudRateOptions}"/>
 
                                 <TextBlock Grid.Row="6" Text="{Binding [UiText.083], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="6" Grid.Column="1"
                                              x:Name="SerialDataBitsSelect"
                                              Mode="Single"
@@ -1437,8 +1240,7 @@
                                              OptionsSource="{Binding SerialDataBitsOptions}"/>
 
                                 <TextBlock Grid.Row="8" Text="{Binding [UiText.084], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="8" Grid.Column="1"
                                              x:Name="SerialStopBitsSelect"
                                              Mode="Single"
@@ -1447,8 +1249,7 @@
                                              OptionsSource="{Binding SerialStopBitsOptions}"/>
 
                                 <TextBlock Grid.Row="10" Text="{Binding [UiText.085], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="10" Grid.Column="1"
                                              x:Name="SerialParitySelect"
                                              Mode="Single"
@@ -1457,8 +1258,7 @@
                                              OptionsSource="{Binding SerialParityOptions}"/>
 
                                 <TextBlock Grid.Row="12" Text="{Binding [UiText.086], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="12" Grid.Column="1"
                                              x:Name="SerialFlowControlSelect"
                                              Mode="Single"
@@ -1472,18 +1272,13 @@
 
                 <ScrollViewer x:Name="RdpPage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,10,Auto,12,Auto,12,Auto,12,Auto,12,Auto,12,Auto"
                                   ColumnDefinitions="120,*"
                                   ColumnSpacing="12">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="{Binding SshTunnelTitleText}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
 
                                 <atom:CheckBox Grid.Row="2"
                                                Grid.ColumnSpan="2"
@@ -1493,13 +1288,11 @@
                                 <TextBlock Grid.Row="4"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding RdpSshTunnelDescriptionText}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
 
                                 <TextBlock Grid.Row="6"
                                            Text="{Binding SshHostText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="6"
                                                Grid.Column="1"
                                                Text="{Binding RdpSshHost, Mode=TwoWay}"
@@ -1508,8 +1301,7 @@
 
                                 <TextBlock Grid.Row="8"
                                            Text="{Binding SshPortText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="8"
                                                Grid.Column="1"
                                                Width="160"
@@ -1520,8 +1312,7 @@
 
                                 <TextBlock Grid.Row="10"
                                            Text="{Binding SshUsernameText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="10"
                                                Grid.Column="1"
                                                Text="{Binding RdpSshUsername, Mode=TwoWay}"
@@ -1530,8 +1321,7 @@
 
                                 <TextBlock Grid.Row="12"
                                            Text="{Binding AuthMethodText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <StackPanel Grid.Row="12"
                                             Grid.Column="1"
                                             Orientation="Horizontal"
@@ -1547,9 +1337,8 @@
 
                                 <TextBlock Grid.Row="14"
                                            Text="{Binding SshPasswordText}"
-                                           VerticalAlignment="Center"
-                                           IsVisible="{Binding IsRdpSshPasswordAuth}"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"
+                                           IsVisible="{Binding IsRdpSshPasswordAuth}"/>
                                 <atom:LineEdit Grid.Row="14"
                                                Grid.Column="1"
                                                Text="{Binding RdpSshPassword, Mode=TwoWay}"
@@ -1561,9 +1350,8 @@
 
                                 <TextBlock Grid.Row="14"
                                            Text="{Binding SshPrivateKeyText}"
-                                           VerticalAlignment="Center"
-                                           IsVisible="{Binding IsRdpSshPrivateKeyAuth}"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"
+                                           IsVisible="{Binding IsRdpSshPrivateKeyAuth}"/>
                                 <Grid Grid.Row="14"
                                       Grid.Column="1"
                                       ColumnDefinitions="*,Auto"
@@ -1580,22 +1368,16 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,10,Auto,12,Auto,12,Auto,12,Auto,10,Auto"
                                   ColumnDefinitions="150,420,*"
                                   ColumnSpacing="8">
                                 <TextBlock Grid.ColumnSpan="3"
                                            Text="{Binding [UiText.060], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
 
                                 <TextBlock Grid.Row="2" Text="{Binding [UiText.087], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="2" Grid.Column="1"
                                              x:Name="RdpWindowSizeSelect"
                                              Mode="Single"
@@ -1611,16 +1393,14 @@
                                     <TextBlock Grid.Column="1"
                                                Text="x"
                                                HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                               Classes="cx-field-label"/>
                                     <atom:LineEdit Grid.Column="2"
                                                    x:Name="RdpHeightBox"
                                                    Text="{Binding RdpDesktopHeight, Mode=TwoWay}"/>
                                 </Grid>
 
                                 <TextBlock Grid.Row="6" Text="{Binding [UiText.088], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="6" Grid.Column="1"
                                              x:Name="RdpResizeModeSelect"
                                              Mode="Single"
@@ -1629,8 +1409,7 @@
                                              OptionsSource="{Binding RdpResizeModeOptions}"/>
 
                                 <TextBlock Grid.Row="8" Text="Screen Scale:"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="8" Grid.Column="1"
                                              x:Name="RdpScreenScaleSelect"
                                              Mode="Single"
@@ -1639,8 +1418,7 @@
                                              OptionsSource="{Binding RdpScreenScaleOptions}"/>
 
                                 <TextBlock Grid.Row="10" Text="{Binding [UiText.089], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="10" Grid.Column="1"
                                              x:Name="RdpColorQualitySelect"
                                              Mode="Single"
@@ -1651,23 +1429,17 @@
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [SessionEdit.Unsupported.RdpDisplayPartial], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,10,Auto,12,Auto,10,Auto,10,Auto"
                                   ColumnDefinitions="150,420,*"
                                   ColumnSpacing="8">
                                 <TextBlock Grid.ColumnSpan="3"
                                            Text="{Binding [UiText.090], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
 
                                 <atom:CheckBox Grid.Row="2"
                                                Grid.ColumnSpan="3"
@@ -1682,8 +1454,7 @@
 
                                 <TextBlock Grid.Row="6"
                                            Text="{Binding [SessionEdit.RdpDriveFolder], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <Grid Grid.Row="6"
                                       Grid.Column="1"
                                       ColumnDefinitions="*,Auto"
@@ -1699,8 +1470,7 @@
 
                                 <TextBlock Grid.Row="8"
                                            Text="{Binding [SessionEdit.RdpDriveName], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="8"
                                                Grid.Column="1"
                                                Width="220"
@@ -1713,25 +1483,18 @@
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [SessionEdit.RdpDriveHint], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,10,Auto,10,Auto,12,Auto"
                                   ColumnDefinitions="Auto,12,220,*">
                                 <TextBlock Grid.ColumnSpan="4"
                                            Text="{Binding [UiText.093], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2" Text="{Binding [UiText.094], Source={x:Static services:LocalizationService.Shared}}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="2" Grid.Column="2"
                                              x:Name="RdpAudioModeSelect"
                                              Mode="Single"
@@ -1744,8 +1507,7 @@
                                            Grid.Column="2"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [SessionEdit.RdpAudioHint], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
                             </Grid>
                         </Border>
                     </StackPanel>
@@ -1753,18 +1515,13 @@
 
                 <ScrollViewer x:Name="VncPage" IsVisible="False">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,8,Auto,12,Auto,12,Auto,12,Auto,12,Auto,12,Auto,12,Auto,12,Auto"
                                   ColumnDefinitions="120,*"
                                   ColumnSpacing="12">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="{Binding VncSshTunnelTitleText}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
 
                                 <atom:CheckBox Grid.Row="2"
                                                Grid.ColumnSpan="2"
@@ -1774,13 +1531,11 @@
                                 <TextBlock Grid.Row="4"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding VncSshTunnelDescriptionText}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
 
                                 <TextBlock Grid.Row="6"
                                            Text="{Binding SshHostText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="6"
                                                Grid.Column="1"
                                                Text="{Binding VncSshHost, Mode=TwoWay}"
@@ -1789,8 +1544,7 @@
 
                                 <TextBlock Grid.Row="8"
                                            Text="{Binding SshPortText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="8"
                                                Grid.Column="1"
                                                Width="160"
@@ -1801,8 +1555,7 @@
 
                                 <TextBlock Grid.Row="10"
                                            Text="VNC Host"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="10"
                                                Grid.Column="1"
                                                Text="{Binding VncSshRemoteHost, Mode=TwoWay}"
@@ -1811,8 +1564,7 @@
 
                                 <TextBlock Grid.Row="12"
                                            Text="VNC Port"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="12"
                                                Grid.Column="1"
                                                Width="160"
@@ -1823,8 +1575,7 @@
 
                                 <TextBlock Grid.Row="14"
                                            Text="{Binding SshUsernameText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:LineEdit Grid.Row="14"
                                                Grid.Column="1"
                                                Text="{Binding VncSshUsername, Mode=TwoWay}"
@@ -1833,8 +1584,7 @@
 
                                 <TextBlock Grid.Row="16"
                                            Text="{Binding AuthMethodText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <StackPanel Grid.Row="16"
                                             Grid.Column="1"
                                             Orientation="Horizontal"
@@ -1850,9 +1600,8 @@
 
                                 <TextBlock Grid.Row="18"
                                            Text="{Binding SshPasswordText}"
-                                           VerticalAlignment="Center"
-                                           IsVisible="{Binding IsVncSshPasswordAuth}"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"
+                                           IsVisible="{Binding IsVncSshPasswordAuth}"/>
                                 <atom:LineEdit Grid.Row="18"
                                                Grid.Column="1"
                                                Text="{Binding VncSshPassword, Mode=TwoWay}"
@@ -1864,9 +1613,8 @@
 
                                 <TextBlock Grid.Row="18"
                                            Text="{Binding SshPrivateKeyText}"
-                                           VerticalAlignment="Center"
-                                           IsVisible="{Binding IsVncSshPrivateKeyAuth}"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"
+                                           IsVisible="{Binding IsVncSshPrivateKeyAuth}"/>
                                 <Grid Grid.Row="18"
                                       Grid.Column="1"
                                       ColumnDefinitions="*,Auto"
@@ -1883,23 +1631,17 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,10,Auto,6,Auto,10,Auto,12,Auto"
                                   ColumnDefinitions="150,360,*"
                                   ColumnSpacing="8">
                                 <TextBlock Grid.ColumnSpan="3"
                                            Text="显示"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
 
                                 <TextBlock Grid.Row="2"
                                            Text="显示模式"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="2"
                                              Grid.Column="1"
                                              x:Name="VncDisplayModeSelect"
@@ -1910,8 +1652,7 @@
 
                                 <TextBlock Grid.Row="4"
                                            Text="缩放百分比"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:NumericUpDown Grid.Row="4"
                                                     Grid.Column="1"
                                                     Minimum="25"
@@ -1921,13 +1662,11 @@
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="固定缩放模式下生效，范围 25-300。"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
 
                                 <TextBlock Grid.Row="8"
                                            Text="远端分辨率"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="8"
                                              Grid.Column="1"
                                              x:Name="VncResizeModeSelect"
@@ -1939,23 +1678,17 @@
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="远端分辨率调整依赖 VNC 服务器支持；不支持时会保持当前远端分辨率。"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,10,Auto,10,Auto,12,Auto"
                                   ColumnDefinitions="150,420,*"
                                   ColumnSpacing="8">
                                 <TextBlock Grid.ColumnSpan="3"
                                            Text="输入与剪贴板"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
                                 <StackPanel Grid.Row="2"
                                             Grid.Column="1"
                                             Grid.ColumnSpan="2"
@@ -1974,8 +1707,7 @@
 
                                 <TextBlock Grid.Row="4"
                                            Text="鼠标指针"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="4"
                                              Grid.Column="1"
                                              x:Name="VncCursorModeSelect"
@@ -1986,8 +1718,7 @@
 
                                 <TextBlock Grid.Row="6"
                                            Text="剪贴板同步"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="6"
                                              Grid.Column="1"
                                              x:Name="VncClipboardModeSelect"
@@ -1999,28 +1730,21 @@
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="自动同步会在 VNC 视图获得焦点或远端剪贴板变化时生效。"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <Grid RowDefinitions="Auto,14,Auto,6,Auto,10,Auto,6,Auto,10,Auto,6,Auto,10,Auto,6,Auto,10,Auto"
                                   ColumnDefinitions="150,220,*"
                                   ColumnSpacing="8">
                                 <TextBlock Grid.ColumnSpan="3"
                                            Text="性能"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                           Classes="cx-section-title"/>
 
                                 <TextBlock Grid.Row="2"
                                            Text="更新间隔"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:NumericUpDown Grid.Row="2"
                                                     Grid.Column="1"
                                                     Minimum="1"
@@ -2030,13 +1754,11 @@
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="单位 ms，范围 1-1000，默认 33"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
 
                                 <TextBlock Grid.Row="6"
                                            Text="压缩级别"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:NumericUpDown Grid.Row="6"
                                                     Grid.Column="1"
                                                     Minimum="0"
@@ -2046,13 +1768,11 @@
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="范围 0-9，默认 3"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
 
                                 <TextBlock Grid.Row="10"
                                            Text="JPEG 质量"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:NumericUpDown Grid.Row="10"
                                                     Grid.Column="1"
                                                     Minimum="1"
@@ -2060,8 +1780,7 @@
                                                     Value="{Binding VncJpegQualityLevel, Mode=TwoWay}"/>
                                 <TextBlock Grid.Row="14"
                                            Text="编码策略"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="14"
                                              Grid.Column="1"
                                              x:Name="VncEncodingProfileSelect"
@@ -2073,13 +1792,11 @@
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="兼容优先最稳；性能优先会优先使用压缩编码。"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
 
                                 <TextBlock Grid.Row="18"
                                            Text="JPEG 子采样"
-                                           VerticalAlignment="Center"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-field-label"/>
                                 <atom:Select Grid.Row="18"
                                              Grid.Column="1"
                                              x:Name="VncJpegSubsamplingSelect"
@@ -2091,8 +1808,7 @@
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="范围 1-100，默认 60"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
                             </Grid>
                         </Border>
                     </StackPanel>
@@ -2103,13 +1819,9 @@
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.096], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.096], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <Grid ColumnDefinitions="120,240"
                                       RowDefinitions="Auto,14,Auto,12,Auto"
                                       ColumnSpacing="10"
@@ -2146,13 +1858,9 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.102], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.102], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <Grid ColumnDefinitions="120,220,40"
                                       RowDefinitions="Auto,12,Auto"
                                       ColumnSpacing="10"
@@ -2172,13 +1880,9 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.106], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.106], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <Grid ColumnDefinitions="120,300"
                                       RowDefinitions="Auto,14,Auto"
                                       ColumnSpacing="10"
@@ -2198,13 +1902,9 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.110], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.110], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <Grid ColumnDefinitions="120,220"
                                       RowDefinitions="Auto,12,Auto"
                                       ColumnSpacing="10"
@@ -2234,7 +1934,7 @@
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="{Binding [UiText.113], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding [UiText.113], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                             <Border x:Name="SessionAppearancePreviewBorder"
                                     Padding="10"
                                     MinHeight="128"
@@ -2328,13 +2028,9 @@
                                          HorizontalAlignment="Stretch"/>
                         </Grid>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.116], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.116], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <Grid ColumnDefinitions="120,*,12,156,12,112"
                                       RowDefinitions="Auto,14,Auto,14,Auto,14,Auto"
                                       ColumnSpacing="0">
@@ -2400,13 +2096,9 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.122], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.122], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <Grid ColumnDefinitions="120,180,28,90,112,72"
                                       RowDefinitions="Auto,14,Auto,14,Auto"
                                       ColumnSpacing="10">
@@ -2454,13 +2146,9 @@
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="18">
-                                <TextBlock Text="{Binding [UiText.131], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.131], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <Grid ColumnDefinitions="90,112,96,90,112"
                                       RowDefinitions="Auto,14,Auto"
                                       ColumnSpacing="14">
@@ -2479,13 +2167,9 @@
                                 </Grid>
                             </StackPanel>
                         </Border>
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="18">
-                                <TextBlock Text="{Binding [UiText.136], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.136], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <Grid ColumnDefinitions="110,112,90,Auto"
                                       RowDefinitions="Auto,14,Auto"
                                       ColumnSpacing="14">
@@ -2500,13 +2184,9 @@
                                 </Grid>
                             </StackPanel>
                         </Border>
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.139], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.139], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <StackPanel Orientation="Horizontal" Spacing="22">
                                     <atom:RadioButton Content="{Binding [UiText.140], Source={x:Static services:LocalizationService.Shared}}" GroupName="SessionAppearanceTabColor"
                                                       IsChecked="{Binding IsAppearanceTabColorDefault, Mode=TwoWay}"/>
@@ -2524,13 +2204,9 @@
                                 </StackPanel>
                             </StackPanel>
                         </Border>
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="8">
-                                <TextBlock Text="{Binding AppearanceTabIconText}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding AppearanceTabIconText}" Classes="cx-section-title"/>
                                 <Grid ColumnDefinitions="110,*" ColumnSpacing="10">
                                     <TextBlock Text="{Binding AppearanceTabIconSelectionText}" VerticalAlignment="Center"/>
                                     <atom:Select Grid.Column="1"
@@ -2540,17 +2216,12 @@
                                                  SelectionChanged="OnSessionAppearanceSelectionChanged"/>
                                 </Grid>
                                 <TextBlock Text="{Binding AppearanceTabIconHintText}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.145], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.145], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <Grid ColumnDefinitions="110,*,64"
                                       RowDefinitions="Auto,14,Auto"
                                       ColumnSpacing="10">
@@ -2582,16 +2253,11 @@
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.148], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.148], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <TextBlock Text="{Binding [UiText.149], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
                                 <Grid ColumnDefinitions="120,*,12,116" ColumnSpacing="14">
                                     <TextBlock Text="{Binding [UiText.150], Source={x:Static services:LocalizationService.Shared}}" VerticalAlignment="Center"/>
                                     <atom:Select Grid.Column="1"
@@ -2613,14 +2279,10 @@
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.151], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.151], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <Grid ColumnDefinitions="150,*"
                                       RowDefinitions="Auto,12,Auto,22,Auto,10,Auto"
                                       ColumnSpacing="12">
@@ -2633,12 +2295,11 @@
                                     <TextBlock Grid.Row="2"
                                                Grid.ColumnSpan="2"
                                                Text="{Binding [UiText.153], Source={x:Static services:LocalizationService.Shared}}"
-                                               TextWrapping="Wrap"
-                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                               Classes="cx-section-hint"/>
                                     <TextBlock Grid.Row="4"
                                                Grid.ColumnSpan="2"
                                                Text="{Binding [UiText.154], Source={x:Static services:LocalizationService.Shared}}"
-                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                               Classes="cx-section-hint"/>
                                     <Grid Grid.Row="6"
                                           Grid.ColumnSpan="2"
                                           ColumnDefinitions="*,8,48">
@@ -2662,14 +2323,10 @@
 
                         <Grid ColumnDefinitions="*,16,*"
                               Margin="0,0,18,0">
-                            <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                    BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                    BorderThickness="1"
-                                    CornerRadius="4"
-                                    Margin="0,0,0,16"
-                                    Padding="18">
+                            <Border Classes="cx-card"
+                                    Margin="0,0,0,16">
                                 <StackPanel Spacing="12">
-                                    <TextBlock Text="{Binding [UiText.155], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding [UiText.155], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                     <atom:RadioButton Content="VT220 Del (Esc[3~)"
                                                       GroupName="SessionDeleteKeySequence"
                                                       IsChecked="{Binding IsDeleteKeyVt220, Mode=TwoWay}"/>
@@ -2682,15 +2339,11 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border Background="{atom:SharedTokenResource ColorBgContainer}"
+                            <Border Classes="cx-card"
                                     Grid.Column="2"
-                                    BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                    BorderThickness="1"
-                                    CornerRadius="4"
-                                    Margin="0,0,0,16"
-                                    Padding="18">
+                                    Margin="0,0,0,16">
                                 <StackPanel Spacing="12">
-                                    <TextBlock Text="{Binding [UiText.156], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding [UiText.156], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                     <atom:RadioButton Content="VT220 Del (Esc[3~)"
                                                       GroupName="SessionBackspaceKeySequence"
                                                       IsChecked="{Binding IsBackspaceKeyVt220, Mode=TwoWay}"/>
@@ -2704,17 +2357,12 @@
                             </Border>
                         </Grid>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.157], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.157], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <TextBlock Text="{Binding [UiText.158], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                           Classes="cx-section-hint"/>
                                 <atom:CheckBox Content="{Binding [UiText.159], Source={x:Static services:LocalizationService.Shared}}"
                                                IsChecked="{Binding TerminalLeftAltAsMeta, Mode=TwoWay}"/>
                                 <atom:CheckBox Content="{Binding [UiText.160], Source={x:Static services:LocalizationService.Shared}}"
@@ -2734,13 +2382,9 @@
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="18">
+                        <Border Classes="cx-card">
                             <StackPanel Spacing="16">
-                                <TextBlock Text="{Binding [UiText.162], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.162], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <StackPanel Spacing="10">
                                     <atom:CheckBox Content="Auto Wrap Mode (DECAWM)"
                                                    IsChecked="{Binding TerminalVtAutoWrapMode, Mode=TwoWay}"/>
@@ -2758,7 +2402,7 @@
 
                                 <StackPanel Spacing="10">
                                     <TextBlock Text="{Binding [UiText.163], Source={x:Static services:LocalizationService.Shared}}"
-                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                               Classes="cx-section-hint"/>
                                     <WrapPanel>
                                         <atom:RadioButton Content="{Binding [UiText.164], Source={x:Static services:LocalizationService.Shared}}"
                                                           GroupName="SessionVtCursorKeyMode"
@@ -2773,7 +2417,7 @@
 
                                 <StackPanel Spacing="10">
                                     <TextBlock Text="{Binding [UiText.166], Source={x:Static services:LocalizationService.Shared}}"
-                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                               Classes="cx-section-hint"/>
                                     <WrapPanel>
                                         <atom:RadioButton Content="{Binding [UiText.167], Source={x:Static services:LocalizationService.Shared}}"
                                                           GroupName="SessionVtNumericKeypadMode"
@@ -2799,14 +2443,10 @@
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <StackPanel Spacing="12">
-                                <TextBlock Text="{Binding [UiText.064], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.064], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <atom:CheckBox Content="{Binding [UiText.170], Source={x:Static services:LocalizationService.Shared}}"
                                                IsChecked="{Binding TerminalAdvancedUseApplicationCursorMode, Mode=TwoWay}"/>
                                 <atom:CheckBox Content="{Binding [UiText.171], Source={x:Static services:LocalizationService.Shared}}"
@@ -2838,14 +2478,10 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <StackPanel Spacing="12">
-                                <TextBlock Text="{Binding [UiText.181], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.181], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <atom:CheckBox Content="{Binding [UiText.182], Source={x:Static services:LocalizationService.Shared}}"
                                                IsChecked="{Binding TerminalAdvancedDisableBlinkingText, Mode=TwoWay}"/>
                                 <atom:CheckBox Content="{Binding [SessionEdit.Terminal.AllowRemoteTitle], Source={x:Static services:LocalizationService.Shared}}"
@@ -2870,14 +2506,10 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <StackPanel Spacing="12">
-                                <TextBlock Text="{Binding [UiText.188], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.188], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <atom:CheckBox Content="{Binding [UiText.189], Source={x:Static services:LocalizationService.Shared}}"
                                                IsChecked="{Binding TerminalAdvancedUseBuiltinLineDrawing, Mode=TwoWay}"/>
                                 <atom:CheckBox Content="{Binding [UiText.190], Source={x:Static services:LocalizationService.Shared}}"
@@ -2893,18 +2525,14 @@
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <Grid ColumnDefinitions="120,*,48,104"
                                   RowDefinitions="Auto,12,Auto,12,Auto,12,Auto,12,Auto,12,Auto"
                                   ColumnSpacing="10">
                                 <TextBlock Grid.ColumnSpan="4"
                                            Text="{Binding [UiText.191], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Grid.ColumnSpan="4"
                                            Text="{Binding [UiText.192], Source={x:Static services:LocalizationService.Shared}}"/>
@@ -2965,14 +2593,10 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.199], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.199], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <TextBlock Text="{Binding [UiText.200], Source={x:Static services:LocalizationService.Shared}}"/>
                                 <StackPanel Orientation="Horizontal" Spacing="220">
                                     <atom:RadioButton Content="{Binding [UiText.201], Source={x:Static services:LocalizationService.Shared}}"
@@ -2985,14 +2609,10 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.203], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.203], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <TextBlock Text="{Binding [UiText.204], Source={x:Static services:LocalizationService.Shared}}"/>
                                 <StackPanel Orientation="Horizontal" Spacing="80">
                                     <atom:RadioButton Content="Xmodem"
@@ -3015,14 +2635,10 @@
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.064], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.064], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <TextBlock Text="{Binding [UiText.206], Source={x:Static services:LocalizationService.Shared}}"/>
                                 <atom:RadioButton Content="128 bytes(Xmodem/Ymodem)(B)"
                                                   GroupName="FileTransferXymodemBlockSize"
@@ -3033,18 +2649,14 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <Grid ColumnDefinitions="180,*"
                                   RowDefinitions="Auto,14,Auto,28,Auto,12,Auto"
                                   ColumnSpacing="10">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.207], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.208], Source={x:Static services:LocalizationService.Shared}}"
@@ -3071,14 +2683,10 @@
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <StackPanel Spacing="28">
-                                <TextBlock Text="{Binding [UiText.064], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.064], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <TextBlock Text="{Binding [UiText.211], Source={x:Static services:LocalizationService.Shared}}"
                                            TextWrapping="Wrap"/>
                                 <atom:CheckBox Content="{Binding [UiText.212], Source={x:Static services:LocalizationService.Shared}}"
@@ -3086,18 +2694,14 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <Grid ColumnDefinitions="180,*"
                                   RowDefinitions="Auto,14,Auto,28,Auto"
                                   ColumnSpacing="10">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.207], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.213], Source={x:Static services:LocalizationService.Shared}}"
@@ -3118,18 +2722,14 @@
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <Grid ColumnDefinitions="150,*,48"
                                   RowDefinitions="Auto,14,Auto,12,Auto,12,Auto,12,Auto,12,Auto,12,Auto,12,Auto,12,Auto,8,Auto"
                                   ColumnSpacing="8">
                                 <TextBlock Grid.ColumnSpan="3"
                                            Text="{Binding [UiText.215], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Text="{Binding [UiText.216], Source={x:Static services:LocalizationService.Shared}}"
                                            VerticalAlignment="Center"/>
@@ -3191,30 +2791,24 @@
                                                         Value="{Binding AdvancedLogRetentionDays, Mode=TwoWay}"/>
                                     <TextBlock Grid.Column="1"
                                                Text="{Binding [UiText.264], Source={x:Static services:LocalizationService.Shared}}"
-                                               VerticalAlignment="Center"
-                                               Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                               Classes="cx-meta"/>
                                 </Grid>
                                 <TextBlock Grid.Row="18"
                                            Grid.Column="1"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.263], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <Grid ColumnDefinitions="150,*"
                                   RowDefinitions="Auto,14,Auto,12,Auto,12,Auto"
                                   ColumnSpacing="8">
                                 <TextBlock Grid.ColumnSpan="2"
                                            Text="{Binding [UiText.222], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"/>
+                                           Classes="cx-section-title"/>
                                 <atom:CheckBox Grid.Row="2"
                                                Grid.ColumnSpan="2"
                                                Content="{Binding [UiText.223], Source={x:Static services:LocalizationService.Shared}}"
@@ -3256,18 +2850,14 @@
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <Grid ColumnDefinitions="20,*,48"
                                   RowDefinitions="Auto,12,Auto,12,Auto,12,Auto,12,Auto,20,Auto,12,Auto"
                                   ColumnSpacing="8">
                                 <TextBlock Grid.ColumnSpan="3"
                                            Text="{Binding [UiText.064], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"/>
+                                           Classes="cx-section-title"/>
                                 <atom:RadioButton Grid.Row="2"
                                                   Grid.ColumnSpan="3"
                                                   Content="{Binding [UiText.227], Source={x:Static services:LocalizationService.Shared}}"
@@ -3308,17 +2898,13 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <Grid ColumnDefinitions="*"
                                   RowDefinitions="Auto,14,Auto,12,Auto,24,Auto,12,Auto"
                                   ColumnSpacing="8">
                                 <TextBlock Text="{Binding [UiText.232], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Text="{Binding [UiText.233], Source={x:Static services:LocalizationService.Shared}}"/>
                                 <StackPanel Grid.Row="4"
@@ -3353,17 +2939,12 @@
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16">
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.236], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.236], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <TextBlock Text="{Binding [SessionEdit.Unsupported.QuickCommands], Source={x:Static services:LocalizationService.Shared}}"
-                                           TextWrapping="Wrap"
-                                           Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                                           Classes="cx-section-hint"/>
                                 <Grid ColumnDefinitions="*,18,196"
                                       ColumnSpacing="0">
                                     <atom:LineEdit IsEnabled="True"
@@ -3377,14 +2958,10 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding [UiText.238], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.238], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <TextBlock Text="{Binding [UiText.239], Source={x:Static services:LocalizationService.Shared}}"/>
                                 <StackPanel Orientation="Horizontal" Spacing="24">
                                     <atom:NumericUpDown Width="138"
@@ -3398,18 +2975,14 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <Grid ColumnDefinitions="170,104,56,120,160,*"
                                   RowDefinitions="Auto,14,Auto,14,Auto,12,Auto,12,Auto,12,Auto"
                                   ColumnSpacing="8">
                                 <TextBlock Grid.ColumnSpan="6"
                                            Text="{Binding [UiText.241], Source={x:Static services:LocalizationService.Shared}}"
-                                           FontWeight="SemiBold"/>
+                                           Classes="cx-section-title"/>
                                 <TextBlock Grid.Row="2"
                                            Grid.ColumnSpan="6"
                                            Text="{Binding [UiText.242], Source={x:Static services:LocalizationService.Shared}}"/>
@@ -3467,29 +3040,21 @@
                             </Grid>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
+                        <Border Classes="cx-card"
                                 Margin="0,0,18,0"
-                                IsVisible="{Binding SupportsTcpTransportOptions}"
-                                Padding="18">
+                                IsVisible="{Binding SupportsTcpTransportOptions}">
                             <StackPanel Spacing="12">
-                                <TextBlock Text="{Binding [UiText.249], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.249], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <atom:CheckBox Content="{Binding [UiText.250], Source={x:Static services:LocalizationService.Shared}}"
                                                IsChecked="{Binding AdvancedUseNagle, Mode=TwoWay}"/>
                             </StackPanel>
                         </Border>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
+                        <Border Classes="cx-card"
                                 Margin="0,0,18,0"
-                                IsVisible="{Binding SupportsTcpTransportOptions}"
-                                Padding="18">
+                                IsVisible="{Binding SupportsTcpTransportOptions}">
                             <StackPanel Spacing="12">
-                                <TextBlock Text="{Binding [UiText.251], Source={x:Static services:LocalizationService.Shared}}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding [UiText.251], Source={x:Static services:LocalizationService.Shared}}" Classes="cx-section-title"/>
                                 <StackPanel Orientation="Horizontal" Spacing="72">
                                     <atom:RadioButton Content="{Binding [UiText.252], Source={x:Static services:LocalizationService.Shared}}"
                                                       GroupName="AdvancedIpVersion"
@@ -3515,16 +3080,11 @@
                                         Foreground="{atom:SharedTokenResource ColorText}"
                                         TextWrapping="Wrap"/>
 
-                        <Border Background="{atom:SharedTokenResource ColorBgContainer}"
-                                BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,0,18,0"
-                                Padding="18">
+                        <Border Classes="cx-card"
+                                Margin="0,0,18,0">
                             <StackPanel Spacing="16">
                                 <atom:TextBlock Text="{Binding [UiText.254], Source={x:Static services:LocalizationService.Shared}}"
-                                                FontWeight="SemiBold"
-                                                Foreground="{atom:SharedTokenResource ColorText}"/>
+                                                Classes="cx-section-title"/>
                                 <StackPanel Spacing="12">
                                     <atom:CheckBox Content="{Binding [UiText.255], Source={x:Static services:LocalizationService.Shared}}"
                                                    IsChecked="{Binding AdvancedTraceSshProtocol, Mode=TwoWay}"/>
@@ -3542,16 +3102,10 @@
 
                 <Border x:Name="PlaceholderPage"
                         IsVisible="False"
-                        Background="{atom:SharedTokenResource ColorBgContainer}"
-                        BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                        BorderThickness="1"
-                        CornerRadius="4"
-                        Padding="24">
+                        Classes="cx-card">
                     <StackPanel Spacing="8" VerticalAlignment="Top">
                         <TextBlock x:Name="PlaceholderTitleText"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   Foreground="{atom:SharedTokenResource ColorText}"/>
+                                   Classes="cx-section-title"/>
                         <TextBlock Text="{Binding PlaceholderText}"
                                    Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
                     </StackPanel>
