@@ -488,9 +488,14 @@
                                      Command="{Binding ToggleSessionSidebarCommand}"
                                      atom:ToolTip.Tip="{Binding SessionManagerToolTip}"
                                      atom:ToolTip.Placement="Right">
-                            <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=FolderOpenOutlined}"
-                                                Width="18"
-                                                Height="18"/>
+                            <StackPanel Spacing="2">
+                                <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=FolderOpenOutlined}}"
+                                                    Width="18"
+                                                    Height="18"
+                                                    HorizontalAlignment="Center"/>
+                                <TextBlock Classes="cx-nav-label"
+                                           Text="{Binding SessionManagerText}"/>
+                            </StackPanel>
                         </atom:Button>
                     </Panel>
                     <Panel>
@@ -500,9 +505,14 @@
                                      Command="{Binding ToggleSftpCommand}"
                                      atom:ToolTip.Tip="{Binding SftpToolTip}"
                                      atom:ToolTip.Placement="Right">
-                            <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=SwapOutlined}"
-                                                Width="18"
-                                                Height="18"/>
+                            <StackPanel Spacing="2">
+                                <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=SwapOutlined}}"
+                                                    Width="18"
+                                                    Height="18"
+                                                    HorizontalAlignment="Center"/>
+                                <TextBlock Classes="cx-nav-label"
+                                           Text="SFTP"/>
+                            </StackPanel>
                         </atom:Button>
                     </Panel>
                     <Panel>
@@ -512,18 +522,28 @@
                                      Command="{Binding ToggleMonitorCommand}"
                                      atom:ToolTip.Tip="{Binding MonitorToolTip}"
                                      atom:ToolTip.Placement="Right">
-                            <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=DashboardOutlined}"
-                                                Width="18"
-                                                Height="18"/>
+                            <StackPanel Spacing="2">
+                                <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=DashboardOutlined}}"
+                                                    Width="18"
+                                                    Height="18"
+                                                    HorizontalAlignment="Center"/>
+                                <TextBlock Classes="cx-nav-label"
+                                           Text="{Binding MonitorText}"/>
+                            </StackPanel>
                         </atom:Button>
                     </Panel>
                     <atom:Button Classes="cx-nav-item"
                                  Command="{Binding ShowSshTunnelCenterCommand}"
                                  atom:ToolTip.Tip="{Binding TunnelsToolTip}"
                                  atom:ToolTip.Placement="Right">
-                        <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=DeploymentUnitOutlined}"
-                                            Width="18"
-                                            Height="18"/>
+                        <StackPanel Spacing="2">
+                            <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=DeploymentUnitOutlined}}"
+                                                Width="18"
+                                                Height="18"
+                                                HorizontalAlignment="Center"/>
+                            <TextBlock Classes="cx-nav-label"
+                                       Text="{Binding TunnelsText}"/>
+                        </StackPanel>
                     </atom:Button>
                     <Panel>
                         <Border Classes="cx-nav-item-active"
@@ -532,9 +552,14 @@
                                      Click="OnAgentPanelToggleClick"
                                      atom:ToolTip.Tip="{Binding AgentToolTip}"
                                      atom:ToolTip.Placement="Right">
-                            <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=RobotOutlined}"
-                                                Width="18"
-                                                Height="18"/>
+                            <StackPanel Spacing="2">
+                                <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=RobotOutlined}}"
+                                                    Width="18"
+                                                    Height="18"
+                                                    HorizontalAlignment="Center"/>
+                                <TextBlock Classes="cx-nav-label"
+                                           Text="{Binding AgentText}"/>
+                            </StackPanel>
                         </atom:Button>
                         <Border Classes="cx-badge"
                                 IsVisible="{Binding HasActiveAgentRuns}"
@@ -550,9 +575,14 @@
                                  Command="{Binding ShowRecentConnectionsCommand}"
                                  atom:ToolTip.Tip="{Binding ViewAllSessionsText}"
                                  atom:ToolTip.Placement="Right">
-                        <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=HistoryOutlined}"
-                                            Width="18"
-                                            Height="18"/>
+                        <StackPanel Spacing="2">
+                            <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=HistoryOutlined}}"
+                                                Width="18"
+                                                Height="18"
+                                                HorizontalAlignment="Center"/>
+                            <TextBlock Classes="cx-nav-label"
+                                       Text="{Binding RecentConnectionsText}"/>
+                        </StackPanel>
                     </atom:Button>
                 </StackPanel>
             </Border>
@@ -622,7 +652,8 @@
                                                      ButtonType="Primary"/>
                                         <atom:Button Content="{Binding WelcomeSessionManagerText}"
                                                      Icon="{antdicons:AntDesignIconProvider Kind=UnorderedListOutlined}"
-                                                     Command="{Binding ShowSessionManagerCommand}"/>
+                                                     Command="{Binding ShowSessionManagerCommand}"
+                                                     IsVisible="{Binding !IsSessionSidebarVisible}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
