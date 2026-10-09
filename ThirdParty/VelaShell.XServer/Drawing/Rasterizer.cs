@@ -503,7 +503,7 @@ internal sealed class Rasterizer
         for (int pi = 0; pi < polygons.Count; pi++)
         {
             IReadOnlyList<(double X, double Y)> poly = polygons[pi];
-            List<Edge> edges = [with(poly.Count)];
+            List<Edge> edges = new(poly.Count);
             for (int i = 0; i < poly.Count; i++)
             {
                 (double ax, double ay) = poly[i];
@@ -698,7 +698,7 @@ internal sealed class Rasterizer
     private static List<(double, double)> Circle(double cx, double cy, double r)
     {
         int n = Math.Max(8, (int)(r * 4));
-        List<(double, double)> points = [with(n)];
+        List<(double, double)> points = new(n);
         for (int i = 0; i < n; i++)
         {
             double t = 2 * Math.PI * i / n;
@@ -717,7 +717,7 @@ internal sealed class Rasterizer
         double extent = Math.Clamp(angle2, -360 * 64, 360 * 64) / 64.0 * Math.PI / 180.0;
         // 约一像素一段;上限 4096 段 —— 半径三万多的整圆,4096 段的弦高也只有百分之一像素,再多只是白算。
         int n = Math.Clamp((int)(Math.Abs(extent) * Math.Max(rx, ry)), 4, 4096);
-        List<(double, double)> points = [with(n + 1)];
+        List<(double, double)> points = new(n + 1);
         for (int i = 0; i <= n; i++)
         {
             double t = start + (extent * i / n);

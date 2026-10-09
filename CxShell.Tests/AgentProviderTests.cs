@@ -36,7 +36,7 @@ public sealed class AgentProviderTests
         settings.Enabled = true;
 
         Assert.NotEqual("plan-secret-key", settings.EncryptedApiKey);
-        Assert.StartsWith("cxaes:", settings.EncryptedApiKey);
+        Assert.StartsWith("cxsec:", settings.EncryptedApiKey);
         Assert.Equal("plan-secret-key", AgentProviderConfiguration.GetApiKey(settings));
         var snapshot = AgentProviderConfiguration.ToSnapshot(settings);
         Assert.True(snapshot.HasApiKey);
@@ -60,7 +60,7 @@ public sealed class AgentProviderTests
             store.Save(settings);
 
             var json = new SqliteAppDataStore(directory).Read("application_settings")!;
-            Assert.Contains("cxaes:", json, StringComparison.Ordinal);
+            Assert.Contains("cxsec:", json, StringComparison.Ordinal);
             Assert.DoesNotContain("plan-secret-key", json, StringComparison.Ordinal);
             Assert.False(File.Exists(Path.Combine(directory, "application-settings.json")));
 

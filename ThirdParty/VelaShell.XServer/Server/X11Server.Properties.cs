@@ -30,7 +30,7 @@ public sealed partial class X11Server
     /// <summary>一个属性的值最多这么多字节。ChangeProperty 的 Append / Prepend 能让它一直涨;_NET_WM_ICON 这种大户也不过几 MB。</summary>
     internal const long MaxPropertyBytes = 32L * 1024 * 1024;
 
-    private readonly Dictionary<string, uint> _atomsByName = [with(StringComparer.Ordinal)];
+    private readonly Dictionary<string, uint> _atomsByName = new(StringComparer.Ordinal);
     private readonly List<string> _atomNames = [];
     private long _atomNameBytes;
     private readonly Dictionary<uint, (XWindow Window, XClient? Client, uint Time)> _selections = [];

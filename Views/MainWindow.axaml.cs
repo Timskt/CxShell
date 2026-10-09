@@ -111,6 +111,7 @@ public partial class MainWindow : Window
             }
         };
         DataContext = vm;
+        SizeChanged += (_, _) => vm.SetWorkspaceWidth(ClientSize.Width);
         WriteToolbarDiagnostics("MainWindow initialized; toolbar menus use AtomUI ContextMenu.");
         Closed += (_, _) => vm.Dispose();
         PropertyChanged += (_, e) =>
@@ -564,6 +565,48 @@ public partial class MainWindow : Window
                   e.TabStripItem.Content as TerminalTabViewModel;
         if (tab != null && DataContext is MainWindowViewModel vm)
             vm.CloseTab(tab);
+    }
+
+    /// <summary>
+    /// Tabs are 72-220px each, so a dozen sessions push the later ones past the edge
+    /// of the strip. The wheel scrolls them into view instead of reaching into the
+    /// terminal underneath.
+    /// </summary>
+    private void OnTabStripPointerWheelChanged(object? sender, PointerWheelEventArgs e)
+    {
+        var scrollable = TabStripScroller.Extent.Width - TabStripScroller.Viewport.Width;
+        if (scrollable <= 0)
+            return;
+
+        var delta = Math.Abs(e.Delta.X) > Math.Abs(e.Delta.Y) ? e.Delta.X : e.Delta.Y;
+        if (delta == 0)
+            return;
+
+        TabStripScroller.Offset = new Point(
+            Math.Clamp(TabStripScroller.Offset.X - delta * 48, 0, scrollable),
+            0);
+        e.Handled = true;
+    }
+
+    private void OnTabStripScrollChanged(object? sender, Avalonia.Controls.ScrollChangedEventArgs e)
+    {
+        TabOverflowButton.IsVisible =
+            TabStripScroller.Extent.Width > TabStripScroller.Viewport.Width + 1;
+    }
+
+    private void OnTabOverflowClick(object? sender, RoutedEventArgs e) =>
+        TabOverflowPopup.IsOpen = !TabOverflowPopup.IsOpen;
+
+    private void OnOverflowTabClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Avalonia.Controls.Control { Tag: TerminalTabViewModel tab } ||
+            DataContext is not MainWindowViewModel vm)
+        {
+            return;
+        }
+
+        vm.SelectedTab = tab;
+        TabOverflowPopup.IsOpen = false;
     }
 
     private static TerminalTabViewModel? ResolveTabContext(Avalonia.Controls.Control? source, out Avalonia.Controls.Control? anchor)
@@ -1138,7 +1181,7 @@ public partial class MainWindow : Window
         {
             await Task.Delay(scene is null ? 1200 : 700);
             OpenUiShotScene(scene);
-            await Task.Delay(scene is null ? 500 : 1500);
+            await Task.Delay(UiShotSettleDelay(scene));
 
             var lifetime = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
             var target = lifetime?.Windows.Count > 0
@@ -1178,7 +1221,32 @@ public partial class MainWindow : Window
                 vm.ToggleAgentPanelVisibility();
                 ApplyAgentPanelLayout(vm);
                 break;
+            case "tabs":
+                _ = OpenLocalTerminalTabsAsync(vm, count: 14);
+                break;
         }
+    }
+
+    /// <summary>Spawning a dozen local shells is not instant, so that scene waits longer.</summary>
+    private static int UiShotSettleDelay(string? scene) => scene switch
+    {
+        null => 500,
+        "tabs" => 9000,
+        _ => 1500
+    };
+
+    private async Task OpenLocalTerminalTabsAsync(MainWindowViewModel vm, int count)
+    {
+        var profile = vm.LocalTerminalProfiles.FirstOrDefault();
+        if (profile == null)
+            return;
+
+        for (var index = 0; index < count; index++)
+            await vm.OpenLocalTerminalAsync(profile);
+
+        // The point of the scene is the control that only appears once they overflow.
+        TabOverflowButton.IsVisible = true;
+        TabOverflowPopup.IsOpen = true;
     }
 
     private static void SaveUiShot(Avalonia.Controls.Window target, string outputPath)

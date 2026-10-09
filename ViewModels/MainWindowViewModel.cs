@@ -46,11 +46,19 @@ public enum KeyboardBroadcastTarget
 
 public partial class MainWindowViewModel : ObservableObject, IDisposable
 {
-    private const double DefaultSftpPanelWidth = 318;
+    internal const double DefaultSftpPanelWidth = 318;
     private const double MinimumSftpPanelWidth = 120;
-    private const double DefaultAgentPanelWidth = 360;
+    internal const double DefaultAgentPanelWidth = 360;
     private const double MinimumAgentPanelWidth = 280;
     private const double MaximumAgentPanelWidth = 600;
+
+    // What the main window's XAML charges these surfaces. The viewport guard needs
+    // the arithmetic to know what is left for the terminal; both sides are pinned by
+    // MainWindowLayoutTests so the numbers cannot drift apart silently.
+    internal const double NavRailWidth = 76;
+    internal const double SessionSidebarWidth = 252;
+    internal const double MonitorPanelWidth = 291;
+    internal const double MinimumTerminalWidth = 480;
 
     private readonly SessionTreeViewModel _sessionTreeVm;
     private readonly LocalizationService _localization = LocalizationService.Shared;
@@ -168,6 +176,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     public string DisconnectText => _localization.Text("Toolbar.Disconnect");
     public string DisconnectToolTip => _localization.Text("Toolbar.DisconnectTip");
     public string SftpToolTip => _localization.Text("Toolbar.SftpTip");
+    public string AllTabsText => _localization.Text("Toolbar.AllTabs");
     public string MonitorText => _localization.Text("Toolbar.Monitor");
     public string MonitorToolTip => _localization.Text("Toolbar.MonitorTip");
     public string TunnelsText => _localization.Text("Toolbar.Tunnels");
@@ -498,6 +507,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             return false;
 
         IsAgentPanelVisible = true;
+        ReserveTerminalWidth(WorkspacePanel.Agent);
         return true;
     }
 
@@ -526,12 +536,14 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         return KeyboardBroadcastTarget switch
         {
+            // AllSessions still includes a tab that dropped and is auto-reconnecting;
+            // ConnectedSessions does not.
             KeyboardBroadcastTarget.AllSessions => Tabs
-                .Where(CanReceiveBroadcastInput)
+                .Where(KeyboardBroadcastScope.IsOpenReceiver)
                 .Distinct()
                 .ToArray(),
             KeyboardBroadcastTarget.ConnectedSessions => Tabs
-                .Where(CanReceiveBroadcastInput)
+                .Where(KeyboardBroadcastScope.IsConnectedReceiver)
                 .Distinct()
                 .ToArray(),
             KeyboardBroadcastTarget.CurrentTabGroup => ResolveCurrentTabGroupTargets(sourceTab),
@@ -551,7 +563,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             return CanReceiveTerminalInput(sourceTab) ? [sourceTab] : [];
 
         return group.Tabs
-            .Where(CanReceiveBroadcastInput)
+            .Where(KeyboardBroadcastScope.IsConnectedReceiver)
             .Distinct()
             .ToArray();
     }
@@ -559,11 +571,6 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private static bool CanReceiveTerminalInput(TerminalTabViewModel tab)
     {
         return tab.IsTerminalSession && tab.Terminal.IsConnected;
-    }
-
-    private static bool CanReceiveBroadcastInput(TerminalTabViewModel tab)
-    {
-        return CanReceiveTerminalInput(tab) && tab.IsKeyboardBroadcastEnabled;
     }
 
     [RelayCommand]
@@ -1146,6 +1153,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(DisconnectText));
         OnPropertyChanged(nameof(DisconnectToolTip));
         OnPropertyChanged(nameof(SftpToolTip));
+        OnPropertyChanged(nameof(AllTabsText));
         OnPropertyChanged(nameof(MonitorText));
         OnPropertyChanged(nameof(MonitorToolTip));
         OnPropertyChanged(nameof(TunnelsText));
@@ -1285,8 +1293,11 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     partial void OnIsMonitorVisibleChanged(bool value)
     {
-        _sessionTreeVm.Settings.ShowMonitorPanel = value;
-        _sessionTreeVm.SaveSettings(_sessionTreeVm.Settings);
+        if (!_isAutoDegrading)
+        {
+            _sessionTreeVm.Settings.ShowMonitorPanel = value;
+            _sessionTreeVm.SaveSettings(_sessionTreeVm.Settings);
+        }
         OnPropertyChanged(nameof(IsMonitorPanelVisible));
         OnPropertyChanged(nameof(IsAgentPanelHostVisible));
         OnPropertyChanged(nameof(AgentSplitterWidth));
@@ -1304,8 +1315,11 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     partial void OnIsSftpVisibleChanged(bool value)
     {
-        _sessionTreeVm.Settings.ShowSftpPanel = value;
-        _sessionTreeVm.SaveSettings(_sessionTreeVm.Settings);
+        if (!_isAutoDegrading)
+        {
+            _sessionTreeVm.Settings.ShowSftpPanel = value;
+            _sessionTreeVm.SaveSettings(_sessionTreeVm.Settings);
+        }
         OnPropertyChanged(nameof(IsSftpPanelVisible));
         OnPropertyChanged(nameof(SftpSplitterWidth));
         if (value)
@@ -1344,8 +1358,11 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     partial void OnIsAgentPanelVisibleChanged(bool value)
     {
-        _sessionTreeVm.Settings.ShowAgentPanel = value;
-        _sessionTreeVm.SaveSettings(_sessionTreeVm.Settings);
+        if (!_isAutoDegrading)
+        {
+            _sessionTreeVm.Settings.ShowAgentPanel = value;
+            _sessionTreeVm.SaveSettings(_sessionTreeVm.Settings);
+        }
         OnPropertyChanged(nameof(IsAgentPanelHostVisible));
         OnPropertyChanged(nameof(AgentSplitterWidth));
         OnPropertyChanged(nameof(AgentPanelColumnWidth));
@@ -1615,13 +1632,112 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     public bool IsSessionSidebarVisible => IsSessionSidebarOpen && !IsTerminalFullScreen;
 
+    private double _workspaceWidth;
+
+    // A panel the viewport guard closed was never a choice the user took back, so it
+    // must not overwrite the layout they asked to see next time.
+    private bool _isAutoDegrading;
+
+    /// <summary>
+    /// Client width of the main window, reported by the view whenever it changes.
+    /// </summary>
+    public void SetWorkspaceWidth(double width)
+    {
+        if (Math.Abs(_workspaceWidth - width) < 1)
+            return;
+
+        _workspaceWidth = width;
+        ReserveTerminalWidth();
+    }
+
+    private bool IsPanelHosted(WorkspacePanel panel) => panel switch
+    {
+        WorkspacePanel.SessionSidebar => IsSessionSidebarVisible,
+        WorkspacePanel.Sftp => IsSftpPanelVisible,
+        WorkspacePanel.Monitor => IsMonitorPanelVisible,
+        _ => IsAgentPanelHostVisible
+    };
+
+    private double PanelWidth(WorkspacePanel panel) => panel switch
+    {
+        WorkspacePanel.SessionSidebar => SessionSidebarWidth,
+        WorkspacePanel.Sftp => SftpPanelWidth.Value + SftpSplitterWidth.Value,
+        WorkspacePanel.Monitor => MonitorPanelWidth,
+        _ => AgentPanelWidth.Value + AgentSplitterWidth.Value
+    };
+
+    private IReadOnlyDictionary<WorkspacePanel, double> OpenPanelWidths()
+    {
+        var widths = new Dictionary<WorkspacePanel, double>();
+        foreach (var panel in WorkspaceViewport.SacrificeOrder)
+        {
+            if (IsPanelHosted(panel))
+                widths[panel] = PanelWidth(panel);
+        }
+
+        return widths;
+    }
+
+    private void ClosePanel(WorkspacePanel panel)
+    {
+        switch (panel)
+        {
+            case WorkspacePanel.Agent:
+                IsAgentPanelVisible = false;
+                break;
+            case WorkspacePanel.Monitor:
+                IsMonitorVisible = false;
+                break;
+            case WorkspacePanel.Sftp:
+                IsSftpVisible = false;
+                break;
+            case WorkspacePanel.SessionSidebar:
+                IsSessionSidebarOpen = false;
+                break;
+        }
+    }
+
+    private void ReserveTerminalWidth(WorkspacePanel? justOpened = null)
+    {
+        if (IsTerminalFullScreen || _workspaceWidth <= 0)
+            return;
+
+        var toClose = WorkspaceViewport.FindPanelsToClose(
+            _workspaceWidth,
+            NavRailWidth,
+            MinimumTerminalWidth,
+            OpenPanelWidths(),
+            justOpened);
+        if (toClose.Count == 0)
+            return;
+
+        _isAutoDegrading = true;
+        try
+        {
+            foreach (var panel in toClose)
+                ClosePanel(panel);
+        }
+        finally
+        {
+            _isAutoDegrading = false;
+        }
+    }
+
     [RelayCommand]
-    private void ToggleSessionSidebar() => IsSessionSidebarOpen = !IsSessionSidebarOpen;
+    private void ToggleSessionSidebar()
+    {
+        IsSessionSidebarOpen = !IsSessionSidebarOpen;
+        ReserveTerminalWidth(IsSessionSidebarOpen ? WorkspacePanel.SessionSidebar : null);
+    }
 
     partial void OnIsSessionSidebarOpenChanged(bool value)
     {
-        _sessionTreeVm.Settings.ShowSessionSidebar = value;
-        _sessionTreeVm.SaveSettings(_sessionTreeVm.Settings);
+        if (!_isAutoDegrading)
+        {
+            _sessionTreeVm.Settings.ShowSessionSidebar = value;
+            _sessionTreeVm.SaveSettings(_sessionTreeVm.Settings);
+        }
+
         OnPropertyChanged(nameof(IsSavedSessionLauncherVisible));
     }
 
@@ -1773,12 +1889,14 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private void ToggleMonitor()
     {
         IsMonitorVisible = !IsMonitorVisible;
+        ReserveTerminalWidth(IsMonitorVisible ? WorkspacePanel.Monitor : null);
     }
 
     [RelayCommand]
     private void ToggleSftp()
     {
         IsSftpVisible = !IsSftpVisible;
+        ReserveTerminalWidth(IsSftpVisible ? WorkspacePanel.Sftp : null);
     }
 
     [RelayCommand]
@@ -1806,6 +1924,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     public void ToggleAgentPanelVisibility()
     {
         IsAgentPanelVisible = !IsAgentPanelVisible;
+        ReserveTerminalWidth(IsAgentPanelVisible ? WorkspacePanel.Agent : null);
     }
 
     partial void OnIsTabBarVisibleChanged(bool value)

@@ -798,20 +798,84 @@
                                 IsVisible="{Binding IsMainTabHeaderVisible}"
                                 Background="{atom:SharedTokenResource ColorBgLayout}"
                                 BorderBrush="{atom:SharedTokenResource ColorBorderSecondary}" BorderThickness="0,0,0,1">
-                            <atom:TabStrip ItemsSource="{Binding Tabs}"
-                                           Classes="session-tab-strip"
-                                           SelectedItem="{Binding SelectedTab, Mode=TwoWay}"
-                                           ItemTemplate="{StaticResource TabHeaderTemplate}"
-                                           IsTabReorderEnabled="True"
-                                           TabActivationTrigger="PointerReleased"
-                                           IsTabClosable="True"
-                                           IsTabAutoHideCloseButton="False"
-                                           IsMotionEnabled="False"
-                                           SizeType="Small"
-                                           HeaderStartEdgePadding="4"
-                                           HeaderEndEdgePadding="4"
-                                           BorderThickness="0"
-                                           Closing="OnTabStripClosing"/>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <ScrollViewer Grid.Column="0"
+                                              x:Name="TabStripScroller"
+                                              HorizontalScrollBarVisibility="Hidden"
+                                              VerticalScrollBarVisibility="Disabled"
+                                              AllowAutoHide="True"
+                                              PointerWheelChanged="OnTabStripPointerWheelChanged"
+                                              ScrollChanged="OnTabStripScrollChanged">
+                                    <atom:TabStrip ItemsSource="{Binding Tabs}"
+                                                   Classes="session-tab-strip"
+                                                   SelectedItem="{Binding SelectedTab, Mode=TwoWay}"
+                                                   ItemTemplate="{StaticResource TabHeaderTemplate}"
+                                                   IsTabReorderEnabled="True"
+                                                   TabActivationTrigger="PointerReleased"
+                                                   IsTabClosable="True"
+                                                   IsTabAutoHideCloseButton="False"
+                                                   IsMotionEnabled="False"
+                                                   SizeType="Small"
+                                                   HeaderStartEdgePadding="4"
+                                                   HeaderEndEdgePadding="4"
+                                                   BorderThickness="0"
+                                                   Closing="OnTabStripClosing"/>
+                                </ScrollViewer>
+                                <atom:Button Grid.Column="1"
+                                             x:Name="TabOverflowButton"
+                                             Classes="cx-icon-button"
+                                             ButtonType="Text"
+                                             IsVisible="False"
+                                             ToolTip.Tip="{Binding AllTabsText}"
+                                             Click="OnTabOverflowClick">
+                                    <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=DoubleRightOutlined}"
+                                                        Width="14"
+                                                        Height="14"/>
+                                </atom:Button>
+                                <Popup Grid.Column="1"
+                                       x:Name="TabOverflowPopup"
+                                       PlacementTarget="{Binding ElementName=TabOverflowButton}"
+                                       Placement="Bottom"
+                                       HorizontalOffset="-262"
+                                       IsLightDismissEnabled="True">
+                                    <Border Classes="cx-popover"
+                                            Width="280"
+                                            Padding="6">
+                                        <ScrollViewer MaxHeight="360"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{Binding Tabs}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="vm:TerminalTabViewModel">
+                                                        <atom:Button Classes="cx-ghost"
+                                                                     ButtonType="Text"
+                                                                     HorizontalAlignment="Stretch"
+                                                                     HorizontalContentAlignment="Stretch"
+                                                                     Tag="{Binding}"
+                                                                     Click="OnOverflowTabClick">
+                                                            <Grid ColumnDefinitions="Auto,*,Auto"
+                                                                  ColumnSpacing="8">
+                                                                <Ellipse Width="8"
+                                                                         Height="8"
+                                                                         Fill="{Binding ConnectionIndicatorBrush}"
+                                                                         VerticalAlignment="Center"/>
+                                                                <atom:TextBlock Grid.Column="1"
+                                                                                Classes="cx-value"
+                                                                                Text="{Binding Title}"
+                                                                                TextTrimming="CharacterEllipsis"/>
+                                                                <atom:TextBlock Grid.Column="2"
+                                                                                Classes="cx-meta"
+                                                                                Text="{Binding Session.Host}"
+                                                                                TextTrimming="CharacterEllipsis"
+                                                                                MaxWidth="110"/>
+                                                            </Grid>
+                                                        </atom:Button>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Popup>
+                            </Grid>
                         </Border>
                         <Grid Grid.Row="1"
                               IsVisible="{Binding IsSingleTabContentVisible}">

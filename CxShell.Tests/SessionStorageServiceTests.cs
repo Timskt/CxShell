@@ -51,6 +51,46 @@ public sealed class SessionStorageServiceTests
         Assert.Contains("CxShell.Session", new SqliteAppDataStore(directory.Path).Read("sessions")!);
     }
 
+    [Fact]
+    public void Load_UpgradesSecretsWrittenUnderThePublishedLegacyKey()
+    {
+        using var directory = new TemporaryDirectory();
+        var secret = "old-server-password";
+        var path = Path.Combine(directory.Path, "sessions.json");
+        File.WriteAllText(path, $$"""
+            {
+              "Format": "CxShell.Session",
+              "Version": "1.0",
+              "Groups": [],
+              "Sessions": [
+                {
+                  "Name": "legacy",
+                  "Host": "10.0.0.1",
+                  "Password": "{{LegacyCipher.Encrypt(secret)}}",
+                  "Proxy": {
+                    "Protocol": "Http",
+                    "Host": "proxy.internal",
+                    "Port": 3128,
+                    "Password": "{{LegacyCipher.Encrypt("proxy-password")}}"
+                  }
+                }
+              ]
+            }
+            """);
+
+        var data = new SessionStorageService(directory.Path).Load();
+
+        var session = Assert.Single(data.Sessions);
+        Assert.Equal(secret, PasswordEncryptionService.Decrypt(session.Password));
+        Assert.Equal("proxy-password", PasswordEncryptionService.Decrypt(session.Proxy.Password));
+
+        // The upgrade has to survive the process: the stored copy is what the next
+        // launch reads, and it must no longer depend on the published constant.
+        var persisted = new SqliteAppDataStore(directory.Path).Read("sessions")!;
+        Assert.DoesNotContain(LegacyCipher.Prefix, persisted, StringComparison.Ordinal);
+        Assert.Contains("cxsec:", persisted, StringComparison.Ordinal);
+    }
+
     private sealed class TemporaryDirectory : IDisposable
     {
         public TemporaryDirectory()
