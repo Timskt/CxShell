@@ -79,6 +79,7 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        SshHostKeyTrustService.UiPrompt = new SshHostKeyPromptService();
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow(desktop.Args ?? Array.Empty<string>());

@@ -36,8 +36,8 @@ public static class AppLog
                 return;
             }
 
+            var repeats = _repeats;
             _lastMessage = message;
-            message = _repeats > 0 ? $"{level} {context} (+{_repeats} repeated)" : message;
             _repeats = 0;
 
             try
@@ -47,6 +47,10 @@ public static class AppLog
                     File.Move(path, path + ".old", true);
 
                 using var writer = File.AppendText(path);
+                if (repeats > 0)
+                    writer.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] .. the previous message repeated {repeats} more time(s)");
+
+                // The first occurrence is written at once so a crash cannot lose it.
                 writer.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}");
             }
             catch
@@ -56,8 +60,16 @@ public static class AppLog
         }
     }
 
+    internal static string? DirectoryOverride { get; set; }
+
     private static string ResolveLogPath()
     {
+        if (!string.IsNullOrWhiteSpace(DirectoryOverride))
+        {
+            Directory.CreateDirectory(DirectoryOverride);
+            return Path.Combine(DirectoryOverride, "diagnostics.log");
+        }
+
         var root = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         if (string.IsNullOrWhiteSpace(root))
             root = AppContext.BaseDirectory;

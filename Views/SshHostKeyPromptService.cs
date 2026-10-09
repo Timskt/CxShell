@@ -3,10 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using CxShell.Models;
+using CxShell.Services;
 using CxShell.ViewModels;
-using CxShell.Views;
 
-namespace CxShell.Services;
+namespace CxShell.Views;
 
 public sealed class SshHostKeyPromptService : ISshHostKeyPrompt
 {

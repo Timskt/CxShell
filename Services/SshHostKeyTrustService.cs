@@ -28,9 +28,22 @@ public sealed class SshHostKeyTrustService
     private readonly ConcurrentDictionary<string, SemaphoreSlim> _endpointLocks = new(StringComparer.OrdinalIgnoreCase);
     private ApplicationSettings _settings = new();
 
+    /// <summary>
+    /// Installed by the application at startup. Services cannot construct the
+    /// window adapter, so an uninstalled prompt rejects unknown keys rather than
+    /// reaching into Views.
+    /// </summary>
+    public static ISshHostKeyPrompt? UiPrompt { get; set; }
+
     public static SshHostKeyTrustService Shared { get; } = new(
         Path.Combine(SessionStorageService.GetStorageDirectory(), "known_hosts.json"),
-        new SshHostKeyPromptService());
+        new DeferredPrompt());
+
+    private sealed class DeferredPrompt : ISshHostKeyPrompt
+    {
+        public Task<SshHostKeyDecision> DecideAsync(SshHostKeyPromptRequest request) =>
+            UiPrompt?.DecideAsync(request) ?? Task.FromResult(SshHostKeyDecision.Reject);
+    }
 
     public SshHostKeyTrustService(string storagePath, ISshHostKeyPrompt prompt)
     {
