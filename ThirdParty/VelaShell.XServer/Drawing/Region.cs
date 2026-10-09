@@ -284,7 +284,7 @@ internal sealed class Region
         }
         while (parts.Count > 1)
         {
-            List<List<XRect>> merged = [with((parts.Count + 1) / 2)];
+            List<List<XRect>> merged = new((parts.Count + 1) / 2);
             for (int i = 0; i + 1 < parts.Count; i += 2)
             {
                 if (Combine(parts[i], parts[i + 1], Op.Union) is not { } union)
@@ -355,7 +355,7 @@ internal sealed class Region
     /// </summary>
     private static List<XRect>? Combine(List<XRect> a, List<XRect> b, Op op)
     {
-        List<XRect> result = [with(Math.Min(a.Count + b.Count, MaxRects))];
+        List<XRect> result = new(Math.Min(a.Count + b.Count, MaxRects));
         List<(int X1, int X2)> spans = [];
         int previousBand = -1;   // 结果里上一带的起始下标(用来与新的一带合并)
         int ia = 0, ib = 0;

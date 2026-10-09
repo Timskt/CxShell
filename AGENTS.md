@@ -17,7 +17,7 @@ CxShell is a single-project Avalonia desktop terminal and remote session client 
 
 ## Build, Test, and Development Commands
 
-The .NET 10 SDK must be 10.0.300 or newer: `ThirdParty/VelaShell.XServer` uses `with` collection-expression syntax, and older SDKs fail with `CS0103: The name 'with' does not exist`.
+The .NET 10 SDK is required. `ThirdParty/VelaShell.XServer` is vendored MIT-licensed source that is compiled into the app; it is kept on plain collection-initialiser syntax so it builds on every 10.x SDK rather than only the newest one.
 
 Run commands from the repository root:
 

@@ -124,7 +124,7 @@ internal static class ColorNames
             ("mediumpurple", 147, 112, 219), ("thistle", 216, 191, 216), ("darkblue", 0, 0, 139), ("darkcyan", 0, 139, 139),
             ("darkmagenta", 139, 0, 139), ("darkred", 139, 0, 0), ("lightgreen", 144, 238, 144),
         ];
-        Dictionary<string, (byte, byte, byte)> table = [with(StringComparer.Ordinal)];
+        Dictionary<string, (byte, byte, byte)> table = new(StringComparer.Ordinal);
         foreach ((string name, byte r, byte g, byte b) in entries)
         {
             table[name] = (r, g, b);
