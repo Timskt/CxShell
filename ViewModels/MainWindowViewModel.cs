@@ -23,7 +23,6 @@ using Avalonia.Threading;
 using CxShell.Models;
 using CxShell.Services;
 using CxShell.Services.Agent;
-using CxShell.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -62,7 +61,6 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private readonly IReadOnlyList<LocalTerminalProfile> _localTerminalProfiles;
     private readonly AgentPermissionPolicy _agentPermissionPolicy;
     private readonly HashSet<Guid> _quickSessionConnectionsInFlight = [];
-    private UpdateProgressWindow? _updateProgressWindow;
     private UpdateProgressViewModel? _updateProgressViewModel;
     private readonly IShellWindows _windows;
     private int _disposeState;
@@ -224,7 +222,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     public string ChineseLanguageText => _localization.Text("Language.Chinese");
     public string EnglishLanguageText => _localization.Text("Language.English");
 
-    public MainWindowViewModel(IShellWindows windows)
+    internal MainWindowViewModel(IShellWindows windows)
     {
         _windows = windows;
         _sessionTreeVm = new SessionTreeViewModel(this);
@@ -667,11 +665,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             var unsupportedOwner = GetMainWindow();
             if (unsupportedOwner != null)
             {
-                await AtomUiDialogService.ShowMessageAsync(
-                    unsupportedOwner,
+                await _windows.ShowMessageAsync(
                     _localization.Text("ExternalLaunch.Title"),
                     string.Format(_localization.Text("ExternalLaunch.Unsupported"), request.Scheme),
-                    AtomUI.Desktop.Controls.MessageBoxStyle.Warning);
+                    ShellMessageKind.Warning);
             }
             return;
         }
@@ -684,8 +681,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             if (owner == null)
                 return;
 
-            var confirmation = await AtomUiDialogService.ShowExternalLaunchConfirmAsync(
-                owner,
+            var confirmation = await _windows.ShowExternalLaunchConfirmAsync(
                 _localization.Text("ExternalLaunch.Title"),
                 _localization.Text("ExternalLaunch.Source"),
                 _localization.Text(GetExternalLaunchOriginKey(request.Origin)),
@@ -821,8 +817,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         if (owner == null)
             return;
 
-        await AtomUiDialogService.ShowAboutAsync(
-            owner,
+        await _windows.ShowAboutAsync(
             _localization.Text("About.Title"),
             "CxShell",
             string.Format(_localization.Text("About.Version"), BuildAppVersion()),
@@ -854,7 +849,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         var viewModel = new SshTunnelCenterViewModel(this);
         viewModel.ShowRuleDialogAsync = ShowSshTunnelRuleDialogAsync;
         viewModel.ConfirmDialogAsync = (title, message) =>
-            AtomUiDialogService.ShowConfirmAsync(owner, title, message);
+            _windows.ShowConfirmAsync(title, message);
         _windows.ShowSshTunnelCenter(viewModel);
     }
 
@@ -926,22 +921,20 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 case AppUpdateCheckStatus.NotInstalled:
                     if (isManual && owner != null)
                     {
-                        await AtomUiDialogService.ShowMessageAsync(
-                            owner,
+                        await _windows.ShowMessageAsync(
                             _localization.Text("Update.Title"),
                             _localization.Text("Update.NotInstalled"),
-                            AtomUI.Desktop.Controls.MessageBoxStyle.Warning);
+                            ShellMessageKind.Warning);
                     }
                     break;
 
                 case AppUpdateCheckStatus.NoUpdate:
                     if (isManual && owner != null)
                     {
-                        await AtomUiDialogService.ShowMessageAsync(
-                            owner,
+                        await _windows.ShowMessageAsync(
                             _localization.Text("Update.Title"),
                             _localization.Text("Update.NoUpdate"),
-                            AtomUI.Desktop.Controls.MessageBoxStyle.Success);
+                            ShellMessageKind.Success);
                     }
                     break;
 
@@ -958,11 +951,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 case AppUpdateCheckStatus.Failed:
                     if (isManual && owner != null)
                     {
-                        await AtomUiDialogService.ShowMessageAsync(
-                            owner,
+                        await _windows.ShowMessageAsync(
                             _localization.Text("Update.Title"),
                             string.Format(_localization.Text("Update.Failed"), BuildUpdateErrorMessage(result.ErrorMessage)),
-                            AtomUI.Desktop.Controls.MessageBoxStyle.Error);
+                            ShellMessageKind.Error);
                     }
                     else
                     {
@@ -1006,15 +998,14 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             return;
 
         var message = BuildUpdateAvailableMessage(update);
-        var shouldDownload = await AtomUiDialogService.ShowConfirmAsync(
-            owner,
+        var shouldDownload = await _windows.ShowConfirmAsync(
             _localization.Text("Update.Title"),
             message);
         if (!shouldDownload)
             return;
 
         using var downloadCts = new CancellationTokenSource();
-        var progressWindow = ShowUpdateProgressWindow(owner, update, downloadCts);
+        _windows.ShowUpdateProgress(CreateUpdateProgressViewModel(update), downloadCts.Cancel);
         UpdateProgressText = _localization.Text("Update.Downloading");
 
         try
@@ -1039,28 +1030,22 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            await AtomUiDialogService.ShowMessageAsync(
-                owner,
+            await _windows.ShowMessageAsync(
                 _localization.Text("Update.Title"),
                 string.Format(_localization.Text("Update.DownloadFailed"), BuildUpdateErrorMessage(ex.Message)),
-                AtomUI.Desktop.Controls.MessageBoxStyle.Error);
+                ShellMessageKind.Error);
             return;
         }
         finally
         {
-            CloseUpdateProgressWindow(progressWindow);
+            _windows.CloseUpdateProgress();
+            _updateProgressViewModel = null;
         }
 
         await PromptRestartForUpdateAsync(update, restartArgs);
     }
 
-    private UpdateProgressWindow ShowUpdateProgressWindow(
-        TopLevel owner,
-        AppUpdateHandle update,
-        CancellationTokenSource downloadCts)
-    {
-        CloseUpdateProgressWindow(_updateProgressWindow);
-
+    private UpdateProgressViewModel CreateUpdateProgressViewModel(AppUpdateHandle update) =>
         _updateProgressViewModel = new UpdateProgressViewModel
         {
             Title = _localization.Text("Update.Title"),
@@ -1070,52 +1055,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             CancelText = _localization.Text("Update.Cancel")
         };
 
-        var window = new UpdateProgressWindow
-        {
-            DataContext = _updateProgressViewModel
-        };
-        window.CancelRequested += (_, _) => downloadCts.Cancel();
-        _updateProgressWindow = window;
-
-        if (owner is Window ownerWindow)
-            window.Show(ownerWindow);
-        else
-            window.Show();
-
-        return window;
-    }
-
-    private void CloseUpdateProgressWindow(UpdateProgressWindow? window)
-    {
-        if (window == null)
-            return;
-
-        try
-        {
-            window.CloseForCompletion();
-        }
-        catch
-        {
-            // Ignore close failures during shutdown or update restart.
-        }
-        finally
-        {
-            if (_updateProgressWindow == window)
-            {
-                _updateProgressWindow = null;
-                _updateProgressViewModel = null;
-            }
-        }
-    }
-
     private async Task PromptRestartForUpdateAsync(AppUpdateHandle update, string[] restartArgs)
     {
         var owner = GetActiveWindow();
         if (owner == null)
             return;
 
-        var restart = await AtomUiDialogService.ShowConfirmAsync(
-            owner,
+        var restart = await _windows.ShowConfirmAsync(
             _localization.Text("Update.Title"),
             AppendMacInstallPermissionWarning(
                 string.Format(_localization.Text("Update.DownloadedMessage"), update.TargetVersion)));
