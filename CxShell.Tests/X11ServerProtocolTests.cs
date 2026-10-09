@@ -69,6 +69,30 @@ public sealed class X11ServerProtocolTests
         listener.Start();
     }
 
+    /// <summary>
+    /// 拒绝一个客户端后立刻收工:accept 循环正挂在 AcceptTcpClientAsync 上,而 DisposeAsync 先 Stop 监听再取消,
+    /// 这条竞态曾在 CI 上随机抛 "Not listening"。
+    /// </summary>
+    [Fact]
+    public async Task DisposeRightAfterRejectingClient_DoesNotThrow()
+    {
+        for (int attempt = 0; attempt < 25; attempt++)
+        {
+            byte[] cookie = RandomNumberGenerator.GetBytes(16);
+            await using (X11Server server = await StartServerAsync(cookie))
+            {
+                using TcpClient client = await ConnectAsync(server.DisplayNumber);
+                NetworkStream stream = client.GetStream();
+
+                await stream.WriteAsync(CreateSetupPacket(RandomNumberGenerator.GetBytes(16)));
+                byte[] status = new byte[1];
+                await stream.ReadExactlyAsync(status);
+
+                Assert.Equal(0, status[0]);
+            }
+        }
+    }
+
     private static async Task<X11Server> StartServerAsync(byte[] cookie)
     {
         X11Server server = new(new X11ServerOptions
