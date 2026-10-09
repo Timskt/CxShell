@@ -801,14 +801,18 @@ public sealed class LocalTerminalConnectionService : ITerminalConnectionService
         private const ulong LinuxTioCsWinsz = 0x5414;
         private const ulong MacTioCsWinsz = 0x80487467;
 
+        private const int PollSliceMilliseconds = 50;
+
         private readonly FileStream _stream;
+        private readonly int _fileDescriptor;
         private readonly int _processId;
         private readonly object _closeGate = new();
         private bool _closed;
 
-        private UnixForkPtySession(FileStream stream, int processId)
+        private UnixForkPtySession(FileStream stream, int fileDescriptor, int processId)
         {
             _stream = stream;
+            _fileDescriptor = fileDescriptor;
             _processId = processId;
         }
 
@@ -816,7 +820,33 @@ public sealed class LocalTerminalConnectionService : ITerminalConnectionService
         public override Stream Output => _stream;
 
         public override Task<int> ReadAsync(byte[] buffer, CancellationToken cancellationToken)
-            => _stream.ReadAsync(buffer.AsMemory(), cancellationToken).AsTask();
+            => Task.Run(() => ReadBlocking(buffer, cancellationToken), cancellationToken);
+
+        /// <summary>
+        /// FileStream refuses async reads on a pty master, and a blocking read cannot be
+        /// cancelled because closing the descriptor does not wake a thread already inside
+        /// read(). So wait for readability with poll() in short slices and take the bytes
+        /// synchronously once something is there; cancellation is checked between slices.
+        /// </summary>
+        private int ReadBlocking(byte[] buffer, CancellationToken cancellationToken)
+        {
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var descriptor = new UnixNative.PollFd
+                {
+                    FileDescriptor = _fileDescriptor,
+                    Events = UnixNative.PollIn
+                };
+                var ready = UnixNative.Poll(ref descriptor, 1, PollSliceMilliseconds);
+                if (ready > 0)
+                    return _stream.Read(buffer, 0, buffer.Length);
+
+                if (ready < 0 && Marshal.GetLastWin32Error() != UnixNative.Interrupted)
+                    throw new IOException($"pty poll failed: {Marshal.GetLastWin32Error()}");
+            }
+        }
 
         public override void Write(byte[] data)
         {
@@ -880,8 +910,8 @@ public sealed class LocalTerminalConnectionService : ITerminalConnectionService
                     new SafeFileHandle((IntPtr)master, ownsHandle: true),
                     FileAccess.ReadWrite,
                     16 * 1024,
-                    isAsync: true);
-                return new UnixForkPtySession(stream, processId);
+                    isAsync: false);
+                return new UnixForkPtySession(stream, master, processId);
             }
             finally
             {
@@ -968,6 +998,19 @@ public sealed class LocalTerminalConnectionService : ITerminalConnectionService
         private static class UnixNative
         {
             public const int NoHang = 1;
+            public const int PollIn = 1;
+            public const int Interrupted = 4;
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct PollFd
+            {
+                public int FileDescriptor;
+                public short Events;
+                public short Revents;
+            }
+
+            [DllImport("libc", EntryPoint = "poll", SetLastError = true)]
+            public static extern int Poll(ref PollFd fds, int count, int timeoutMilliseconds);
 
             [StructLayout(LayoutKind.Sequential)]
             public struct WinSize
