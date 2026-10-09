@@ -19,10 +19,39 @@ public class ServerMonitorService : IDisposable
     private enum MonitorTargetKind
     {
         Linux,
-        Windows
+        Windows,
+        Darwin
     }
 
     private const string LinuxSectionSeparator = "---SEP---";
+
+    /// <summary>
+    /// macOS collector. It emits the same CPU|MEM|DISK|NET lines the Windows script
+    /// does, so both share one parser. vm_stat counts pages whose size only appears in
+    /// its header, and "available" is free + inactive + speculative because macOS keeps
+    /// retired pages reclaimable rather than zeroed. df is filtered to real volumes:
+    /// APFS otherwise reports every system snapshot and asset mount as its own disk.
+    /// </summary>
+    private const string DarwinMonitorScript = """
+top -l 1 -n 0 | awk -F'[:,%]+' '/CPU usage/ { for (i=1; i<=NF; i++) if ($i ~ /idle/) printf "CPU|0|%.1f\n", 100 - $(i-1) }'
+
+pagesize=$(vm_stat | awk 'NR==1 { for (i=1; i<=NF; i++) if ($i == "of") { gsub(/[^0-9]/, "", $(i+1)); print $(i+1); exit } }')
+free=$(vm_stat | awk -F: '/^Pages free/ {gsub(/[ \t.]/, "", $2); print $2}')
+inactive=$(vm_stat | awk -F: '/^Pages inactive/ {gsub(/[ \t.]/, "", $2); print $2}')
+spec=$(vm_stat | awk -F: '/^Pages speculative/ {gsub(/[ \t.]/, "", $2); print $2}')
+echo "MEM|$(sysctl -n hw.memsize | awk '{printf "%d\n", $1/1024}')|$(( (${free:-0} + ${inactive:-0} + ${spec:-0}) * ${pagesize:-4096} / 1024 ))"
+
+df -P | awk 'NR>1 && $1 ~ /^\/dev\// {
+  m = $6
+  if (m != "/" && m !~ /^\/Volumes\// && m != "/System/Volumes/Data") next
+  printf "DISK|%s|%d|%d\n", m, $2 * 512, $4 * 512
+}'
+
+rx() { netstat -ibn | awk 'NR>1 && $1 !~ /^lo/ && $NF != "-" { if (!seen[$1]++) r += $7 } END { print r+0 }'; }
+tx() { netstat -ibn | awk 'NR>1 && $1 !~ /^lo/ && $NF != "-" { if (!seen[$1]++) t += $10 } END { print t+0 }'; }
+r1=$(rx); t1=$(tx); sleep 1; r2=$(rx); t2=$(tx)
+echo "NET|$(( r2 > r1 ? r2 - r1 : 0 ))|$(( t2 > t1 ? t2 - t1 : 0 ))"
+""";
     private const string WindowsMonitorScript = """
 $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference = 'SilentlyContinue'
@@ -117,6 +146,7 @@ exit 0
     private Dictionary<string, (long readSectors, long writeSectors)>? _prevDiskStat;
     private readonly object _debugLogLock = new();
     private bool _hasLoggedWindowsScript;
+    private bool _hasProbedTargetKind;
 
     public bool IsMonitoring => _monitorTask != null && !_monitorTask.IsCompleted;
     public static string DebugLogPath => Path.Combine(GetDebugLogDirectory(), "server-monitor-debug.log");
@@ -211,6 +241,7 @@ exit 0
         _monitorTask = null;
         _lastSampleTime = default;
         _targetKind = MonitorTargetKind.Linux;
+        _hasProbedTargetKind = false;
         _refreshIntervalSeconds = SessionInfo.DefaultSshMonitorRefreshIntervalSeconds;
         _enableNetworkLatencyProbe = false;
         _commandRunner = null;
@@ -230,6 +261,35 @@ exit 0
         _cts = new CancellationTokenSource();
         DebugLog($"monitor loop start target={_targetKind} ownsSshClient={_ownsSshClient} commandRunner={_commandRunner != null} callbackGeneration={callbackGeneration}");
         _monitorTask = Task.Run(() => MonitorLoop(_cts.Token, callbackGeneration));
+    }
+
+    /// <summary>
+    /// The SSH banner only distinguishes Windows OpenSSH from everything else, so a
+    /// macOS or BSD host was collected with /proc commands and silently produced
+    /// nothing. One uname per session picks the right collector; a failed probe keeps
+    /// the previous Linux default rather than losing monitoring altogether.
+    /// </summary>
+    private async Task DetectTargetKindAsync(CancellationToken ct, long callbackGeneration)
+    {
+        if (_targetKind == MonitorTargetKind.Windows || _hasProbedTargetKind)
+            return;
+
+        _hasProbedTargetKind = true;
+        var output = await TryRunRemoteCommandAsync(
+                "uname -s",
+                TimeSpan.FromSeconds(5),
+                ct,
+                "uname-probe",
+                callbackGeneration)
+            .ConfigureAwait(false);
+        if (output == null)
+            return;
+
+        var kernel = output.Trim();
+        if (kernel.StartsWith("Darwin", StringComparison.OrdinalIgnoreCase))
+            _targetKind = MonitorTargetKind.Darwin;
+
+        DebugLog($"uname probe kernel={kernel} target={_targetKind}");
     }
 
     private static async Task ConnectWithRetryAsync(SshClient client, CancellationToken cancellationToken)
@@ -259,6 +319,8 @@ exit 0
 
     private async Task MonitorLoop(CancellationToken ct, long callbackGeneration)
     {
+        await DetectTargetKindAsync(ct, callbackGeneration).ConfigureAwait(false);
+
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(_refreshIntervalSeconds));
         while (await timer.WaitForNextTickAsync(ct).ConfigureAwait(false))
         {
@@ -293,9 +355,12 @@ exit 0
 
     private Task<MonitorSnapshot?> CollectAsync(CancellationToken ct, long callbackGeneration)
     {
-        return _targetKind == MonitorTargetKind.Windows
-            ? CollectWindowsAsync(ct, callbackGeneration)
-            : CollectLinuxAsync(ct, callbackGeneration);
+        return _targetKind switch
+        {
+            MonitorTargetKind.Windows => CollectWindowsAsync(ct, callbackGeneration),
+            MonitorTargetKind.Darwin => CollectDarwinAsync(ct, callbackGeneration),
+            _ => CollectLinuxAsync(ct, callbackGeneration)
+        };
     }
 
     private async Task<MonitorSnapshot?> CollectLinuxAsync(CancellationToken ct, long callbackGeneration)
@@ -375,6 +440,24 @@ exit 0
         };
     }
 
+    private async Task<MonitorSnapshot?> CollectDarwinAsync(CancellationToken ct, long callbackGeneration)
+    {
+        if (!HasRemoteCommandSource())
+            return null;
+
+        var output = await TryRunRemoteCommandAsync(
+                DarwinMonitorScript,
+                TimeSpan.FromSeconds(15),
+                ct,
+                "darwin-monitor",
+                callbackGeneration)
+            .ConfigureAwait(false);
+        if (output == null)
+            return null;
+
+        return ParseMonitorProtocolOutput(output);
+    }
+
     private async Task<MonitorSnapshot?> CollectWindowsAsync(CancellationToken ct, long callbackGeneration)
     {
         if (!HasRemoteCommandSource())
@@ -405,7 +488,7 @@ exit 0
             throw new InvalidOperationException(decoded);
         }
 
-        var snapshot = ParseWindowsMonitorOutput(output);
+        var snapshot = ParseMonitorProtocolOutput(output);
         snapshot.NetworkLatencyMilliseconds = _enableNetworkLatencyProbe
             ? await MeasureNetworkLatencyAsync(ct).ConfigureAwait(false)
             : null;
@@ -570,7 +653,10 @@ exit 0
         }
     }
 
-    private static MonitorSnapshot ParseWindowsMonitorOutput(string output)
+    /// <summary>
+    /// Shared by the Windows and macOS collectors, which both emit this line protocol.
+    /// </summary>
+    internal static MonitorSnapshot ParseMonitorProtocolOutput(string output)
     {
         var snapshot = new MonitorSnapshot();
         foreach (var rawLine in output.Split('\n', StringSplitOptions.RemoveEmptyEntries))
