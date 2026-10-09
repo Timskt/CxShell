@@ -64,9 +64,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private readonly HashSet<Guid> _quickSessionConnectionsInFlight = [];
     private UpdateProgressWindow? _updateProgressWindow;
     private UpdateProgressViewModel? _updateProgressViewModel;
-    private SettingsCenterWindow? _settingsCenterWindow;
-    private RecentConnectionsWindow? _recentConnectionsWindow;
-    private SshTunnelCenterWindow? _sshTunnelCenterWindow;
+    private readonly IShellWindows _windows;
     private int _disposeState;
 
     [ObservableProperty] private SessionTreeViewModel _sessionTree;
@@ -226,9 +224,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     public string ChineseLanguageText => _localization.Text("Language.Chinese");
     public string EnglishLanguageText => _localization.Text("Language.English");
 
-    private Window? _sessionManagerWindow;
-    public MainWindowViewModel()
+    public MainWindowViewModel(IShellWindows windows)
     {
+        _windows = windows;
         _sessionTreeVm = new SessionTreeViewModel(this);
         _sessionTree = _sessionTreeVm;
         Func<ProxySettings?> globalProxyProvider = () =>
@@ -384,7 +382,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
                 ThemeTransitionReason.UserRequest));
 
         if (result.Status == ThemeTransitionStatus.Failed)
+        {
+            AppLog.Warn($"Theme switch to {mode} failed; keeping {ThemeIcon} appearance");
             return;
+        }
 
         IsDarkMode = result.State?.Appearance == ThemeAppearance.Dark;
         App.ApplyAvaloniaThemeVariant(IsDarkMode);
@@ -850,31 +851,18 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         if (owner == null)
             return;
 
-        if (_sshTunnelCenterWindow != null)
-        {
-            _sshTunnelCenterWindow.Activate();
-            return;
-        }
-
         var viewModel = new SshTunnelCenterViewModel(this);
-        viewModel.ShowRuleDialogAsync = rule => ShowSshTunnelRuleDialogAsync(owner, rule);
+        viewModel.ShowRuleDialogAsync = ShowSshTunnelRuleDialogAsync;
         viewModel.ConfirmDialogAsync = (title, message) =>
             AtomUiDialogService.ShowConfirmAsync(owner, title, message);
-        _sshTunnelCenterWindow = new SshTunnelCenterWindow(viewModel);
-        _sshTunnelCenterWindow.Closed += (_, _) => _sshTunnelCenterWindow = null;
-        _sshTunnelCenterWindow.Show(owner);
+        _windows.ShowSshTunnelCenter(viewModel);
     }
 
     private bool CanShowSshTunnelCenter()
         => SelectedTab is { IsTerminalSession: true, Session.Protocol: SessionProtocol.SSH };
 
-    private static async Task<SshTunnelRule?> ShowSshTunnelRuleDialogAsync(
-        AtomUI.Desktop.Controls.Window owner,
-        SshTunnelRule? source)
-    {
-        var dialog = new SshTunnelRuleDialogWindow(new SshTunnelRuleDialogViewModel(source));
-        return await dialog.ShowRuleDialogAsync(owner);
-    }
+    private Task<SshTunnelRule?> ShowSshTunnelRuleDialogAsync(SshTunnelRule? source) =>
+        _windows.ShowSshTunnelRuleDialogAsync(source);
 
     private void ApplyApplicationSettings(ApplicationSettings settings)
     {
@@ -1677,29 +1665,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private void ToggleSessionSidebar() => IsSessionSidebarOpen = !IsSessionSidebarOpen;
 
     [RelayCommand]
-    private void ShowSessionManager()
-    {
-        var lifetime = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-        var owner = lifetime?.MainWindow;
-        if (owner == null) return;
-
-        if (_sessionManagerWindow != null)
-        {
-            _sessionManagerWindow.Activate();
-            return;
-        }
-
-        _sessionManagerWindow = new SessionManagerWindow(_sessionTreeVm)
-        {
-            ShowInTaskbar = false
-        };
-        _sessionManagerWindow.Closed += (_, _) =>
-        {
-            _sessionManagerWindow = null;
-            RefreshRecentSessions();
-        };
-        _sessionManagerWindow.Show(owner);
-    }
+    private void ShowSessionManager() =>
+        _windows.ShowSessionManager(_sessionTreeVm, RefreshRecentSessions);
 
     public void ShowSessionManagerOnStartupIfEnabled()
     {
@@ -1721,34 +1688,16 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void ShowRecentConnections()
     {
-        var owner = GetMainWindow();
-        if (owner == null)
-            return;
-
-        if (_recentConnectionsWindow != null)
-        {
-            _recentConnectionsWindow.Activate();
-            return;
-        }
-
         var viewModel = new RecentConnectionsViewModel(
             _connectionAuditService,
             _sessionTreeVm.GetAllSessions,
             ConnectFromRecentConnectionsAsync);
-        _recentConnectionsWindow = new RecentConnectionsWindow
-        {
-            DataContext = viewModel,
-            ShowInTaskbar = false
-        };
-        _recentConnectionsWindow.Closed += (_, _) => _recentConnectionsWindow = null;
-        _recentConnectionsWindow.Show(owner);
+        _windows.ShowRecentConnections(viewModel);
     }
 
     private async Task ConnectFromRecentConnectionsAsync(SessionInfo session)
     {
-        var window = _recentConnectionsWindow;
-        _recentConnectionsWindow = null;
-        window?.Close();
+        _windows.CloseRecentConnections();
         await ConnectSession(session);
     }
 
@@ -2134,14 +2083,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task NewSession()
     {
-        var dialog = new SessionEditDialog();
-        var vm = new SessionEditViewModel(_sessionTreeVm.CreateSession());
-        dialog.DataContext = vm;
-        SessionInfo? savedSession = null;
         var sessionAdded = false;
-        dialog.SessionSaved += session =>
+        var outcome = await _windows.EditSessionAsync(_sessionTreeVm.CreateSession(), session =>
         {
-            savedSession = session;
             if (!sessionAdded)
             {
                 _sessionTreeVm.AddSession(session);
@@ -2150,18 +2094,12 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             }
 
             _sessionTreeVm.UpdateSession(session);
-        };
+        });
 
-        var lifetime = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-        if (lifetime?.MainWindow != null)
-        {
-            await dialog.ShowDialog(lifetime.MainWindow);
-        }
-
-        if (dialog.ShouldConnect && savedSession != null)
+        if (outcome is { ShouldConnect: true })
         {
             CloseSessionManagerWindow();
-            await ConnectSession(savedSession);
+            await ConnectSession(outcome.Session);
         }
     }
 
@@ -2177,27 +2115,16 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     public async Task EditSessionAsync(SessionInfo session)
     {
-        var dialog = new SessionEditDialog();
-        var vm = new SessionEditViewModel(session);
-        dialog.DataContext = vm;
-        SessionInfo? savedSession = null;
-        dialog.SessionSaved += saved =>
+        var outcome = await _windows.EditSessionAsync(session, saved =>
         {
-            savedSession = saved;
             _sessionTreeVm.UpdateSession(saved);
             RefreshOpenTabsForSession(saved);
-        };
+        });
 
-        var lifetime = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-        if (lifetime?.MainWindow != null)
-        {
-            await dialog.ShowDialog(lifetime.MainWindow);
-        }
-
-        if (dialog.ShouldConnect && savedSession != null)
+        if (outcome is { ShouldConnect: true })
         {
             CloseSessionManagerWindow();
-            await ConnectSession(savedSession);
+            await ConnectSession(outcome.Session);
         }
     }
 
@@ -2206,13 +2133,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         if (session.Protocol != SessionProtocol.SSH)
             return;
 
-        var dialog = new ConnectionDiagnosticsWindow
-        {
-            DataContext = new ConnectionDiagnosticsViewModel(session, GetSavedPassword(session))
-        };
-        var lifetime = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-        if (lifetime?.MainWindow != null)
-            await dialog.ShowDialog(lifetime.MainWindow);
+        await _windows.ShowConnectionDiagnosticsAsync(
+            new ConnectionDiagnosticsViewModel(session, GetSavedPassword(session)));
     }
 
     public async Task ShowConnectionAuditAsync()
@@ -2223,18 +2145,6 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     private void ShowSettingsCenter(SettingsSection section)
     {
-        var owner = GetMainWindow();
-        if (owner == null)
-            return;
-
-        if (_settingsCenterWindow != null)
-        {
-            if (_settingsCenterWindow.DataContext is SettingsCenterViewModel existingViewModel)
-                existingViewModel.Select(section);
-            _settingsCenterWindow.Activate();
-            return;
-        }
-
         var viewModel = new SettingsCenterViewModel(
             _sessionTreeVm.Settings,
             ApplyApplicationSettings,
@@ -2243,10 +2153,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             _connectionAuditService,
             BuildAppVersion(),
             CheckForUpdatesCommand);
-        viewModel.Select(section);
-        _settingsCenterWindow = new SettingsCenterWindow(viewModel);
-        _settingsCenterWindow.Closed += (_, _) => _settingsCenterWindow = null;
-        _settingsCenterWindow.Show(owner);
+        _windows.ShowSettingsCenter(viewModel, section);
     }
 
     private async Task CopyTextToClipboardAsync(string text)
@@ -2460,15 +2367,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         return true;
     }
 
-    private void CloseSessionManagerWindow()
-    {
-        var window = _sessionManagerWindow;
-        if (window == null)
-            return;
-
-        _sessionManagerWindow = null;
-        window.Close();
-    }
+    private void CloseSessionManagerWindow() => _windows.CloseSessionManager();
 
     public Task ConnectSession(SessionInfo session)
     {
