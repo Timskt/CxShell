@@ -9,8 +9,6 @@ using CxShell.ViewModels;
 
 namespace CxShell.Views;
 
-internal readonly record struct ExternalLaunchConfirmation(bool Confirmed, bool TrustTarget);
-
 internal static class AtomUiDialogService
 {
     public static async Task ShowMessageAsync(

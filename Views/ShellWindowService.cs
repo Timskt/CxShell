@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using AtomUI.Desktop.Controls;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using CxShell.Models;
@@ -7,12 +9,13 @@ using CxShell.ViewModels;
 
 namespace CxShell.Views;
 
-public sealed class ShellWindowService : IShellWindows
+internal sealed class ShellWindowService : IShellWindows
 {
     private SessionManagerWindow? _sessionManagerWindow;
     private SettingsCenterWindow? _settingsCenterWindow;
     private SshTunnelCenterWindow? _sshTunnelCenterWindow;
     private RecentConnectionsWindow? _recentConnectionsWindow;
+    private UpdateProgressWindow? _updateProgressWindow;
 
     public async Task<SessionEditOutcome?> EditSessionAsync(SessionInfo session, Action<SessionInfo> onSaved)
     {
@@ -164,9 +167,142 @@ public sealed class ShellWindowService : IShellWindows
         await ShowAsDialogAsync(dialog);
     }
 
+    public async Task ShowMessageAsync(string title, string message, ShellMessageKind kind)
+    {
+        if (DialogOwner is not { } owner)
+            return;
+
+        await AtomUiDialogService.ShowMessageAsync(
+            owner,
+            title,
+            message,
+            kind switch
+            {
+                ShellMessageKind.Success => MessageBoxStyle.Success,
+                ShellMessageKind.Warning => MessageBoxStyle.Warning,
+                ShellMessageKind.Error => MessageBoxStyle.Error,
+                _ => MessageBoxStyle.Information
+            });
+    }
+
+    public async Task<bool> ShowConfirmAsync(string title, string message, string? okText, string? cancelText)
+    {
+        if (DialogOwner is not { } owner)
+            return false;
+
+        return await AtomUiDialogService.ShowConfirmAsync(owner, title, message, okText, cancelText);
+    }
+
+    public async Task<ExternalLaunchConfirmation> ShowExternalLaunchConfirmAsync(
+        string title,
+        string sourceLabel,
+        string origin,
+        string protocolLabel,
+        string protocol,
+        string targetLabel,
+        string target,
+        string credentialLabel,
+        bool credentialSupplied,
+        string credentialSuppliedText,
+        string credentialNoneText,
+        string connectText,
+        string cancelText,
+        string trustText)
+    {
+        if (DialogOwner is not { } owner)
+            return new ExternalLaunchConfirmation(false, false);
+
+        return await AtomUiDialogService.ShowExternalLaunchConfirmAsync(
+            owner,
+            title,
+            sourceLabel,
+            origin,
+            protocolLabel,
+            protocol,
+            targetLabel,
+            target,
+            credentialLabel,
+            credentialSupplied,
+            credentialSuppliedText,
+            credentialNoneText,
+            connectText,
+            cancelText,
+            trustText);
+    }
+
+    public async Task ShowAboutAsync(
+        string title,
+        string appName,
+        string versionText,
+        string description,
+        string builtWith,
+        string githubLabel,
+        string githubUrl)
+    {
+        if (DialogOwner is not { } owner)
+            return;
+
+        await AtomUiDialogService.ShowAboutAsync(
+            owner,
+            title,
+            appName,
+            versionText,
+            description,
+            builtWith,
+            githubLabel,
+            githubUrl);
+    }
+
+    public void ShowUpdateProgress(UpdateProgressViewModel viewModel, Action cancelRequested)
+    {
+        CloseUpdateProgress();
+
+        var window = new UpdateProgressWindow
+        {
+            DataContext = viewModel
+        };
+        window.CancelRequested += (_, _) => cancelRequested();
+        _updateProgressWindow = window;
+
+        if (DialogOwner is { } owner)
+            window.Show(owner);
+        else
+            window.Show();
+    }
+
+    public void CloseUpdateProgress()
+    {
+        var window = _updateProgressWindow;
+        if (window == null)
+            return;
+
+        try
+        {
+            window.CloseForCompletion();
+        }
+        catch
+        {
+            // Ignore close failures during shutdown or update restart.
+        }
+        finally
+        {
+            if (ReferenceEquals(_updateProgressWindow, window))
+                _updateProgressWindow = null;
+        }
+    }
+
+    /// <summary>
+    /// A modal belongs to the window the user is actually in, which is not
+    /// always the main window when an update or tunnel window has focus.
+    /// </summary>
+    private static Avalonia.Controls.Window? DialogOwner =>
+        Lifetime?.Windows.FirstOrDefault(window => window.IsActive) ?? Lifetime?.MainWindow;
+
+    private static IClassicDesktopStyleApplicationLifetime? Lifetime =>
+        Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+
     private static AtomUI.Desktop.Controls.Window? Owner =>
-        (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?
-            .MainWindow as AtomUI.Desktop.Controls.Window;
+        Lifetime?.MainWindow as AtomUI.Desktop.Controls.Window;
 
     private static async Task ShowAsDialogAsync(Avalonia.Controls.Window dialog)
     {
