@@ -107,6 +107,10 @@ public sealed class ApplicationSettingsStore
         settings.AgentProvider.Model = settings.AgentProvider.Model?.Trim() ?? string.Empty;
         settings.AgentProvider.ActiveModelId = settings.AgentProvider.ActiveModelId?.Trim() ?? string.Empty;
         settings.AgentProvider.EncryptedApiKey = settings.AgentProvider.EncryptedApiKey?.Trim() ?? string.Empty;
+        // Load compares before and after normalization and rewrites when they differ,
+        // so upgrading here is enough to move the key onto the per-install cipher.
+        settings.AgentProvider.EncryptedApiKey = LegacySecretUpgrader.Upgrade(
+            settings.AgentProvider.EncryptedApiKey);
         settings.AgentProvider.Models = (settings.AgentProvider.Models ?? [])
             .Where(model => model != null)
             .ToList();
@@ -182,7 +186,9 @@ public sealed class ApplicationSettingsStore
     {
         proxy.Host = proxy.Host?.Trim() ?? string.Empty;
         proxy.Username = proxy.Username?.Trim() ?? string.Empty;
-        proxy.Password = proxy.Password?.Trim() ?? string.Empty;
+        proxy.Password = LegacySecretUpgrader.Upgrade(proxy.Password?.Trim() ?? string.Empty);
+        proxy.PrivateKeyPassphrase = LegacySecretUpgrader.Upgrade(
+            proxy.PrivateKeyPassphrase?.Trim() ?? string.Empty);
         if (proxy.Protocol is ProxyProtocol.None or ProxyProtocol.JumpHost or ProxyProtocol.SshPassthrough)
         {
             proxy.Protocol = ProxyProtocol.None;

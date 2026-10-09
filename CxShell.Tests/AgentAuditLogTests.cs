@@ -29,7 +29,7 @@ public sealed class AgentAuditLogTests
         log.Record(request, result);
 
         var stored = new SqliteAppDataStore(directory.Path).Read("agent_audit", "entries")!;
-        Assert.StartsWith("cxaes:", stored, StringComparison.Ordinal);
+        Assert.StartsWith("cxsec:", stored, StringComparison.Ordinal);
         Assert.DoesNotContain("operator-password", stored, StringComparison.Ordinal);
         Assert.False(File.Exists(path));
 

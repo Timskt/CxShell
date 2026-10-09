@@ -209,7 +209,7 @@ public sealed class SqliteAgentRunHistoryStore : IAgentRunHistoryStore
 
         var trimmed = stored.Trim();
         var decrypted = PasswordEncryptionService.Decrypt(trimmed);
-        return trimmed.StartsWith("cxaes:", StringComparison.Ordinal) &&
+        return PasswordEncryptionService.IsProtectedValue(trimmed) &&
                string.IsNullOrEmpty(decrypted)
             ? null
             : decrypted;

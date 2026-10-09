@@ -53,9 +53,17 @@ public class SessionStorageService
             payload = _store.Read("sessions");
         }
 
-        return string.IsNullOrWhiteSpace(payload)
+        var data = string.IsNullOrWhiteSpace(payload)
             ? new SessionData()
             : TryDeserialize(payload) ?? new SessionData();
+
+        // Secrets written before the per-install key still carry the old prefix and
+        // are protected only by a constant published in this repository. Upgrade
+        // them on the first load so the next save persists them under the new key.
+        if (MigrateLegacySecrets(data))
+            Save(data);
+
+        return data;
     }
 
     public void Save(SessionData data)
@@ -74,6 +82,35 @@ public class SessionStorageService
         };
         var json = System.Text.Json.JsonSerializer.Serialize(persisted);
         _store.Write("sessions", "default", json);
+    }
+
+    /// <summary>
+    /// Rewrites every secret still protected by the published legacy key. Returns
+    /// false when nothing changed so the caller can skip the extra write.
+    /// </summary>
+    private static bool MigrateLegacySecrets(SessionData data)
+    {
+        var changed = false;
+
+        foreach (var session in data.Sessions)
+        {
+            changed |= LegacySecretUpgrader.UpgradeField(session.Password, value => session.Password = value);
+            changed |= LegacySecretUpgrader.UpgradeField(session.PrivateKeyPassphrase, value => session.PrivateKeyPassphrase = value);
+            changed |= LegacySecretUpgrader.UpgradeField(session.RdpSshPassword, value => session.RdpSshPassword = value);
+            changed |= LegacySecretUpgrader.UpgradeField(session.VncSshPassword, value => session.VncSshPassword = value);
+            changed |= MigrateProxySecrets(session.Proxy);
+
+            foreach (var proxy in session.ProxyServers)
+                changed |= MigrateProxySecrets(proxy);
+        }
+
+        return changed;
+    }
+
+    private static bool MigrateProxySecrets(ProxySettings proxy)
+    {
+        var changed = LegacySecretUpgrader.UpgradeField(proxy.Password, value => proxy.Password = value);
+        return LegacySecretUpgrader.UpgradeField(proxy.PrivateKeyPassphrase, value => proxy.PrivateKeyPassphrase = value) || changed;
     }
 
     private static SessionData? TryDeserialize(string json)

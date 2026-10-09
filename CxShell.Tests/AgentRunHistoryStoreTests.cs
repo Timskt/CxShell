@@ -167,7 +167,7 @@ public sealed class AgentRunHistoryStoreTests
             Assert.Equal(checkpoint, loaded.Checkpoint);
             Assert.Equal(checkpoint, loaded.Snapshot.Checkpoint);
             var persisted = new SqliteAppDataStore(directory).Read("agent_runs", "recovery")!;
-            Assert.StartsWith("cxaes:", persisted, StringComparison.Ordinal);
+            Assert.StartsWith("cxsec:", persisted, StringComparison.Ordinal);
             Assert.DoesNotContain("inspect the host", persisted, StringComparison.Ordinal);
         }
         finally
@@ -217,7 +217,7 @@ public sealed class AgentRunHistoryStoreTests
 
             store.SaveRecoverable([loaded]);
             var persisted = new SqliteAppDataStore(directory).Read("agent_runs", "recovery")!;
-            Assert.StartsWith("cxaes:", persisted, StringComparison.Ordinal);
+            Assert.StartsWith("cxsec:", persisted, StringComparison.Ordinal);
             Assert.DoesNotContain("legacy prompt", persisted, StringComparison.Ordinal);
             Assert.True(File.Exists(recoveryPath + ".migrated.bak"));
         }
