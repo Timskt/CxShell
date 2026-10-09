@@ -54,10 +54,7 @@
               RowSpacing="10">
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="3">
                 <StackPanel Spacing="2" VerticalAlignment="Center">
-                    <atom:TextBlock Text="{Binding TitleText}"
-                                    FontSize="15"
-                                    FontWeight="SemiBold"
-                                    Foreground="{atom:SharedTokenResource ColorText}"/>
+                    <atom:TextBlock Classes="cx-section-title" Text="{Binding TitleText}"/>
                     <Grid RowDefinitions="Auto,Auto"
                           RowSpacing="2"
                           IsVisible="{Binding HasActiveRuns}">
@@ -103,14 +100,12 @@
                              IsVisible="{Binding IsHistoryVisible}"
                              VerticalAlignment="Top"/>
                 <atom:Button Grid.Column="2"
-                             Width="28"
-                             Height="28"
-                             Padding="0"
+                             Classes="cx-icon-button"
                              ButtonType="Text"
                              Icon="{antdicons:AntDesignIconProvider Kind=CloseOutlined}"
                              Click="OnCloseClick"
                              atom:ToolTip.Tip="{Binding CloseText}"
-                              VerticalAlignment="Top"/>
+                             VerticalAlignment="Top"/>
             </Grid>
 
             <Border Grid.Row="1"
@@ -119,20 +114,15 @@
                     BorderThickness="0,0,0,1">
                     <Grid ColumnDefinitions="Auto,130,Auto,*,Auto"
                           ColumnSpacing="8">
-                        <atom:TextBlock Text="{Binding ModeText}"
-                                        FontSize="11"
-                                        Foreground="{atom:SharedTokenResource ColorTextSecondary}"
-                                        VerticalAlignment="Center"/>
+                        <atom:TextBlock Classes="cx-field-label" Text="{Binding ModeText}"/>
                         <atom:Select Grid.Column="1"
                                      OptionsSource="{Binding ChatModeOptions}"
                                      SelectedOption="{Binding SelectedChatModeOption, Mode=TwoWay}"
                                      Width="130"
                                      HorizontalAlignment="Left"/>
                         <atom:TextBlock Grid.Column="2"
-                                        Text="{Binding SessionText}"
-                                        FontSize="11"
-                                        Foreground="{atom:SharedTokenResource ColorTextSecondary}"
-                                        VerticalAlignment="Center"/>
+                                        Classes="cx-field-label"
+                                        Text="{Binding SessionText}"/>
                         <atom:Select Grid.Column="3"
                                      OptionsSource="{Binding SessionOptions}"
                                      SelectedOption="{Binding SelectedSessionOption, Mode=TwoWay}"
@@ -140,10 +130,8 @@
                                      IsEnabled="{Binding IsSessionSelectionEnabled}"
                                      HorizontalAlignment="Stretch"/>
                         <atom:TextBlock Grid.Column="4"
-                                        Text="{Binding SelectedSessionStatusText}"
-                                        FontSize="11"
-                                        Foreground="{atom:SharedTokenResource ColorTextTertiary}"
-                                        VerticalAlignment="Center"/>
+                                        Classes="cx-meta"
+                                        Text="{Binding SelectedSessionStatusText}"/>
                     </Grid>
             </Border>
 
@@ -156,10 +144,7 @@
                       RowSpacing="5">
                     <Grid ColumnDefinitions="*,150,Auto"
                           ColumnSpacing="4">
-                        <atom:TextBlock Text="{Binding HistoryText}"
-                                        FontSize="11"
-                                        Foreground="{atom:SharedTokenResource ColorTextSecondary}"
-                                        VerticalAlignment="Center"/>
+                        <atom:TextBlock Classes="cx-field-label" Text="{Binding HistoryText}"/>
                         <atom:TextBox Grid.Column="1"
                                       Text="{Binding RunHistorySearch, Mode=TwoWay}"
                                       PlaceholderText="{Binding HistorySearchText}"
@@ -717,7 +702,7 @@
                              Width="30"
                              Height="30"
                              Padding="0"
-                             Content="↓"
+                             Icon="{antdicons:AntDesignIconProvider Kind=DownOutlined}"
                              ButtonType="Default"
                              HorizontalAlignment="Right"
                              VerticalAlignment="Bottom"
@@ -728,12 +713,7 @@
             </Grid>
 
             <Grid Grid.Row="4" RowDefinitions="Auto,Auto" RowSpacing="8">
-                <Border
-                        Background="{atom:SharedTokenResource ColorBgContainer}"
-                        BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                        BorderThickness="1"
-                        CornerRadius="5"
-                        Padding="8,7">
+                <Border Classes="cx-card-tight">
                     <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="5">
                         <ItemsControl Grid.Row="0"
                                       ItemsSource="{Binding PendingAttachments}"
@@ -842,22 +822,15 @@
                                 Padding="0,5,0,0">
                             <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto"
                                   ColumnSpacing="6">
-                                <atom:Button Width="28"
-                                             Height="28"
-                                             Padding="0"
+                                <atom:Button Classes="cx-icon-button"
                                              ButtonType="Text"
                                              Icon="{antdicons:AntDesignIconProvider Kind=PaperClipOutlined}"
-                                             VerticalAlignment="Center"
-                                             VerticalContentAlignment="Center"
                                              Click="OnAttachFileClick"
                                              IsEnabled="{Binding IsPromptInputEnabled}"
                                              atom:ToolTip.Tip="{Binding AttachFileTipText}"/>
-                                <atom:TextBlock Text="{Binding StatusText}"
+                                <atom:TextBlock Classes="cx-meta"
                                                 Grid.Column="2"
-                                                FontSize="11"
-                                                TextTrimming="CharacterEllipsis"
-                                                Foreground="{atom:SharedTokenResource ColorTextTertiary}"
-                                                VerticalAlignment="Center"/>
+                                                Text="{Binding StatusText}"/>
                                 <atom:Button x:Name="PermissionModeButton"
                                              Grid.Column="1"
                                              Content="{Binding PermissionModeSummaryText}"
@@ -875,18 +848,13 @@
                                        Placement="Top"
                                        VerticalOffset="-6"
                                        IsLightDismissEnabled="True">
-                                    <Border Width="300"
-                                            Background="{atom:SharedTokenResource ColorBgElevated}"
-                                            BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                            BorderThickness="1"
-                                            CornerRadius="6"
-                                            BoxShadow="0 6 18 0 #26000000"
+                                    <Border Classes="cx-popover"
+                                            Width="300"
                                             Padding="10">
                                         <Grid ColumnDefinitions="Auto,*"
                                               ColumnSpacing="8">
-                                            <atom:TextBlock Text="{Binding AccessPermissionText}"
-                                                            Foreground="{atom:SharedTokenResource ColorTextSecondary}"
-                                                            VerticalAlignment="Center"/>
+                                            <atom:TextBlock Classes="cx-field-label"
+                                                            Text="{Binding AccessPermissionText}"/>
                                             <atom:Select Grid.Column="1"
                                                          OptionsSource="{Binding PermissionModeOptions}"
                                                          SelectedOption="{Binding SelectedPermissionModeOption, Mode=TwoWay}"
@@ -913,19 +881,14 @@
                                        Placement="Top"
                                        VerticalOffset="-6"
                                        IsLightDismissEnabled="True">
-                                    <Border Width="300"
-                                            Background="{atom:SharedTokenResource ColorBgElevated}"
-                                            BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                            BorderThickness="1"
-                                            CornerRadius="6"
-                                            BoxShadow="0 6 18 0 #26000000"
+                                    <Border Classes="cx-popover"
+                                            Width="300"
                                             Padding="10">
                                         <StackPanel Spacing="8">
                                             <Grid ColumnDefinitions="Auto,*"
                                                   ColumnSpacing="8">
-                                                <atom:TextBlock Text="{Binding ModelText}"
-                                                                Foreground="{atom:SharedTokenResource ColorTextSecondary}"
-                                                                VerticalAlignment="Center"/>
+                                                <atom:TextBlock Classes="cx-field-label"
+                                                                Text="{Binding ModelText}"/>
                                                 <atom:Select Grid.Column="1"
                                                              OptionsSource="{Binding ModelOptions}"
                                                              SelectedOption="{Binding SelectedModelOption, Mode=TwoWay}"
@@ -936,9 +899,8 @@
                                             </Grid>
                                             <Grid ColumnDefinitions="Auto,*"
                                                   ColumnSpacing="8">
-                                                <atom:TextBlock Text="{Binding ReasoningEffortText}"
-                                                                Foreground="{atom:SharedTokenResource ColorTextSecondary}"
-                                                                VerticalAlignment="Center"/>
+                                                <atom:TextBlock Classes="cx-field-label"
+                                                                Text="{Binding ReasoningEffortText}"/>
                                                 <atom:Select Grid.Column="1"
                                                              OptionsSource="{Binding ReasoningEffortOptions}"
                                                              SelectedOption="{Binding SelectedReasoningEffortOption, Mode=TwoWay}"

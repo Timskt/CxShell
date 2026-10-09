@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using Avalonia;
 using AtomUI.Desktop.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using CxShell.Models;
@@ -132,6 +134,7 @@ public partial class MainWindow : Window
         base.OnLoaded(e);
         StartCommandLineHandoffServer();
         StartRdpSmokeIfRequested();
+        StartUiShotIfRequested();
         HandleCommandLineLaunchIfRequested();
         ShowSessionManagerOnStartupIfNeeded();
         if (DataContext is MainWindowViewModel vm)
@@ -265,33 +268,6 @@ public partial class MainWindow : Window
             ApplyAgentPanelLayout(viewModel);
         }
 
-        e.Handled = true;
-    }
-
-    private void OnLocalTerminalButtonClick(object? sender, RoutedEventArgs e)
-    {
-        if (sender is not Avalonia.Controls.Control anchor ||
-            DataContext is not MainWindowViewModel vm)
-        {
-            return;
-        }
-
-        var menu = new AtomContextMenu
-        {
-            Placement = Avalonia.Controls.PlacementMode.Bottom,
-            PlacementTarget = anchor
-        };
-
-        foreach (var profile in vm.LocalTerminalProfiles)
-        {
-            var capturedProfile = profile;
-            AddMenuItem(
-                menu,
-                profile.Name,
-                () => _ = vm.OpenLocalTerminalAsync(capturedProfile));
-        }
-
-        menu.Open(anchor);
         e.Handled = true;
     }
 
@@ -1144,9 +1120,82 @@ public partial class MainWindow : Window
         });
     }
 
+    /// <summary>
+    /// Renders the current UI to a PNG and exits (--ui-shot path[,scene]).
+    /// Scenes open one dialog on top of the workspace so the shot captures it.
+    /// </summary>
+    private void StartUiShotIfRequested()
+    {
+        var spec = GetStartupArg("--ui-shot");
+        if (string.IsNullOrWhiteSpace(spec))
+            return;
+
+        var parts = spec.Split(',', 2, StringSplitOptions.RemoveEmptyEntries);
+        var outputPath = parts[0].Trim();
+        var scene = parts.Length > 1 ? parts[1].Trim() : null;
+
+        Dispatcher.UIThread.Post(async () =>
+        {
+            await Task.Delay(scene is null ? 1200 : 700);
+            OpenUiShotScene(scene);
+            await Task.Delay(scene is null ? 500 : 1500);
+
+            var lifetime = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+            var target = lifetime?.Windows.Count > 0
+                ? lifetime.Windows[^1]
+                : (Avalonia.Controls.Window)this;
+            SaveUiShot(target, outputPath);
+            lifetime?.Shutdown();
+        }, DispatcherPriority.ApplicationIdle);
+    }
+
+    private void OpenUiShotScene(string? scene)
+    {
+        if (string.IsNullOrEmpty(scene) || DataContext is not MainWindowViewModel vm)
+            return;
+
+        switch (scene)
+        {
+            case "session-edit":
+                vm.NewSessionCommand.Execute(null);
+                break;
+            case "settings":
+                vm.ShowApplicationSettingsCommand.Execute(null);
+                break;
+            case "session-manager":
+                vm.ShowSessionManagerCommand.Execute(null);
+                break;
+            case "recent-connections":
+                vm.ShowRecentConnectionsCommand.Execute(null);
+                break;
+            case "tunnels":
+                vm.ShowSshTunnelCenterCommand.Execute(null);
+                break;
+            case "agent":
+                vm.ToggleAgentPanelVisibility();
+                ApplyAgentPanelLayout(vm);
+                break;
+        }
+    }
+
+    private static void SaveUiShot(Avalonia.Controls.Window target, string outputPath)
+    {
+        var width = Math.Max(1, (int)Math.Ceiling(target.Bounds.Width));
+        var height = Math.Max(1, (int)Math.Ceiling(target.Bounds.Height));
+        using var bitmap = new RenderTargetBitmap(new PixelSize(width, height), new Vector(96, 96));
+        bitmap.Render(target);
+
+        var full = Path.GetFullPath(outputPath);
+        var directory = Path.GetDirectoryName(full);
+        if (!string.IsNullOrEmpty(directory))
+            Directory.CreateDirectory(directory);
+        bitmap.Save(full);
+    }
+
     private void ShowSessionManagerOnStartupIfNeeded()
     {
         if (Array.IndexOf(_startupArgs, "--rdp-smoke") >= 0 ||
+            Array.IndexOf(_startupArgs, "--ui-shot") >= 0 ||
             _startupLaunchOptions.HasCommand ||
             DataContext is not MainWindowViewModel vm)
         {
@@ -1160,6 +1209,7 @@ public partial class MainWindow : Window
     {
         if (!_startupLaunchOptions.HasCommand ||
             Array.IndexOf(_startupArgs, "--rdp-smoke") >= 0 ||
+            Array.IndexOf(_startupArgs, "--ui-shot") >= 0 ||
             DataContext is not MainWindowViewModel vm)
         {
             return;

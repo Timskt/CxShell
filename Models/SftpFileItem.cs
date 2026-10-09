@@ -46,31 +46,12 @@ public class SftpFileItem : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-    public string Icon => IsDirectory ? "📁" : GetFileIcon(Name);
     public string SizeDisplay => IsDirectory ? "-" : FormatSize(Size);
     public string DateDisplay => LastModified.ToString("MM-dd HH:mm");
 
     public string DisplayName => IsSymLink && SymLinkTarget != null
         ? $"{Name} → {SymLinkTarget}"
         : Name;
-
-    private static string GetFileIcon(string name)
-    {
-        var ext = System.IO.Path.GetExtension(name).ToLowerInvariant();
-        return ext switch
-        {
-            ".txt" or ".log" or ".md" or ".rst" => "📝",
-            ".sh" or ".bash" or ".zsh" or ".fish" => "⚙",
-            ".py" or ".rb" or ".js" or ".ts" or ".go" or ".rs" or ".cs" or ".java" => "📄",
-            ".zip" or ".tar" or ".gz" or ".bz2" or ".xz" or ".7z" or ".rar" => "📦",
-            ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" or ".svg" or ".webp" => "🖼",
-            ".mp3" or ".wav" or ".flac" or ".ogg" or ".m4a" => "🎵",
-            ".mp4" or ".mkv" or ".avi" or ".mov" or ".webm" => "🎬",
-            ".pdf" => "📕",
-            ".json" or ".yaml" or ".yml" or ".toml" or ".xml" or ".ini" or ".conf" => "⚙",
-            _ => "📄"
-        };
-    }
 
     private static string FormatSize(long bytes)
     {

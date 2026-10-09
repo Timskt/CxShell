@@ -7,28 +7,16 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Spacing="18" Margin="0,2,12,8">
             <StackPanel Spacing="8">
-                <TextBlock Text="{Binding StartupText}"
-                           FontWeight="SemiBold"
-                           Foreground="{atom:SharedTokenResource ColorText}"/>
-                <Border Background="{atom:SharedTokenResource ColorBgLayout}"
-                        BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                        BorderThickness="1"
-                        CornerRadius="5"
-                        Padding="12,10">
+                <TextBlock Classes="cx-section-title" Text="{Binding StartupText}"/>
+                <Border Classes="cx-card-quiet">
                     <atom:CheckBox Content="{Binding ShowSessionManagerOnStartupText}"
                                    IsChecked="{Binding ShowSessionManagerOnStartup, Mode=TwoWay}"/>
                 </Border>
             </StackPanel>
 
             <StackPanel Spacing="8">
-                <TextBlock Text="{Binding AppearanceText}"
-                           FontWeight="SemiBold"
-                           Foreground="{atom:SharedTokenResource ColorText}"/>
-                <Border Background="{atom:SharedTokenResource ColorBgLayout}"
-                        BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                        BorderThickness="1"
-                        CornerRadius="5"
-                        Padding="12,10">
+                <TextBlock Classes="cx-section-title" Text="{Binding AppearanceText}"/>
+                <Border Classes="cx-card-quiet">
                     <StackPanel Spacing="8">
                         <atom:CheckBox Content="{Binding ShowTabBarText}"
                                        IsChecked="{Binding ShowTabBar, Mode=TwoWay}"/>
@@ -45,9 +33,7 @@
             </StackPanel>
 
             <StackPanel Spacing="8">
-                <TextBlock Text="{Binding ThemeText}"
-                           FontWeight="SemiBold"
-                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                <TextBlock Classes="cx-section-title" Text="{Binding ThemeText}"/>
                 <StackPanel Orientation="Horizontal" Spacing="18">
                     <atom:RadioButton Content="{Binding DarkThemeText}"
                                       GroupName="ApplicationTheme"
@@ -59,26 +45,16 @@
             </StackPanel>
 
             <StackPanel Spacing="8">
-                <TextBlock Text="{Binding NetworkText}"
-                           FontWeight="SemiBold"
-                           Foreground="{atom:SharedTokenResource ColorText}"/>
-                <Border Background="{atom:SharedTokenResource ColorBgLayout}"
-                        BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                        BorderThickness="1"
-                        CornerRadius="5"
-                        Padding="12,10">
+                <TextBlock Classes="cx-section-title" Text="{Binding NetworkText}"/>
+                <Border Classes="cx-card-quiet">
                     <StackPanel Spacing="9">
-                        <TextBlock Text="{Binding GlobalProxyText}"
-                                   FontWeight="SemiBold"
-                                   Foreground="{atom:SharedTokenResource ColorText}"/>
+                        <TextBlock Classes="cx-section-title" Text="{Binding GlobalProxyText}"/>
                         <atom:CheckBox Content="{Binding GlobalProxyEnabledText}"
                                        IsChecked="{Binding GlobalProxyEnabled, Mode=TwoWay}"/>
                         <Grid ColumnDefinitions="132,*"
                               ColumnSpacing="10"
                               IsEnabled="{Binding GlobalProxyEnabled}">
-                            <TextBlock Text="{Binding GlobalProxyTypeText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                            <TextBlock Classes="cx-field-label" Text="{Binding GlobalProxyTypeText}"/>
                             <atom:Select Grid.Column="1"
                                          OptionsSource="{Binding GlobalProxyTypeOptions}"
                                          SelectedOption="{Binding GlobalProxyTypeOption, Mode=TwoWay}"
@@ -87,18 +63,14 @@
                         <Grid ColumnDefinitions="132,*"
                               ColumnSpacing="10"
                               IsEnabled="{Binding GlobalProxyEnabled}">
-                            <TextBlock Text="{Binding GlobalProxyHostText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                            <TextBlock Classes="cx-field-label" Text="{Binding GlobalProxyHostText}"/>
                             <atom:TextBox Grid.Column="1"
                                           Text="{Binding GlobalProxyHost, Mode=TwoWay}"/>
                         </Grid>
                         <Grid ColumnDefinitions="132,Auto"
                               ColumnSpacing="10"
                               IsEnabled="{Binding GlobalProxyEnabled}">
-                            <TextBlock Text="{Binding GlobalProxyPortText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                            <TextBlock Classes="cx-field-label" Text="{Binding GlobalProxyPortText}"/>
                             <atom:NumericUpDown Grid.Column="1"
                                                 Width="92"
                                                 Minimum="0"
@@ -108,18 +80,14 @@
                         <Grid ColumnDefinitions="132,*"
                               ColumnSpacing="10"
                               IsEnabled="{Binding GlobalProxyEnabled}">
-                            <TextBlock Text="{Binding GlobalProxyUsernameText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                            <TextBlock Classes="cx-field-label" Text="{Binding GlobalProxyUsernameText}"/>
                             <atom:TextBox Grid.Column="1"
                                           Text="{Binding GlobalProxyUsername, Mode=TwoWay}"/>
                         </Grid>
                         <Grid ColumnDefinitions="132,*"
                               ColumnSpacing="10"
                               IsEnabled="{Binding GlobalProxyEnabled}">
-                            <TextBlock Text="{Binding GlobalProxyPasswordText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                            <TextBlock Classes="cx-field-label" Text="{Binding GlobalProxyPasswordText}"/>
                             <atom:TextBox Grid.Column="1"
                                           Text="{Binding GlobalProxyPassword, Mode=TwoWay}"
                                           PasswordChar="*"
@@ -130,14 +98,8 @@
             </StackPanel>
 
             <StackPanel Spacing="8">
-                <TextBlock Text="{Binding UpdatesText}"
-                           FontWeight="SemiBold"
-                           Foreground="{atom:SharedTokenResource ColorText}"/>
-                <Border Background="{atom:SharedTokenResource ColorBgLayout}"
-                        BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                        BorderThickness="1"
-                        CornerRadius="5"
-                        Padding="12,10">
+                <TextBlock Classes="cx-section-title" Text="{Binding UpdatesText}"/>
+                <Border Classes="cx-card-quiet">
                     <StackPanel Spacing="8">
                         <atom:CheckBox Content="{Binding AutoCheckForUpdatesText}"
                                        IsChecked="{Binding AutoCheckForUpdates, Mode=TwoWay}"/>
@@ -148,9 +110,7 @@
             </StackPanel>
 
             <StackPanel Spacing="8">
-                <TextBlock Text="{Binding LanguageText}"
-                           FontWeight="SemiBold"
-                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                <TextBlock Classes="cx-section-title" Text="{Binding LanguageText}"/>
                 <StackPanel Orientation="Horizontal" Spacing="18">
                     <atom:RadioButton Content="{Binding ChineseText}"
                                       GroupName="ApplicationLanguage"
@@ -162,46 +122,27 @@
             </StackPanel>
 
             <StackPanel Spacing="8">
-                <TextBlock Text="{Binding RecordingText}"
-                           FontWeight="SemiBold"
-                           Foreground="{atom:SharedTokenResource ColorText}"/>
-                <Border Background="{atom:SharedTokenResource ColorBgLayout}"
-                        BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                        BorderThickness="1"
-                        CornerRadius="5"
-                        Padding="12,10">
+                <TextBlock Classes="cx-section-title" Text="{Binding RecordingText}"/>
+                <Border Classes="cx-card-quiet">
                     <StackPanel Spacing="8">
                         <atom:CheckBox Content="{Binding RecordTerminalSessionsText}"
                                        IsChecked="{Binding RecordTerminalSessions, Mode=TwoWay}"/>
-                        <TextBlock Text="{Binding RecordingDescriptionText}"
-                                   TextWrapping="Wrap"
-                                   FontSize="11"
-                                   Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                        <TextBlock Classes="cx-section-hint" Text="{Binding RecordingDescriptionText}"/>
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="{Binding RecordingRetentionText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                            <TextBlock Classes="cx-field-label" Text="{Binding RecordingRetentionText}"/>
                             <atom:NumericUpDown Width="96"
                                                 Minimum="1"
                                                 Maximum="3650"
                                                 Value="{Binding RecordingRetentionDays, Mode=TwoWay}"/>
-                            <TextBlock Text="{Binding RecordingDaysText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                            <TextBlock Classes="cx-field-label" Text="{Binding RecordingDaysText}"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
             </StackPanel>
 
             <StackPanel Spacing="8">
-                <TextBlock Text="{Binding SshSecurityText}"
-                           FontWeight="SemiBold"
-                           Foreground="{atom:SharedTokenResource ColorText}"/>
-                <Border Background="{atom:SharedTokenResource ColorBgLayout}"
-                        BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                        BorderThickness="1"
-                        CornerRadius="5"
-                        Padding="12,10">
+                <TextBlock Classes="cx-section-title" Text="{Binding SshSecurityText}"/>
+                <Border Classes="cx-card-quiet">
                     <StackPanel Spacing="9">
                         <atom:CheckBox Content="{Binding ConfirmSshHostKeyOnFirstConnectionText}"
                                        IsChecked="{Binding ConfirmSshHostKeyOnFirstConnection, Mode=TwoWay}"/>
@@ -213,14 +154,8 @@
             </StackPanel>
 
             <StackPanel Spacing="8">
-                <TextBlock Text="{Binding ExternalLaunchText}"
-                           FontWeight="SemiBold"
-                           Foreground="{atom:SharedTokenResource ColorText}"/>
-                <Border Background="{atom:SharedTokenResource ColorBgLayout}"
-                        BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                        BorderThickness="1"
-                        CornerRadius="5"
-                        Padding="12,10">
+                <TextBlock Classes="cx-section-title" Text="{Binding ExternalLaunchText}"/>
+                <Border Classes="cx-card-quiet">
                     <StackPanel Spacing="9">
                         <atom:CheckBox Content="{Binding AllowExternalLaunchText}"
                                        IsChecked="{Binding AllowExternalLaunch, Mode=TwoWay}"/>
@@ -229,9 +164,7 @@
                         <atom:CheckBox Content="{Binding RegisterExternalUrlProtocolsText}"
                                        IsChecked="{Binding RegisterExternalUrlProtocols, Mode=TwoWay}"/>
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="{Binding ExternalLaunchTrustCountText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                            <TextBlock Classes="cx-field-label" Text="{Binding ExternalLaunchTrustCountText}"/>
                             <atom:Button Content="{Binding ClearTrustedExternalLaunchTargetsText}"
                                          Command="{Binding ClearTrustedExternalLaunchTargetsCommand}"/>
                         </StackPanel>

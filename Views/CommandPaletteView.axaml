@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
              xmlns:vm="using:CxShell.ViewModels"
              x:Class="CxShell.Views.CommandPaletteView"
              x:DataType="vm:CommandPaletteViewModel"
@@ -29,11 +30,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Border Background="{atom:SharedTokenResource ColorBgElevated}"
-            BorderBrush="{atom:SharedTokenResource ColorBorder}"
-            BorderThickness="1"
-            CornerRadius="8"
-            BoxShadow="0 8 28 0 #66000000">
+    <Border Classes="cx-popover">
         <DockPanel>
             <Border DockPanel.Dock="Top"
                     Height="50"
@@ -41,11 +38,12 @@
                     BorderBrush="{atom:SharedTokenResource ColorSplit}"
                     BorderThickness="0,0,0,1">
                 <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
-                    <atom:TextBlock Text="⌕"
-                                    FontSize="20"
-                                    Foreground="{atom:SharedTokenResource ColorTextSecondary}"
-                                    VerticalAlignment="Center"
-                                    Margin="0,0,10,0"/>
+                    <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=FileSearchOutlined}"
+                                        Width="16"
+                                        Height="16"
+                                        IconBrush="{atom:SharedTokenResource ColorTextSecondary}"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,10,0"/>
                     <atom:LineEdit Grid.Column="1"
                                    x:Name="SearchBox"
                                    Text="{Binding Query, Mode=TwoWay}"
@@ -64,23 +62,19 @@
             </Border>
 
             <Border DockPanel.Dock="Bottom"
-                    Height="34"
-                    Padding="14,0"
-                    Background="{atom:SharedTokenResource ColorBgLayout}"
-                    BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                    BorderThickness="0,1,0,0">
+                    Classes="cx-footer-bar">
                 <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Border Classes="palette-key"><atom:TextBlock Text="↑↓" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
-                        <atom:TextBlock Text="{Binding NavigateText}" FontSize="11" Foreground="{atom:SharedTokenResource ColorTextTertiary}" VerticalAlignment="Center"/>
+                        <atom:TextBlock Text="{Binding NavigateText}" Classes="cx-meta"/>
                         <Border Classes="palette-key"><atom:TextBlock Text="↵" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
-                        <atom:TextBlock Text="{Binding ConfirmText}" FontSize="11" Foreground="{atom:SharedTokenResource ColorTextTertiary}" VerticalAlignment="Center"/>
+                        <atom:TextBlock Text="{Binding ConfirmText}" Classes="cx-meta"/>
                         <Border Classes="palette-key"><atom:TextBlock Text="Esc" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
-                        <atom:TextBlock Text="{Binding CloseText}" FontSize="11" Foreground="{atom:SharedTokenResource ColorTextTertiary}" VerticalAlignment="Center"/>
+                        <atom:TextBlock Text="{Binding CloseText}" Classes="cx-meta"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-                        <atom:TextBlock Text="{Binding ResultCount}" FontSize="11" Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
-                        <atom:TextBlock Text="{Binding ResultsText}" FontSize="11" Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                        <atom:TextBlock Text="{Binding ResultCount}" Classes="cx-meta"/>
+                        <atom:TextBlock Text="{Binding ResultsText}" Classes="cx-meta"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -91,9 +85,7 @@
                         <DataTemplate DataType="vm:CommandPaletteGroup">
                             <StackPanel>
                                 <atom:TextBlock Text="{Binding Category}"
-                                                FontSize="11"
-                                                FontWeight="SemiBold"
-                                                Foreground="{atom:SharedTokenResource ColorTextTertiary}"
+                                                Classes="cx-section-title"
                                                 Margin="16,8,0,3"/>
                                 <ItemsControl ItemsSource="{Binding Items}">
                                     <ItemsControl.ItemTemplate>
@@ -112,21 +104,16 @@
                                                              Fill="{atom:SharedTokenResource ColorSuccess}"/>
                                                     <atom:TextBlock Grid.Column="1"
                                                                     Text="{Binding Title}"
-                                                                    FontSize="12"
-                                                                    Foreground="{atom:SharedTokenResource ColorText}"
-                                                                    TextTrimming="CharacterEllipsis"
-                                                                    VerticalAlignment="Center"/>
+                                                                    Classes="cx-value"/>
                                                     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                                                         <Border IsVisible="{Binding Tag, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                                                 Background="{atom:SharedTokenResource ColorPrimaryBg}"
                                                                 CornerRadius="3"
                                                                 Padding="5,1">
-                                                            <atom:TextBlock Text="{Binding Tag}" FontSize="10" Foreground="{atom:SharedTokenResource ColorPrimary}"/>
+                                                            <atom:TextBlock Text="{Binding Tag}" Classes="cx-badge-text"/>
                                                         </Border>
                                                         <atom:TextBlock Text="{Binding Hint}"
-                                                                        FontSize="11"
-                                                                        Foreground="{atom:SharedTokenResource ColorTextTertiary}"
-                                                                        TextTrimming="CharacterEllipsis"/>
+                                                                        Classes="cx-meta"/>
                                                     </StackPanel>
                                                 </Grid>
                                             </Border>

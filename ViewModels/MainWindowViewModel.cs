@@ -344,6 +344,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         // Initialize theme state
         _isDarkMode = Application.Current?.GetThemeManager()?.CurrentTheme?.Appearance == ThemeAppearance.Dark;
+        App.ApplyAvaloniaThemeVariant(_isDarkMode);
         AgentPanel.RefreshSessions();
         RefreshRecentSessions();
     }
@@ -386,6 +387,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             return;
 
         IsDarkMode = result.State?.Appearance == ThemeAppearance.Dark;
+        App.ApplyAvaloniaThemeVariant(IsDarkMode);
         _sessionTreeVm.Settings.ThemeMode = IsDarkMode
             ? ApplicationSettings.DarkThemeMode
             : ApplicationSettings.LightThemeMode;

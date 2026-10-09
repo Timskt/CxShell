@@ -8,14 +8,8 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Spacing="18" Margin="0,2,12,8">
             <StackPanel Spacing="8">
-                <TextBlock Text="{Binding AgentText}"
-                           FontWeight="SemiBold"
-                           Foreground="{atom:SharedTokenResource ColorText}"/>
-                <Border Background="{atom:SharedTokenResource ColorBgLayout}"
-                        BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                        BorderThickness="1"
-                        CornerRadius="5"
-                        Padding="12,10">
+                <TextBlock Classes="cx-section-title" Text="{Binding AgentText}"/>
+                <Border Classes="cx-card-quiet">
                     <StackPanel Spacing="10">
                         <atom:CheckBox Content="{Binding AgentEnabledText}"
                                        IsChecked="{Binding AgentEnabled, Mode=TwoWay}"/>
@@ -24,34 +18,28 @@
                         <Grid ColumnDefinitions="132,*"
                               ColumnSpacing="10"
                               IsEnabled="{Binding AgentAllowCommandExecution}">
-                            <TextBlock Text="{Binding AgentPermissionModeText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                            <TextBlock Classes="cx-field-label" Text="{Binding AgentPermissionModeText}"/>
                             <atom:Select Grid.Column="1"
                                          OptionsSource="{Binding AgentPermissionModeOptions}"
                                          SelectedOption="{Binding AgentPermissionModeOption, Mode=TwoWay}"
                                          HorizontalAlignment="Stretch"/>
                         </Grid>
-                        <TextBlock Text="{Binding AgentPermissionModeDescriptionText}"
-                                   TextWrapping="Wrap"
-                                   FontSize="11"
-                                   Foreground="{atom:SharedTokenResource ColorTextTertiary}"
+                        <TextBlock Classes="cx-section-hint"
+                                   Text="{Binding AgentPermissionModeDescriptionText}"
                                    Margin="142,0,0,0"/>
                         <atom:CheckBox Content="{Binding AgentReadOnlyModeText}"
                                        IsChecked="{Binding AgentReadOnlyMode, Mode=TwoWay}"
                                        IsEnabled="{Binding AgentAllowCommandExecution}"/>
-                        <TextBlock Text="{Binding AgentCommandPolicyDescriptionText}"
-                                   TextWrapping="Wrap"
-                                   FontSize="11"
-                                   Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                        <TextBlock Classes="cx-section-hint"
+                                   Text="{Binding AgentCommandPolicyDescriptionText}"/>
                         <Grid RowDefinitions="Auto,Auto"
                               ColumnDefinitions="132,*"
                               ColumnSpacing="10"
                               RowSpacing="8">
-                            <TextBlock Text="{Binding AgentAllowedCommandPrefixesText}"
+                            <TextBlock Classes="cx-field-label"
+                                       Text="{Binding AgentAllowedCommandPrefixesText}"
                                        VerticalAlignment="Top"
-                                       Margin="0,6,0,0"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                       Margin="0,6,0,0"/>
                             <atom:TextBox Grid.Column="1"
                                           Text="{Binding AgentAllowedCommandPrefixes, Mode=TwoWay}"
                                           AcceptsReturn="True"
@@ -59,10 +47,10 @@
                                           MinHeight="48"
                                           PlaceholderText="pwd\nfree -m"/>
                             <TextBlock Grid.Row="1"
+                                       Classes="cx-field-label"
                                        Text="{Binding AgentBlockedCommandPrefixesText}"
                                        VerticalAlignment="Top"
-                                       Margin="0,6,0,0"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                       Margin="0,6,0,0"/>
                             <atom:TextBox Grid.Row="1"
                                           Grid.Column="1"
                                           Text="{Binding AgentBlockedCommandPrefixes, Mode=TwoWay}"
@@ -71,44 +59,36 @@
                                           MinHeight="48"
                                           PlaceholderText="rm\nshutdown"/>
                         </Grid>
-                        <TextBlock Text="{Binding AgentDescriptionText}"
-                                   TextWrapping="Wrap"
-                                   FontSize="11"
-                                   Foreground="{atom:SharedTokenResource ColorTextTertiary}"/>
+                        <TextBlock Classes="cx-section-hint" Text="{Binding AgentDescriptionText}"/>
                         <Grid ColumnDefinitions="132,*"
                               RowDefinitions="Auto,Auto,Auto,Auto,Auto"
                               ColumnSpacing="10"
                               RowSpacing="9">
-                            <TextBlock Text="{Binding AgentProviderText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                            <TextBlock Classes="cx-field-label" Text="{Binding AgentProviderText}"/>
                             <atom:Select Grid.Column="1"
                                          OptionsSource="{Binding AgentProviderTypeOptions}"
                                          SelectedOption="{Binding AgentProviderTypeOption, Mode=TwoWay}"
                                          HorizontalAlignment="Stretch"/>
 
                             <TextBlock Grid.Row="1"
-                                       Text="{Binding AgentProviderNameText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                       Classes="cx-field-label"
+                                       Text="{Binding AgentProviderNameText}"/>
                             <atom:TextBox Grid.Row="1"
                                           Grid.Column="1"
                                           Text="{Binding AgentProviderName, Mode=TwoWay}"
                                           MinWidth="220"/>
 
                             <TextBlock Grid.Row="2"
-                                       Text="{Binding AgentBaseUrlText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                       Classes="cx-field-label"
+                                       Text="{Binding AgentBaseUrlText}"/>
                             <atom:TextBox Grid.Row="2"
                                           Grid.Column="1"
                                           Text="{Binding AgentBaseUrl, Mode=TwoWay}"
                                           MinWidth="220"/>
 
                             <TextBlock Grid.Row="3"
-                                       Text="{Binding AgentModelText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                       Classes="cx-field-label"
+                                       Text="{Binding AgentModelText}"/>
                             <Grid Grid.Row="3"
                                   Grid.Column="1"
                                   ColumnDefinitions="*,Auto,Auto"
@@ -130,14 +110,10 @@
                                        PlacementTarget="{Binding ElementName=AgentModelPickerButton}"
                                        Placement="Bottom"
                                        IsLightDismissEnabled="True">
-                                    <Border MinWidth="300"
+                                    <Border Classes="cx-popover"
+                                            MinWidth="300"
                                             MaxWidth="480"
                                             MaxHeight="260"
-                                            Background="{atom:SharedTokenResource ColorBgElevated}"
-                                            BorderBrush="{atom:SharedTokenResource ColorBorder}"
-                                            BorderThickness="1"
-                                            CornerRadius="4"
-                                            BoxShadow="0 6 18 0 #26000000"
                                             Padding="2">
                                         <ListBox ItemsSource="{Binding AgentModelOptions}"
                                                  SelectedItem="{Binding AgentModelOption, Mode=TwoWay}"
@@ -157,9 +133,8 @@
                             </Grid>
 
                             <TextBlock Grid.Row="4"
-                                       Text="{Binding AgentPlanKeyText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                       Classes="cx-field-label"
+                                       Text="{Binding AgentPlanKeyText}"/>
                             <atom:TextBox Grid.Row="4"
                                           Grid.Column="1"
                                           Text="{Binding AgentApiKey, Mode=TwoWay}"
@@ -167,30 +142,23 @@
                                           IsEnableRevealButton="True"
                                           MinWidth="220"/>
                         </Grid>
-                        <TextBlock Text="{Binding AgentPlanKeyDescriptionText}"
-                                   TextWrapping="Wrap"
-                                   FontSize="11"
-                                   Foreground="{atom:SharedTokenResource ColorTextTertiary}"
+                        <TextBlock Classes="cx-section-hint"
+                                   Text="{Binding AgentPlanKeyDescriptionText}"
                                    Margin="142,0,0,0"/>
-                        <TextBlock Text="{Binding AgentModelCatalogStatusText}"
-                                   TextWrapping="Wrap"
-                                   FontSize="11"
-                                   Foreground="{atom:SharedTokenResource ColorTextTertiary}"
+                        <TextBlock Classes="cx-section-hint"
+                                   Text="{Binding AgentModelCatalogStatusText}"
                                    Margin="142,0,0,0"/>
                         <Grid ColumnDefinitions="132,Auto,Auto,*"
                               ColumnSpacing="10">
-                            <TextBlock Text="{Binding AgentRequestTimeoutText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                            <TextBlock Classes="cx-field-label" Text="{Binding AgentRequestTimeoutText}"/>
                             <atom:NumericUpDown Grid.Column="1"
                                                 Width="92"
                                                 Minimum="5"
                                                 Maximum="600"
                                                 Value="{Binding AgentRequestTimeoutSeconds, Mode=TwoWay}"/>
                             <TextBlock Grid.Column="2"
-                                       Text="{Binding AgentSecondsText}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                       Classes="cx-field-label"
+                                       Text="{Binding AgentSecondsText}"/>
                         </Grid>
                         <Grid ColumnDefinitions="*">
                             <TextBlock Text="{Binding AgentStatusText}"
@@ -199,24 +167,15 @@
                                        VerticalAlignment="Center"
                                        Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
                         </Grid>
-                        <Border Background="{atom:SharedTokenResource ColorBgLayout}"
-                                BorderBrush="{atom:SharedTokenResource ColorSplit}"
-                                BorderThickness="1"
-                                CornerRadius="5"
-                                Padding="12,10"
-                                Margin="0,4,0,0">
+                        <Border Classes="cx-card-quiet" Margin="0,4,0,0">
                             <StackPanel Spacing="10">
-                                <TextBlock Text="{Binding AgentWebText}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{atom:SharedTokenResource ColorText}"/>
+                                <TextBlock Classes="cx-section-title" Text="{Binding AgentWebText}"/>
                                 <atom:CheckBox Content="{Binding AgentWebEnabledText}"
                                                IsChecked="{Binding AgentWebEnabled, Mode=TwoWay}"/>
                                 <Grid ColumnDefinitions="132,*"
                                       ColumnSpacing="10"
                                       IsEnabled="{Binding AgentWebEnabled}">
-                                    <TextBlock Text="{Binding AgentSearxngBaseUrlText}"
-                                               VerticalAlignment="Center"
-                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                    <TextBlock Classes="cx-field-label" Text="{Binding AgentSearxngBaseUrlText}"/>
                                     <atom:TextBox Grid.Column="1"
                                                   Text="{Binding AgentSearxngBaseUrl, Mode=TwoWay}"
                                                   Watermark="https://searx.example"/>
@@ -224,10 +183,10 @@
                                 <Grid ColumnDefinitions="132,*"
                                       ColumnSpacing="10"
                                       IsEnabled="{Binding AgentWebEnabled}">
-                                    <TextBlock Text="{Binding AgentAllowedPrivateHostsText}"
+                                    <TextBlock Classes="cx-field-label"
+                                               Text="{Binding AgentAllowedPrivateHostsText}"
                                                VerticalAlignment="Top"
-                                               Margin="0,6,0,0"
-                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                               Margin="0,6,0,0"/>
                                     <atom:TextBox Grid.Column="1"
                                                   Text="{Binding AgentAllowedPrivateHosts, Mode=TwoWay}"
                                                   AcceptsReturn="True"
@@ -241,18 +200,15 @@
                                 <Grid ColumnDefinitions="132,Auto,132,Auto"
                                       ColumnSpacing="10"
                                       IsEnabled="{Binding AgentWebEnabled}">
-                                    <TextBlock Text="{Binding AgentWebMaxResultsText}"
-                                               VerticalAlignment="Center"
-                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                    <TextBlock Classes="cx-field-label" Text="{Binding AgentWebMaxResultsText}"/>
                                     <atom:NumericUpDown Grid.Column="1"
                                                         Width="76"
                                                         Minimum="1"
                                                         Maximum="20"
                                                         Value="{Binding AgentWebMaxResults, Mode=TwoWay}"/>
                                     <TextBlock Grid.Column="2"
-                                               Text="{Binding AgentWebMaxFetchCharactersText}"
-                                               VerticalAlignment="Center"
-                                               Foreground="{atom:SharedTokenResource ColorTextSecondary}"/>
+                                               Classes="cx-field-label"
+                                               Text="{Binding AgentWebMaxFetchCharactersText}"/>
                                     <atom:NumericUpDown Grid.Column="3"
                                                         Width="92"
                                                         Minimum="2000"
