@@ -11,10 +11,10 @@ public readonly record struct TerminalTextMatch(int Row, int Column, int Length)
 public class TerminalBuffer
 {
     private TerminalCell[,] _cells;
-    private List<TerminalCell[]> _scrollback = new();
+    private ScrollbackRing<TerminalCell[]> _scrollback;
     private readonly int _maxScrollback;
     private TerminalCell[,]? _mainCellsWhileAlternate;
-    private List<TerminalCell[]>? _mainScrollbackWhileAlternate;
+    private ScrollbackRing<TerminalCell[]>? _mainScrollbackWhileAlternate;
     private int _mainCursorRowWhileAlternate;
     private int _mainCursorColWhileAlternate;
     private int _scrollTop;
@@ -22,8 +22,8 @@ public class TerminalBuffer
     private bool[] _tabStops = [];
     private bool[] _wrappedRows;
     private bool[]? _mainWrappedRowsWhileAlternate;
-    private List<bool> _scrollbackWrapped = new();
-    private List<bool>? _mainScrollbackWrappedWhileAlternate;
+    private ScrollbackRing<bool> _scrollbackWrapped;
+    private ScrollbackRing<bool>? _mainScrollbackWrappedWhileAlternate;
     private int _mainKittyKeyboardFlagsWhileAlternate;
     private List<int>? _mainKittyKeyboardFlagStackWhileAlternate;
     private List<int> _kittyKeyboardFlagStack = new();
@@ -259,6 +259,8 @@ public class TerminalBuffer
         Columns = columns;
         Rows = rows;
         _maxScrollback = maxScrollback;
+        _scrollback = new ScrollbackRing<TerminalCell[]>(maxScrollback);
+        _scrollbackWrapped = new ScrollbackRing<bool>(maxScrollback);
         PushClearedScreenToScrollback = pushClearedScreenToScrollback;
         TreatAmbiguousAsWide = treatAmbiguousAsWide;
         AutoWrapMode = autoWrapMode;
@@ -946,9 +948,9 @@ public class TerminalBuffer
         _mainCursorColWhileAlternate = CursorCol;
 
         _cells = new TerminalCell[Rows, Columns];
-        _scrollback = new List<TerminalCell[]>();
+        _scrollback = new ScrollbackRing<TerminalCell[]>(_maxScrollback);
         _wrappedRows = new bool[Rows];
-        _scrollbackWrapped = new List<bool>();
+        _scrollbackWrapped = new ScrollbackRing<bool>(_maxScrollback);
         _kittyKeyboardFlagStack = new List<int>();
         KittyKeyboardFlags = 0;
         IsAlternateScreen = true;
@@ -970,9 +972,9 @@ public class TerminalBuffer
             return false;
 
         _cells = _mainCellsWhileAlternate ?? _cells;
-        _scrollback = _mainScrollbackWhileAlternate ?? new List<TerminalCell[]>();
+        _scrollback = _mainScrollbackWhileAlternate ?? new ScrollbackRing<TerminalCell[]>(_maxScrollback);
         _wrappedRows = _mainWrappedRowsWhileAlternate ?? new bool[Rows];
-        _scrollbackWrapped = _mainScrollbackWrappedWhileAlternate ?? new List<bool>();
+        _scrollbackWrapped = _mainScrollbackWrappedWhileAlternate ?? new ScrollbackRing<bool>(_maxScrollback);
         KittyKeyboardFlags = _mainKittyKeyboardFlagsWhileAlternate;
         _kittyKeyboardFlagStack = _mainKittyKeyboardFlagStackWhileAlternate ?? new List<int>();
         _mainCellsWhileAlternate = null;
@@ -1044,17 +1046,11 @@ public class TerminalBuffer
         if (!includeBlank && IsRowBlank(row))
             return;
 
-        if (_scrollback.Count >= _maxScrollback)
-        {
-            _scrollback.RemoveAt(0);
-            if (_scrollbackWrapped.Count > 0)
-                _scrollbackWrapped.RemoveAt(0);
-        }
-
         var scrollbackRow = new TerminalCell[Columns];
         for (int c = 0; c < Columns; c++)
             scrollbackRow[c] = _cells[row, c];
 
+        // Both rings drop their oldest entry once full, so they stay aligned.
         _scrollback.Add(scrollbackRow);
         _scrollbackWrapped.Add(_wrappedRows[row]);
     }
@@ -1521,9 +1517,8 @@ public class TerminalBuffer
             _wrappedRows[rowIndex] = screenWraps[rowIndex];
         }
 
-        _scrollback = scrollRows;
-        _scrollbackWrapped = scrollWraps;
-        TrimScrollback();
+        _scrollback = new ScrollbackRing<TerminalCell[]>(_maxScrollback, scrollRows);
+        _scrollbackWrapped = new ScrollbackRing<bool>(_maxScrollback, scrollWraps);
         CursorRow = Math.Clamp(cursorOutputRow - screenStart, 0, Rows - 1);
         CursorCol = Math.Clamp(cursorOutputColumn, 0, Columns - 1);
         _tabStops = ResizeTabStops(_tabStops, Columns);
@@ -1563,16 +1558,6 @@ public class TerminalBuffer
         for (var column = 0; column < columns; column++)
             row[column] = CreateClearedCell();
         return row;
-    }
-
-    private void TrimScrollback()
-    {
-        while (_scrollback.Count > _maxScrollback)
-        {
-            _scrollback.RemoveAt(0);
-            if (_scrollbackWrapped.Count > 0)
-                _scrollbackWrapped.RemoveAt(0);
-        }
     }
 
     private void ResizeGrid(int newColumns, int newRows)
@@ -1646,10 +1631,10 @@ public class TerminalBuffer
             }
         }
 
-        _mainScrollbackWrappedWhileAlternate ??= new List<bool>();
+        _mainScrollbackWrappedWhileAlternate ??= new ScrollbackRing<bool>(_maxScrollback);
         var parkedScrollbackCount = _mainScrollbackWhileAlternate?.Count ?? 0;
         while (_mainScrollbackWrappedWhileAlternate.Count > parkedScrollbackCount)
-            _mainScrollbackWrappedWhileAlternate.RemoveAt(_mainScrollbackWrappedWhileAlternate.Count - 1);
+            _mainScrollbackWrappedWhileAlternate.RemoveNewest();
 
         _mainCursorRowWhileAlternate = Math.Clamp(_mainCursorRowWhileAlternate, 0, newRows - 1);
         _mainCursorColWhileAlternate = Math.Clamp(_mainCursorColWhileAlternate, 0, newColumns - 1);
