@@ -111,6 +111,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     public bool HasTabs => Tabs.Count > 0;
     public bool HasRecentSessions => RecentSessions.Count > 0;
+
+    /// <summary>
+    /// With no recent connections and the browser closed, the welcome screen was
+    /// an empty area; saved sessions are the thing a user needs next.
+    /// </summary>
+    public bool IsSavedSessionLauncherVisible =>
+        !HasRecentSessions && !IsSessionSidebarVisible && _sessionTreeVm.SessionRows.Count > 0;
     public bool IsMainChromeVisible => !IsTerminalFullScreen;
     public bool IsSftpPanelVisible => IsSftpVisible && !IsTerminalFullScreen;
     public double SftpPanelPixelWidth => SftpPanelWidth.Value;
@@ -1615,6 +1622,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         _sessionTreeVm.Settings.ShowSessionSidebar = value;
         _sessionTreeVm.SaveSettings(_sessionTreeVm.Settings);
+        OnPropertyChanged(nameof(IsSavedSessionLauncherVisible));
     }
 
     [RelayCommand]
@@ -2215,6 +2223,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             ? RecentSessions.FirstOrDefault(item => item.Session.Id == selectedSessionId.Value)
             : null;
         OnPropertyChanged(nameof(HasRecentSessions));
+        OnPropertyChanged(nameof(IsSavedSessionLauncherVisible));
     }
 
     [RelayCommand]
