@@ -73,7 +73,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     [ObservableProperty] private string _connectionStatusText = "Disconnected";
     [ObservableProperty] private IBrush _connectionStatusColor = Brushes.Gray;
     [ObservableProperty] private string _connectedHostInfo = string.Empty;
-    [ObservableProperty] private string _terminalSizeText = "80x24";
+    [ObservableProperty] private string _terminalSizeText = string.Empty;
     [ObservableProperty] private bool _isDarkMode;
     [ObservableProperty] private bool _isTerminalFullScreen;
     [ObservableProperty] private bool _isFullScreenHintVisible;
@@ -2029,7 +2029,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         }
         else
         {
-            TerminalSizeText = "80x24";
+            TerminalSizeText = string.Empty;
         }
     }
 
