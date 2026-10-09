@@ -79,6 +79,7 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        CrashGuard.InstallDispatcherGuard();
         SshHostKeyTrustService.UiPrompt = new SshHostKeyPromptService();
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

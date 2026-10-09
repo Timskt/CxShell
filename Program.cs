@@ -12,6 +12,8 @@ internal class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        CrashGuard.Install();
+
         VelopackApp.Build()
             .SetArgs(args)
             .Run();
