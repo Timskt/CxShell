@@ -57,6 +57,7 @@ public class TerminalControl : Control
     private string? _loadedBackgroundImagePath;
     private IReadOnlyList<CompiledHighlightRule> _compiledHighlightRules = [];
     private string _ghostText = string.Empty;
+    private string _preeditText = string.Empty;
     private TerminalBuffer? _renderCacheBuffer;
     private TerminalCell[][] _renderRows = [];
     private bool[] _renderRowsLoaded = [];
@@ -447,6 +448,21 @@ public class TerminalControl : Control
             return;
 
         _ghostText = normalized;
+        InvalidateVisual();
+    }
+
+    /// <summary>
+    /// Shows the input method's uncommitted composition at the caret. Without this the
+    /// terminal reports preedit as unsupported, so the IME falls back to drawing the
+    /// half-typed pinyin in its own floating window instead of where the user is typing.
+    /// </summary>
+    internal void SetPreeditText(string? text)
+    {
+        var normalized = text ?? string.Empty;
+        if (string.Equals(_preeditText, normalized, StringComparison.Ordinal))
+            return;
+
+        _preeditText = normalized;
         InvalidateVisual();
     }
 
@@ -902,6 +918,36 @@ public class TerminalControl : Control
                             buffer.CursorRow * _cellHeight,
                             Color.FromArgb(150, CursorColor.R, CursorColor.G, CursorColor.B),
                             bold: false);
+                    }
+                }
+
+                // Composition text sits on top of the autocomplete ghost: it is what
+                // the user is typing right now, and the underline marks it uncommitted.
+                if (!string.IsNullOrEmpty(_preeditText) &&
+                    _scrollOffset == 0 &&
+                    buffer.CursorRow >= 0 && buffer.CursorRow < buffer.Rows &&
+                    buffer.CursorCol >= 0 && buffer.CursorCol < buffer.Columns)
+                {
+                    var preeditLength = Math.Min(_preeditText.Length, buffer.Columns - buffer.CursorCol);
+                    if (preeditLength > 0)
+                    {
+                        var preeditX = buffer.CursorCol * _cellWidth;
+                        var preeditY = buffer.CursorRow * _cellHeight;
+                        var preeditWidth = preeditLength * _cellWidth;
+                        context.FillRectangle(
+                            GetBrush(Color.FromArgb(46, CursorColor.R, CursorColor.G, CursorColor.B)),
+                            new Rect(preeditX, preeditY, preeditWidth, _cellHeight));
+                        DrawTextRun(
+                            context,
+                            _preeditText[..preeditLength],
+                            preeditX,
+                            preeditY,
+                            CursorTextColor,
+                            bold: false);
+                        context.DrawLine(
+                            new Pen(GetBrush(CursorColor), 1),
+                            new Point(preeditX, preeditY + _cellHeight - 1),
+                            new Point(preeditX + preeditWidth, preeditY + _cellHeight - 1));
                     }
                 }
             }
@@ -1909,6 +1955,9 @@ public class TerminalControl : Control
     protected override void OnLostFocus(FocusChangedEventArgs e)
     {
         base.OnLostFocus(e);
+        // An input method that loses the fight for focus does not always retract its
+        // composition, and half-typed pinyin left on screen reads as terminal output.
+        SetPreeditText(null);
         UpdateCursorBlinkTimer();
         if (TerminalBuffer?.FocusReportingMode == true)
             InputReceived?.Invoke("\x1b[O");
@@ -2652,7 +2701,7 @@ public class TerminalControl : Control
         }
 
         public override Visual TextViewVisual => _owner;
-        public override bool SupportsPreedit => false;
+        public override bool SupportsPreedit => true;
         public override bool SupportsSurroundingText => false;
         public override string SurroundingText => string.Empty;
         public override Rect CursorRectangle => _owner.GetCursorRectangle();
@@ -2663,12 +2712,10 @@ public class TerminalControl : Control
         }
 
         public override void SetPreeditText(string? preeditText)
-        {
-        }
+            => _owner.SetPreeditText(preeditText);
 
         public override void SetPreeditText(string? preeditText, int? cursorOffset)
-        {
-        }
+            => _owner.SetPreeditText(preeditText);
 
         public override void ExecuteContextMenuAction(ContextMenuAction action)
         {
