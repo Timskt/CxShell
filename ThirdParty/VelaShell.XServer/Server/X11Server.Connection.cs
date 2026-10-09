@@ -69,7 +69,10 @@ public sealed partial class X11Server
             {
                 tcp = await listener.AcceptTcpClientAsync(cancellationToken).ConfigureAwait(false);
             }
-            catch (Exception ex) when (ex is OperationCanceledException or ObjectDisposedException or SocketException)
+            catch (Exception ex) when (ex is OperationCanceledException or ObjectDisposedException or SocketException
+                    // 收工时 DisposeAsync 先 Stop() 监听再取消 token:挂起的 accept 抛的是 InvalidOperationException
+                    // ("Not listening"),不是 ObjectDisposedException。漏掉它会让 DisposeAsync 自己炸(CI 上随机复现)。
+                    or InvalidOperationException)
             {
                 return;
             }
