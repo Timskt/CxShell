@@ -239,6 +239,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         _lastSftpPanelWidth = Math.Max(MinimumSftpPanelWidth, _sessionTreeVm.Settings.SftpPanelWidth);
         _isSftpVisible = _sessionTreeVm.Settings.ShowSftpPanel;
         _isMonitorVisible = _sessionTreeVm.Settings.ShowMonitorPanel;
+        _isSessionSidebarOpen = _sessionTreeVm.Settings.ShowSessionSidebar;
         _isTabBarVisible = _sessionTreeVm.Settings.ShowTabBar;
         _isAgentPanelVisible = _sessionTreeVm.Settings.ShowAgentPanel;
         _lastAgentPanelWidth = Math.Clamp(
@@ -1609,6 +1610,12 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     [RelayCommand]
     private void ToggleSessionSidebar() => IsSessionSidebarOpen = !IsSessionSidebarOpen;
+
+    partial void OnIsSessionSidebarOpenChanged(bool value)
+    {
+        _sessionTreeVm.Settings.ShowSessionSidebar = value;
+        _sessionTreeVm.SaveSettings(_sessionTreeVm.Settings);
+    }
 
     [RelayCommand]
     private void ShowSessionManager() =>

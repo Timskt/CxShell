@@ -346,6 +346,7 @@ public class ApplicationSettings
     public bool ShowTabBar { get; set; }
     public bool ShowSftpPanel { get; set; }
     public bool ShowMonitorPanel { get; set; }
+    public bool ShowSessionSidebar { get; set; }
     public bool ShowAgentPanel { get; set; }
     public bool EnableCommandSuggestions { get; set; } = true;
     public bool AllowExternalLaunch { get; set; } = true;
