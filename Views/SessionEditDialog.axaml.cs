@@ -1887,6 +1887,7 @@ public partial class SessionEditDialog : AtomUI.Desktop.Controls.Window
             var protocol = GetSelectedProxyProtocol(protocolSelect);
             var isSocks4 = protocol is ProxyProtocol.Socks4 or ProxyProtocol.Socks4A;
             var isJumpHost = protocol == ProxyProtocol.JumpHost;
+            var isSshHop = isJumpHost || protocol == ProxyProtocol.SshPassthrough;
 
             usernameBox.IsEnabled = !isSocks4;
             passwordBox.IsEnabled = !isSocks4;
@@ -1899,15 +1900,15 @@ public partial class SessionEditDialog : AtomUI.Desktop.Controls.Window
             sessionFileCheck.IsEnabled = false;
             sessionFileBox.IsEnabled = false;
             sessionFileButton.IsEnabled = false;
-            useAgentCheck.IsEnabled = isJumpHost;
-            privateKeyCheck.IsEnabled = isJumpHost;
-            privateKeyBox.IsEnabled = isJumpHost && privateKeyCheck.IsChecked == true;
-            privateKeyPassphraseBox.IsEnabled = isJumpHost && privateKeyCheck.IsChecked == true;
-            privateKeyButton.IsEnabled = isJumpHost && privateKeyCheck.IsChecked == true;
+            useAgentCheck.IsEnabled = isSshHop;
+            privateKeyCheck.IsEnabled = isSshHop;
+            privateKeyBox.IsEnabled = isSshHop && privateKeyCheck.IsChecked == true;
+            privateKeyPassphraseBox.IsEnabled = isSshHop && privateKeyCheck.IsChecked == true;
+            privateKeyButton.IsEnabled = isSshHop && privateKeyCheck.IsChecked == true;
             nextProxySelect.IsEnabled = isJumpHost;
             browseNextButton.IsEnabled = isJumpHost;
             sessionFileCheck.IsChecked = false;
-            if (!isJumpHost)
+            if (!isSshHop)
             {
                 useAgentCheck.IsChecked = false;
                 privateKeyCheck.IsChecked = false;
@@ -2138,7 +2139,8 @@ public partial class SessionEditDialog : AtomUI.Desktop.Controls.Window
             {
                 new SelectOption { Header = "HTTP CONNECT", Content = ProxyProtocol.Http.ToString() },
                 new SelectOption { Header = "SOCKS4", Content = ProxyProtocol.Socks4.ToString() },
-                new SelectOption { Header = "SOCKS5", Content = ProxyProtocol.Socks5.ToString() }
+                new SelectOption { Header = "SOCKS5", Content = ProxyProtocol.Socks5.ToString() },
+                new SelectOption { Header = "SSH Passthrough", Content = ProxyProtocol.SshPassthrough.ToString() }
             },
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
@@ -3028,7 +3030,8 @@ public partial class SessionEditDialog : AtomUI.Desktop.Controls.Window
 
     private static bool IsSupportedProxyProtocol(ProxyProtocol protocol)
     {
-        return protocol is ProxyProtocol.Socks4 or ProxyProtocol.Socks4A or ProxyProtocol.Socks5 or ProxyProtocol.Http or ProxyProtocol.JumpHost;
+        return protocol is ProxyProtocol.Socks4 or ProxyProtocol.Socks4A or ProxyProtocol.Socks5 or ProxyProtocol.Http
+            or ProxyProtocol.JumpHost or ProxyProtocol.SshPassthrough;
     }
 
     private static ProxyProtocol GetSelectedProxyProtocol(Select select)

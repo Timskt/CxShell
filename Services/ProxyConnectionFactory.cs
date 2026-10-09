@@ -20,12 +20,19 @@ public static class ProxyConnectionFactory
     public static void ConfigureGlobalProxy(Func<ProxySettings?>? proxyProvider)
         => Volatile.Write(ref _globalProxyProvider, proxyProvider);
 
+    /// <summary>
+    /// Both bastion styles reach the target by opening an SSH connection to the
+    /// configured host and forwarding the target through it.
+    /// </summary>
+    private static bool IsSshHop(ProxyProtocol protocol) =>
+        protocol is ProxyProtocol.JumpHost or ProxyProtocol.SshPassthrough;
+
     public static ConnectionInfo CreateSshConnectionInfo(
         SessionInfo session,
         IReadOnlyList<AuthenticationMethod> authMethods)
     {
-        if (session.Proxy?.Protocol == ProxyProtocol.JumpHost)
-            throw new InvalidOperationException("JumpHost SSH connections require CreateSshConnectionContext.");
+        if (IsSshHop(session.Proxy?.Protocol ?? ProxyProtocol.None))
+            throw new InvalidOperationException("SSH hop proxies require CreateSshConnectionContext.");
 
         return CreateSshConnectionContext(session, authMethods).ConnectionInfo;
     }
@@ -41,7 +48,7 @@ public static class ProxyConnectionFactory
                 new ConnectionInfo(session.Host, session.Port, session.Username, authMethods.ToArray()));
         }
 
-        if (proxy.Protocol == ProxyProtocol.JumpHost)
+        if (IsSshHop(proxy.Protocol))
             return CreateJumpHostConnectionContext(session, authMethods);
 
         return new SshConnectionContext(
@@ -71,6 +78,9 @@ public static class ProxyConnectionFactory
             await ConnectClientAsync(directClient, host, port, ipVersion, cancellationToken);
             return directClient;
         }
+
+        if (proxy.Protocol == ProxyProtocol.SshPassthrough)
+            return await ConnectViaSshHopAsync(host, port, proxy, ipVersion, cancellationToken);
 
         var client = new TcpClient();
         try
@@ -143,8 +153,7 @@ public static class ProxyConnectionFactory
             ProxyProtocol.Socks4 => ProxyTypes.Socks4,
             ProxyProtocol.Socks4A => ProxyTypes.Socks4,
             ProxyProtocol.Socks5 => ProxyTypes.Socks5,
-            ProxyProtocol.SshPassthrough =>
-                throw new NotSupportedException($"{proxy.TypeDisplay} proxy connection is not implemented yet."),
+
             _ => ProxyTypes.None
         };
     }
@@ -214,7 +223,7 @@ public static class ProxyConnectionFactory
     private static IReadOnlyList<ProxySettings> BuildJumpHostChain(SessionInfo session)
     {
         var proxy = session.Proxy;
-        if (proxy == null || !proxy.IsEnabled || proxy.Protocol != ProxyProtocol.JumpHost)
+        if (proxy == null || !proxy.IsEnabled || !IsSshHop(proxy.Protocol))
             return [];
 
         var proxiesById = session.ProxyServers
@@ -225,8 +234,8 @@ public static class ProxyConnectionFactory
         var visited = new HashSet<Guid>();
         while (proxy is { IsEnabled: true })
         {
-            if (proxy.Protocol != ProxyProtocol.JumpHost)
-                throw new NotSupportedException("JumpHost proxy chain only supports JUMPHOST proxies.");
+            if (!IsSshHop(proxy.Protocol))
+                throw new NotSupportedException("SSH hop chains only support JUMPHOST and SSHPASSTHROUGH proxies.");
 
             if (!visited.Add(proxy.Id))
                 throw new InvalidOperationException("JumpHost proxy chain contains a cycle.");
@@ -345,6 +354,80 @@ public static class ProxyConnectionFactory
     {
         for (var index = lifetimes.Count - 1; index >= 0; index--)
             lifetimes[index].Dispose();
+    }
+
+    private static async Task<TcpClient> ConnectViaSshHopAsync(
+        string host,
+        int port,
+        ProxySettings proxy,
+        string ipVersion,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(proxy.Username))
+            throw new InvalidOperationException("SSH proxy username is required.");
+
+        var authMethods = SshAgentAuthService.CreateAuthenticationMethods(
+            proxy.Username.Trim(),
+            PasswordEncryptionService.DecryptEncrypted(proxy.Password),
+            proxy.AuthMethod,
+            proxy.PrivateKeyPath,
+            SshAgentAuthService.ResolvePrivateKeyPassphrase(
+                proxy.RuntimePrivateKeyPassphrase,
+                proxy.PrivateKeyPassphrase),
+            proxy.UseAgent);
+
+        var hopClient = new SshClient(new ConnectionInfo(
+            proxy.Host, proxy.Port, proxy.Username.Trim(), authMethods.ToArray()))
+        {
+            KeepAliveInterval = TimeSpan.FromSeconds(30)
+        };
+        SshHostKeyTrustService.Shared.Attach(hopClient, proxy.Host, proxy.Port);
+
+        var lifetimes = new List<IDisposable> { new SshClientLifetime(hopClient) };
+        try
+        {
+            await Task.Run(hopClient.Connect, cancellationToken);
+            var forward = StartLocalForward(hopClient, host, port);
+            lifetimes.Add(new LocalForwardLifetime(hopClient, forward.ForwardedPort));
+
+            var client = new ProxiedTcpClient(new CompositeLifetime(lifetimes));
+            try
+            {
+                await ConnectClientAsync(client, "127.0.0.1", forward.LocalPort, ipVersion, cancellationToken);
+            }
+            catch
+            {
+                client.Dispose();
+                throw;
+            }
+
+            return client;
+        }
+        catch
+        {
+            DisposeAllReverse(lifetimes);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// A TcpClient that owns the SSH hop behind it, so callers that only know how
+    /// to dispose a TcpClient still tear the tunnel down.
+    /// </summary>
+    private sealed class ProxiedTcpClient(IDisposable lifetime) : TcpClient
+    {
+        protected override void Dispose(bool disposing)
+        {
+            try
+            {
+                base.Dispose(disposing);
+            }
+            finally
+            {
+                if (disposing)
+                    lifetime.Dispose();
+            }
+        }
     }
 
     private sealed record JumpHostForward(ForwardedPortLocal ForwardedPort, int LocalPort);
