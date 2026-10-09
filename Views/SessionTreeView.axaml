@@ -7,47 +7,55 @@
              x:DataType="vm:SessionTreeViewModel"
              Background="{atom:SharedTokenResource ColorBgLayout}">
     <Grid>
-        <Grid Width="760"
-              HorizontalAlignment="Center"
+        <Grid HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
-              Margin="0,20,0,16"
+              MaxWidth="1080"
+              Margin="20,20,20,16"
               RowDefinitions="Auto,12,Auto,12,*">
-            <StackPanel Grid.Row="0"
-                        Orientation="Horizontal"
-                        Spacing="8">
+            <WrapPanel Grid.Row="0"
+                       Orientation="Horizontal">
                 <atom:Button x:Name="NewSessionBtn"
+                             Margin="0,0,8,8"
                              Icon="{antdicons:AntDesignIconProvider Kind=PlusOutlined}"
                              Content="{Binding NewText}"/>
                 <atom:Button x:Name="CopySessionBtn"
+                             Margin="0,0,8,8"
                              Icon="{antdicons:AntDesignIconProvider Kind=CopyOutlined}"
                              Content="{Binding CopyText}"
                              IsEnabled="{Binding CanUseSelectedSession}"/>
                 <atom:Button x:Name="PasteSessionBtn"
+                             Margin="0,0,8,8"
                              Icon="{antdicons:AntDesignIconProvider Kind=SnippetsOutlined}"
                              Content="{Binding PasteText}"
                              IsEnabled="{Binding CanPaste}"/>
                 <atom:Button x:Name="PropertiesSessionBtn"
+                             Margin="0,0,8,8"
                              Icon="{antdicons:AntDesignIconProvider Kind=SettingOutlined}"
                              Content="{Binding PropertiesText}"
                              IsEnabled="{Binding CanUseSelectedSession}"/>
                 <atom:Button x:Name="DeleteSessionBtn"
+                             Margin="0,0,8,8"
                              Icon="{antdicons:AntDesignIconProvider Kind=DeleteOutlined}"
                              Content="{Binding DeleteText}"
                              IsEnabled="{Binding CanDeleteSelectedSessions}"/>
                 <atom:Button x:Name="MoveSessionUpBtn"
+                             Margin="0,0,8,8"
                              Content="{Binding MoveUpText}"
                              IsEnabled="{Binding CanMoveSelectedSessionUp}"/>
                 <atom:Button x:Name="MoveSessionDownBtn"
+                             Margin="0,0,8,8"
                              Content="{Binding MoveDownText}"
                              IsEnabled="{Binding CanMoveSelectedSessionDown}"/>
                 <atom:Button x:Name="ImportSessionBtn"
+                             Margin="0,0,8,8"
                              Icon="{antdicons:AntDesignIconProvider Kind=ImportOutlined}"
                              Content="{Binding ImportText}"/>
                 <atom:Button x:Name="ExportSessionBtn"
+                             Margin="0,0,8,8"
                              Icon="{antdicons:AntDesignIconProvider Kind=ExportOutlined}"
                              Content="{Binding ExportText}"
                              IsEnabled="{Binding CanExportSelectedSessions}"/>
-            </StackPanel>
+            </WrapPanel>
 
             <atom:SearchEdit Grid.Row="2"
                              Width="320"
@@ -71,9 +79,9 @@
                            CanUserSortColumns="True"
                            >
                 <atom:DataGrid.Columns>
-                    <atom:DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="180"/>
-                    <atom:DataGridTextColumn Header="主机" Binding="{Binding Host}" Width="240"/>
-                    <atom:DataGridTextColumn Header="用户名" Binding="{Binding Username}" Width="160"/>
+                    <atom:DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="180" MinWidth="120"/>
+                    <atom:DataGridTextColumn Header="主机" Binding="{Binding Host}" Width="*" MinWidth="140"/>
+                    <atom:DataGridTextColumn Header="用户名" Binding="{Binding Username}" Width="160" MinWidth="100"/>
                     <atom:DataGridTextColumn Header="协议" Binding="{Binding Protocol}" Width="100"/>
                     <atom:DataGridTextColumn Header="端口" Binding="{Binding Port}" Width="100"/>
                 </atom:DataGrid.Columns>
