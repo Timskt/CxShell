@@ -203,7 +203,10 @@
     </Style>
     <Style Selector="Border.cx-nav-item-active">
         <Setter Property="Background" Value="{atom:SharedTokenResource ColorPrimaryBg}"/>
+        <Setter Property="BorderBrush" Value="{atom:SharedTokenResource ColorPrimary}"/>
+        <Setter Property="BorderThickness" Value="2,0,0,0"/>
         <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Margin" Value="0,2"/>
     </Style>
 
     <!-- Overlays -->

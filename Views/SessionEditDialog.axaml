@@ -85,7 +85,8 @@
         </Style>
     </atom:Window.Styles>
 
-    <Grid Margin="20" ColumnDefinitions="220,14,*,14,104">
+    <Grid RowDefinitions="*,Auto">
+    <Grid Margin="20" ColumnDefinitions="220,14,*">
         <Border Grid.Column="0" Classes="cx-card">
             <DockPanel LastChildFill="True">
                 <StackPanel DockPanel.Dock="Top" Spacing="2" Margin="2,2,2,12">
@@ -155,11 +156,11 @@
         </Border>
 
         <Grid Grid.Column="2" RowDefinitions="Auto,12,*">
-            <Border Classes="cx-panel-header">
-                <TextBlock x:Name="PageTitleText"
-                           Text="{Binding ConnectionText}"
-                           Classes="cx-panel-title"/>
-            </Border>
+            <TextBlock Grid.Row="0"
+                       x:Name="PageTitleText"
+                       Text="{Binding ConnectionText}"
+                       Classes="cx-hero-title"
+                       Margin="0,0,0,12"/>
 
             <Grid Grid.Row="2">
                 <ScrollViewer x:Name="ConnectionPage">
@@ -3112,27 +3113,28 @@
                 </Border>
             </Grid>
         </Grid>
+        </Grid>
 
-        <StackPanel Grid.Column="4" Spacing="10">
-            <atom:Button x:Name="SaveBtn"
-                         ButtonType="Primary"
-                         Icon="{antdicons:AntDesignIconProvider Kind=CheckOutlined}"
-                         Content="{Binding SaveText}"
-                         MinWidth="0"
-                         HorizontalAlignment="Stretch"/>
-            <atom:Button x:Name="ConnectBtn"
-                         ButtonType="Default"
-                         Icon="{antdicons:AntDesignIconProvider Kind=LinkOutlined}"
-                         Content="{Binding ConnectText}"
-                         MinWidth="0"
-                         IsVisible="{Binding IsSessionScope}"
-                         HorizontalAlignment="Stretch"/>
-            <atom:Button x:Name="CancelBtn"
-                         Icon="{antdicons:AntDesignIconProvider Kind=CloseOutlined}"
-                         Content="{Binding CancelText}"
-                         MinWidth="0"
-                         HorizontalAlignment="Stretch"/>
-        </StackPanel>
+        <Border Grid.Row="1"
+                Classes="cx-footer-bar"
+                Padding="20,12">
+            <StackPanel Orientation="Horizontal"
+                        Spacing="10"
+                        HorizontalAlignment="Right">
+                <atom:Button x:Name="SaveBtn"
+                             ButtonType="Primary"
+                             Icon="{antdicons:AntDesignIconProvider Kind=CheckOutlined}"
+                             Content="{Binding SaveText}"/>
+                <atom:Button x:Name="ConnectBtn"
+                             ButtonType="Default"
+                             Icon="{antdicons:AntDesignIconProvider Kind=LinkOutlined}"
+                             Content="{Binding ConnectText}"
+                             IsVisible="{Binding IsSessionScope}"/>
+                <atom:Button x:Name="CancelBtn"
+                             Icon="{antdicons:AntDesignIconProvider Kind=CloseOutlined}"
+                             Content="{Binding CancelText}"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </atom:Window>
 
