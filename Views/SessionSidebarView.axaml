@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:vm="using:CxShell.ViewModels"
+             x:Class="CxShell.Views.SessionSidebarView"
+             x:DataType="vm:SessionTreeViewModel">
+    <Border Classes="cx-panel">
+        <Grid RowDefinitions="Auto,Auto,*">
+            <Border Grid.Row="0"
+                    Classes="cx-panel-header">
+                <Grid ColumnDefinitions="*,Auto" Margin="0">
+                    <atom:TextBlock Classes="cx-panel-title"
+                                    Text="{Binding SessionManagerTitle}"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,6,0"/>
+                    <atom:Button Grid.Column="1"
+                                 Classes="cx-icon-button"
+                                 ButtonType="Text"
+                                 SizeType="Small"
+                                 Icon="{antdicons:AntDesignIconProvider Kind=LayoutOutlined}"
+                                 Command="{Binding $parent[Window].DataContext.ShowSessionManagerCommand, x:CompileBindings=False}"
+                                 atom:ToolTip.Tip="{Binding $parent[Window].DataContext.SessionManagerToolTip, x:CompileBindings=False}"/>
+                </Grid>
+            </Border>
+
+            <atom:SearchEdit Grid.Row="1"
+                             Margin="8"
+                             Text="{Binding SessionSearchText, Mode=TwoWay}"
+                             PlaceholderText="{Binding SearchPlaceholderText}"
+                             IsAllowClear="True"/>
+
+            <TreeView Grid.Row="2"
+                      x:Name="SessionNodeTree"
+                      Background="Transparent"
+                      BorderThickness="0"
+                      Padding="4,0"
+                      ItemsSource="{Binding SessionNodes}"
+                      DoubleTapped="OnSessionNodeDoubleTapped">
+                <TreeView.ItemTemplate>
+                    <TreeDataTemplate ItemsSource="{Binding Children}" x:DataType="vm:SessionNodeViewModel">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <atom:IconPresenter IsVisible="{Binding !IsGroup}"
+                                                Icon="{antdicons:AntDesignIconProvider Kind=CloudServerOutlined}"
+                                                Width="14"
+                                                Height="14"
+                                                IconBrush="{atom:SharedTokenResource ColorTextSecondary}"
+                                                VerticalAlignment="Center"/>
+                            <atom:IconPresenter IsVisible="{Binding IsGroup}"
+                                                Icon="{antdicons:AntDesignIconProvider Kind=FolderOpenOutlined}"
+                                                Width="14"
+                                                Height="14"
+                                                IconBrush="{atom:SharedTokenResource ColorTextSecondary}"
+                                                VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Name}"
+                                       FontSize="12"
+                                       MaxWidth="180"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                    </TreeDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+
+            <atom:TextBlock Grid.Row="2"
+                            Classes="cx-meta"
+                            IsVisible="{Binding !SessionNodes.Count}"
+                            Margin="12,8"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Text="{Binding EmptyText}"/>
+        </Grid>
+    </Border>
+</UserControl>

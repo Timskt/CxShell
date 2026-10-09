@@ -1171,6 +1171,9 @@ public partial class MainWindow : Window
             case "tunnels":
                 vm.ShowSshTunnelCenterCommand.Execute(null);
                 break;
+            case "sidebar":
+                vm.ToggleSessionSidebarCommand.Execute(null);
+                break;
             case "agent":
                 vm.ToggleAgentPanelVisibility();
                 ApplyAgentPanelLayout(vm);

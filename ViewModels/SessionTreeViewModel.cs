@@ -112,6 +112,7 @@ public partial class SessionTreeViewModel : ObservableObject
     public string MoveUpText => L.Text("SessionManager.MoveUp");
     public string MoveDownText => L.Text("SessionManager.MoveDown");
     public string SearchPlaceholderText => L.Text("SessionManager.SearchPlaceholder");
+    public string EmptyText => L.Text("SessionManager.Empty");
     public string ConnectText => L.Text("Toolbar.Connect");
     public string DiagnosticsText => L.Text("Diagnostics.Title");
     public string CloseText => L.Text("SessionManager.Close");

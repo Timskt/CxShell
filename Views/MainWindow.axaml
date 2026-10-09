@@ -473,7 +473,7 @@
             </DockPanel>
         </Border>
 
-        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,*">
             <Border Grid.Column="0"
                     Classes="cx-nav-rail"
                     IsVisible="{Binding IsMainChromeVisible}">
@@ -481,14 +481,18 @@
                             Margin="0,8"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Top">
-                    <atom:Button Classes="cx-nav-item"
-                                 Command="{Binding ShowSessionManagerCommand}"
-                                 atom:ToolTip.Tip="{Binding SessionManagerToolTip}"
-                                 atom:ToolTip.Placement="Right">
-                        <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=FolderOpenOutlined}"
-                                            Width="18"
-                                            Height="18"/>
-                    </atom:Button>
+                    <Panel>
+                        <Border Classes="cx-nav-item-active"
+                                IsVisible="{Binding IsSessionSidebarVisible}"/>
+                        <atom:Button Classes="cx-nav-item"
+                                     Command="{Binding ToggleSessionSidebarCommand}"
+                                     atom:ToolTip.Tip="{Binding SessionManagerToolTip}"
+                                     atom:ToolTip.Placement="Right">
+                            <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=FolderOpenOutlined}"
+                                                Width="18"
+                                                Height="18"/>
+                        </atom:Button>
+                    </Panel>
                     <Panel>
                         <Border Classes="cx-nav-item-active"
                                 IsVisible="{Binding IsSftpPanelVisible}"/>
@@ -553,8 +557,14 @@
                 </StackPanel>
             </Border>
 
+            <Border Grid.Column="1"
+                    Width="252"
+                    IsVisible="{Binding IsSessionSidebarVisible}">
+                <views:SessionSidebarView DataContext="{Binding SessionTree, x:CompileBindings=False}"/>
+            </Border>
+
             <Grid x:Name="MainContentGrid"
-                  Grid.Column="1"
+                  Grid.Column="2"
                   Background="{atom:SharedTokenResource ColorBgLayout}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0"/>
