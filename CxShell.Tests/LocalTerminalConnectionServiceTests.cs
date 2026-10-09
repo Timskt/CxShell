@@ -11,11 +11,15 @@ namespace CxShell.Tests;
 /// local shell has end to end, and it is what a screenshot cannot show: whether
 /// bytes actually come back.
 ///
-/// Gated on CXSHELL_TEST_PTY=1: forking a child from the multithreaded test host
-/// aborts it on the GitHub ubuntu runner (the run reports "Test host process
-/// crashed" with zero failed tests), and it is not yet established whether the
-/// container or the product is at fault. Set the variable to run them; they pass
-/// on macOS and on a normal Linux desktop.
+/// Gated on CXSHELL_TEST_PTY=1 because both tests in one process abort the GitHub
+/// ubuntu test host ("Test host process crashed", no test result reported at all).
+/// Measured with --blame: the disconnect test alone passes on the same runner, and
+/// both pass together on macOS - so it is two pty sessions coming and going in one
+/// process, not either path by itself. The likeliest cause is that the forkpty child
+/// inherits the parent's descriptors and so keeps the runner's results channel open;
+/// if that is right it is a harness artifact, though the same inheritance in the app
+/// is worth fixing on its own terms. Issues are disabled on this fork, so this is the
+/// record. Set the variable to run them; verified passing on macOS.
 /// </summary>
 public sealed class LocalTerminalConnectionServiceTests
 {
