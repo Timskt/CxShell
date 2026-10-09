@@ -176,6 +176,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     public string DisconnectText => _localization.Text("Toolbar.Disconnect");
     public string DisconnectToolTip => _localization.Text("Toolbar.DisconnectTip");
     public string SftpToolTip => _localization.Text("Toolbar.SftpTip");
+    public string AllTabsText => _localization.Text("Toolbar.AllTabs");
     public string MonitorText => _localization.Text("Toolbar.Monitor");
     public string MonitorToolTip => _localization.Text("Toolbar.MonitorTip");
     public string TunnelsText => _localization.Text("Toolbar.Tunnels");
@@ -1152,6 +1153,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(DisconnectText));
         OnPropertyChanged(nameof(DisconnectToolTip));
         OnPropertyChanged(nameof(SftpToolTip));
+        OnPropertyChanged(nameof(AllTabsText));
         OnPropertyChanged(nameof(MonitorText));
         OnPropertyChanged(nameof(MonitorToolTip));
         OnPropertyChanged(nameof(TunnelsText));
